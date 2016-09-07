@@ -1,4 +1,5 @@
 var bodyParser = require('body-parser');
+var config = require('config');
 var cookieParser = require('cookie-parser');
 var express = require('express');
 var favicon = require('serve-favicon');
