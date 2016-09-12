@@ -1,7 +1,7 @@
 extends layout
 
 block extraHeader
-	script(type="text/javascript" src="/js/accounts.js")
+	script(type="text/javascript" src="/js/index.js")
 
 block content
 	div.container
@@ -10,12 +10,12 @@ block content
 				h1.text-center.login-title Sign in to Budget
 					div.account-wall
 						img(class='profile-img', src='https://lh5.googleusercontent.com/-b0-k99FZlyE/AAAAAAAAAAI/AAAAAAAAAAA/eu7opA4byxI/photo.jpg?sz=120')
-						form(class='form-signin' onsubmit='logIn(event);')
+						form.form-signin(data-bind='submit: logIn')
 							input(type='text', name='username', id='username', class='form-control', placeholder='Username',required, autofocus)
 							input(type='password', name='password', id='password', class='form-control', placeholder='Password', required)
 							button(class='btn btn-lg btn-primary btn-block', type='submit') Sign in
 							span.clearfix
 					a(href='/register', class='text-center new-account') Create an account
 					#message
-					if message
-						h1.text-center.error-message #{message}
+					//- if message
+					h1.text-center.error-message(id='error-message') #{message}

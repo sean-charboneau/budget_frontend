@@ -21,13 +21,26 @@ var authenticate = function(req, res, next) {
 	return next();
 };
 
+var logOut = function(req, res, opts) {
+	res.clearCookie('seanBudgetToken');
+	var error = opts.error || 0;
+	return res.redirect('/?error=' + error);
+}
+
+var ERRORS = {
+	0: "",
+	1: "Your session has expired, please log in again"
+}
+
 /* GET login page. */
 router.get('/', function(req, res) {
-	if(req.cookies && req.cookies['seanBudgetToken']) {
+	var errorCode = req.query.error || 0;
+	if(req.cookies && req.cookies['seanBudgetToken'] && !errorCode) {
 		return res.redirect('/home');
 	}
 	// Display the Login page with any flash message, if any
-	res.render('index');
+	console.log('MESSAGE: ' + ERRORS[errorCode]);
+	res.render('index', {message: ERRORS[errorCode]});
 });
 
 /* Handle Login POST */
@@ -46,8 +59,9 @@ router.post('/login', function(req, res) {
 });
 
 /* GET Registration Page */
-router.get('/register', function(req, res){
-	res.render('register');
+router.get('/register', function(req, res) {
+	var currency = require('../data/currency.json');
+	res.render('register', {currency: JSON.stringify(currency)});
 });
 
 /* Handle Registration POST */
@@ -57,6 +71,7 @@ router.post('/register', function(req, res) {
 			return res.json({error: err}); //TODO error flash
 		}
 		if(httpResponse.statusCode == 401) {
+			console.log(httpResponse);
 			return res.json({error: 'Invalid login'});
 		}
 		var bodyObj = JSON.parse(body);
@@ -73,8 +88,12 @@ router.get('/home', authenticate, function(req, res) {
 		if(err || !body) {
 			console.log(err);
 			console.log(body);
-			return res.redirect('/');
+			return logOut(req, res, {error: 0})
 		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		console.log('all good');
 		console.log(JSON.parse(body));
 		
 		return res.render('home', { user: JSON.parse(body) });
