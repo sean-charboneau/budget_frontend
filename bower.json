@@ -1,0 +1,6 @@
+{
+  "name": "budget",
+  "dependencies": {
+    "slideout.js": "https://github.com/mango/slideout.git#^0.1.12"
+  }
+}

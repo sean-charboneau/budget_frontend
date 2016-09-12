@@ -10,11 +10,12 @@ block content
 				h1.text-center.login-title Registration Details
 					div.signup-wall
 						form.form-signin(data-bind='submit: register')
-							input(type='text', name='username', id='username', class='form-control', placeholder='Username',required, autofocus)
-							input(type='password', name='password', id='password', class='form-control nomargin', placeholder='Password', required)
-							input(type='email', name='email', id='email', class='form-control', placeholder='Email',required)
-							input(type='text', name='firstName', id='firstName', class='form-control', placeholder='First Name',required)
-							input(type='text', name='lastName', id='lastName', class='form-control', placeholder='Last Name',required)
+							input.form-control(type='text', data-bind='value: username', name='username', placeholder='Username', required, autofocus)
+							input.form-control.nomargin(type='password', data-bind='value: password', name='password', placeholder='Password', required)
+							input.form-control(type='email', data-bind='value: email', name='email', placeholder='Email', required)
+							input.form-control(type='text', data-bind='value: firstName', name='firstName', placeholder='First Name', required)
+							input.form-control(type='text', data-bind='value: lastName', name='lastName', placeholder='Last Name', required)
+							select.form-control(data-bind='options: currencies, optionsText: "display_name", value: selectedCurrency, optionsCaption: "Choose Home Currency"', required)
 							button(class='btn btn-lg btn-primary btn-block', type='submit') Register
 							span.clearfix
 					#message
@@ -23,9 +24,17 @@ block content
 	script.
 		var vm = new RegisterViewModel();
 		var currencies = !{currency};
-		vm.currencies = ko.observable(currencies);
+		var currencyArr = [];
+		for(var key in currencies) {
+			if(currencies.hasOwnProperty(key)) {
+				var curr = currencies[key];
+				console.log(curr);
+				currencyArr.push(curr);
+			}
+		}
+		vm.currencies = ko.observableArray(currencyArr);
 		
 		$(document).ready(function() {
-			ko.applyBindings(vm);
 			console.log(vm.currencies());
+			ko.applyBindings(vm);
 		});
