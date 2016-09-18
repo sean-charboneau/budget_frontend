@@ -1,0 +1,36 @@
+.cash-reserves {
+    width: 100%;
+    height: 250px;
+    border: 1px solid black;
+    padding: 16px;
+    position: relative;
+}
+
+.cash-reserves .title {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.cash-reserves .amount {
+    font-size: 16px;
+    /*font-size: 16vw;*/
+}
+
+.cash-reserves .positive {
+    color: green;
+}
+
+.cash-reserves .negative {
+    color: red;
+}
+
+.cash-reserves .withdraw {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+.cash-reserves .withdraw button {
+    width: 100%;
+}

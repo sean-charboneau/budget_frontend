@@ -82,6 +82,11 @@ router.post('/register', function(req, res) {
 
 /* GET Home Page */
 router.get('/home', authenticate, function(req, res) {
+	var currency = require('../data/currency.json');
+	return res.render('home', {currency: JSON.stringify(currency)});
+});
+
+router.get('/profile', authenticate, function(req, res) {
 	console.log('PAGE');
 	console.log(req.cookies['seanBudgetToken']);
 	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
@@ -96,12 +101,13 @@ router.get('/home', authenticate, function(req, res) {
 		console.log('all good');
 		console.log(JSON.parse(body));
 		
-		return res.render('home', { user: JSON.parse(body) });
-	})
+		return res.render('profile', { user: JSON.parse(body) });
+	});
 });
 
 /* Handle Logout */
 router.get('/signout', function(req, res) {
+	console.log(req.user);
 	req.logout();
 	res.redirect('/');
 });

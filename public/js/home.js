@@ -1,8 +1,12 @@
-var signOut = function() {
-    deleteCookie('seanBudgetToken');
-    window.location = '/';
-};
+var HomeViewModel = function() {
+    var self = this;
 
-var deleteCookie = function(name) {
-    document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+    self.cashLoading = ko.observable(true);
+    self.trajectoryLoadng = ko.observable(true);
+    self.transactionsLoading = ko.observable(true);
+
+    self.cashReserves = ko.observable(0);
+    self.cashReservesClass = ko.computed(function() {
+        return self.cashReserves() < 0 ? 'negative' : 'positive';
+    });
 };

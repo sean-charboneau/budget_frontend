@@ -1,7 +1,6 @@
 var RegisterViewModel = function() {
     var self = this;
 
-    self.selectedCurrency = ko.observable();
     self.username = ko.observable();
     self.password = ko.observable();
     self.email = ko.observable();
@@ -9,7 +8,6 @@ var RegisterViewModel = function() {
     self.lastName = ko.observable();
 
     self.register = function () {
-        console.log(self.selectedCurrency());
         $.ajax({
             type: 'POST',
             url: '/register',
@@ -19,7 +17,7 @@ var RegisterViewModel = function() {
                 email: self.email(),
                 firstName: self.firstName(),
                 lastName: self.lastName(),
-                baseCurrency: self.selectedCurrency().code
+                baseCurrency: $('.currency-dropdown').val()
             },
             success: function(data) {
                 if(!data || data.error) {
@@ -30,8 +28,8 @@ var RegisterViewModel = function() {
                         type: 'POST',
                         url: '/login',
                         data: {
-                            username: username,
-                            password: password
+                            username: self.username(),
+                            password: self.password()
                         },
                         success: function(data) {
                             if(!data || data.error) {

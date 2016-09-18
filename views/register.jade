@@ -15,7 +15,8 @@ block content
 							input.form-control(type='email', data-bind='value: email', name='email', placeholder='Email', required)
 							input.form-control(type='text', data-bind='value: firstName', name='firstName', placeholder='First Name', required)
 							input.form-control(type='text', data-bind='value: lastName', name='lastName', placeholder='Last Name', required)
-							select.form-control(data-bind='options: currencies, optionsText: "display_name", value: selectedCurrency, optionsCaption: "Choose Home Currency"', required)
+							select.form-control.currency-dropdown(required)
+								option
 							button(class='btn btn-lg btn-primary btn-block', type='submit') Register
 							span.clearfix
 					#message
@@ -24,17 +25,40 @@ block content
 	script.
 		var vm = new RegisterViewModel();
 		var currencies = !{currency};
-		var currencyArr = [];
-		for(var key in currencies) {
-			if(currencies.hasOwnProperty(key)) {
-				var curr = currencies[key];
-				console.log(curr);
-				currencyArr.push(curr);
-			}
-		}
-		vm.currencies = ko.observableArray(currencyArr);
-		
+		vm.currencies = ko.observableArray(currencies);
+
 		$(document).ready(function() {
-			console.log(vm.currencies());
 			ko.applyBindings(vm);
+			var formatOption = function(item) {
+				if (!item.icon) { return item.display_name; }
+				var $item = $(
+					'<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.display_name + '</span>'
+				);
+				return $item;
+			}
+			$('.currency-dropdown').select2({
+				data: vm.currencies(),
+				matcher: function(params, data) {
+					var term = $.trim(params.term);
+					if (term === '') {
+						return data;
+					}
+					if(data.id === '') {
+						return null;
+					}
+					if(data.display_name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+						return data;
+					}
+					return null;
+				},
+				placeholder: {
+					id: '',
+					display_name: 'Home Currency',
+					icon: '_unknown'
+				},
+				templateResult: formatOption,
+				templateSelection: formatOption,
+				theme: 'bootstrap'
+			});
+			$('.select2-selection').css('height', 'auto');
 		});
