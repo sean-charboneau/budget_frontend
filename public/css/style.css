@@ -285,3 +285,19 @@ body.nav-expanded {
 .select2-selection__rendered {
     text-align: left;
 }
+
+.m-none {
+    margin: 0px;
+}
+
+.m-bottom {
+    margin-bottom: 15px;
+}
+
+.m-top {
+    margin-top: 15px;
+}
+
+.bootstrap-datetimepicker-widget {
+    z-index:1151 !important;
+}

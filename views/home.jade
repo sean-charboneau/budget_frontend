@@ -2,6 +2,7 @@ extends layout
 
 block extraHeader
     script(type='text/javascript' src='/js/home.js')
+    script(type='text/javascript' src='/js/bindings/datepicker.js')
     link(rel='stylesheet', href='/css/home.css')
 
 block content
@@ -14,29 +15,96 @@ block content
                 div.cash-reserves
                     div.title.text-center
                         span Cash Reserves
-                    div.amount.text-center(data-bind='text: cashReserves, css: cashReservesClass')
+                    div.amount.text-center(data-bind='foreach: cashReserves')
+                        span(data-bind='text: amount + " " + currency') 
+                        br
+                        span Worth: 
+                        span(data-bind='text: worth + " " + base')
+                        hr
                     div.withdraw
                         button.btn.btn-primary.btn-lg(type='button', data-toggle='modal', data-target='#withdrawalModal') + Withdrawal
     
         //- Modals
-        #withdrawalModal.modal.fade(tabindex='-1', role='dialog', aria-labelledby='withdrawalModalLabel')
+        #withdrawalModal.modal.fade(role='dialog', aria-labelledby='withdrawalModalLabel')
             .modal-dialog(role='document')
                 .modal-content
                     .modal-header
                         button.close(type='button', data-dismiss='modal', aria-label='Close')
                             span(aria-hidden='true') ×
-                        h4#withdrawalModalLabel.modal-title Add Withdrawal
-                    .modal-body
-                        
+                        h4#withdrawalModalLabel.modal-title Record Withdrawal
+                    .modal-body(style='overflow: hidden')
+                        form
+                            div.input-group.m-none
+                                label(for='withdrawalAmountInput') Withdrawal Amount
+                                input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount')
+                            label.m-top(for='withdrawalCurrency') Currency
+                            select.form-control.currency-dropdown(required)
+                                option
+                            small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
+                            br
+                            label.m-top(for='withdrawalDate') Date
+                            div.input-group.m-none
+                                input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                                span.input-group-addon
+                                    i.fa.fa-calendar
+                            div.form-check
+                                label.form-check-label.m-top
+                                    input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
+                                    |    This withdrawal incurred a transaction fee
+                            div.input-group.m-none(data-bind='visible: isTransactionFee')
+                                label.m-top(for='transactionFee') Fee Amount
+                                input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee')
+
                     .modal-footer
-                        button.btn.btn-default(type='button', data-dismiss='modal') Close
-                        button.btn.btn-primary(type='button') Save changes
+                        button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+                        button.btn.btn-primary(type='button', data-bind='click: saveWithdrawal, disabled: savingWithdrawal') Save
 
 
 
     script.
         var vm = new HomeViewModel();
+        var currencies = !{currency};
+        vm.currencies = ko.observableArray(currencies);
         
         $(document).ready(function() {
             ko.applyBindings(vm);
+            var formatOption = function(item) {
+                if (!item.icon) { return item.display_name; }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.display_name + '</span>'
+                );
+                return $item;
+            };
+            var formatSelection = function(item) {
+                if (!item.icon) { return item.display_name; }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.id + '</span>'
+                );
+                return $item;
+            };
+            $('.currency-dropdown').select2({
+                data: vm.currencies(),
+                matcher: function(params, data) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return data;
+                    }
+                    if(data.id === '') {
+                        return null;
+                    }
+                    if(data.display_name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    return null;
+                },
+                placeholder: {
+                    id: '',
+                    display_name: 'Home Currency',
+                    icon: '_unknown'
+                },
+                templateResult: formatOption,
+                templateSelection: formatSelection,
+                theme: 'bootstrap'
+            });
+            $('.select2-selection').css('height', 'auto');
         });

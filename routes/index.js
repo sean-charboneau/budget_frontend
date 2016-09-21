@@ -71,12 +71,37 @@ router.post('/register', function(req, res) {
 			return res.json({error: err}); //TODO error flash
 		}
 		if(httpResponse.statusCode == 401) {
-			console.log(httpResponse);
 			return res.json({error: 'Invalid login'});
 		}
 		var bodyObj = JSON.parse(body);
 		bodyObj.cookie = httpResponse.headers['set-cookie'][0];
 		return res.json(bodyObj);
+	});
+});
+
+router.post('/withdrawal', authenticate, function(req, res) {
+	request.post({url: config.get('api.hostname') + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+
+		return res.json(body);
+	});
+});
+
+router.get('/cashReserves', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + '/cashReserves', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
+		return res.json(body);
 	});
 });
 
@@ -91,15 +116,11 @@ router.get('/profile', authenticate, function(req, res) {
 	console.log(req.cookies['seanBudgetToken']);
 	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
-			console.log(err);
-			console.log(body);
-			return logOut(req, res, {error: 0})
+			return logOut(req, res, {error: 0});
 		}
 		if(JSON.parse(body).message == 'jwt expired') {
 			return logOut(req, res, {error: 1});
 		}
-		console.log('all good');
-		console.log(JSON.parse(body));
 		
 		return res.render('profile', { user: JSON.parse(body) });
 	});

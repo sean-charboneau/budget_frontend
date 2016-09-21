@@ -1,0 +1,8 @@
+{
+  "name": "budget",
+  "dependencies": {
+    "eonasdan-bootstrap-datetimepicker": "^4.17.42",
+    "slidebars": "^2.0.2",
+    "font-awesome": "^4.6.3"
+  }
+}
