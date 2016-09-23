@@ -17,7 +17,7 @@ var HomeViewModel = function() {
             message: "Please enter the transaction fee"
         },
         deferValidation: true
-    });;
+    });
     self.withdrawalAmount = ko.observable().extend({
         gt: {
             val: 0,
@@ -30,9 +30,9 @@ var HomeViewModel = function() {
         deferValidation: true
     });
     self.withdrawalDate = ko.observable(moment());
-    self.withdrawalCurrency = ko.observable();
     self.withdrawalError = ko.observable();
-    $('.currency-dropdown').on('change', function() {
+    self.withdrawalCurrency = ko.observable();
+    $('#withdrawalCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.withdrawalCurrency(this.value);
     });
@@ -122,7 +122,44 @@ var HomeViewModel = function() {
         });
     };
 
-    self.loadCashReserves();
+    self.transactionError = ko.observable();
+    self.transactionType = ko.observable('cash');
+    self.transactionAmount = ko.observable().extend({
+        gt: {
+            val: 0,
+            message: 'Value must be positive'
+        },
+        required: {
+            val: true,
+            message: "Please enter the transaction amount"
+        },
+        deferValidation: true
+    });
+    self.transactionCurrency = ko.observable();
+    $('#transactionCurrency').on('change', function() {
+        // Hacky way to make select2 observable
+        self.transactionCurrency(this.value);
+    });
+    self.transactionDate = ko.observable(moment());
+    self.transactionSplit = ko.observable(false);
+    self.transactionEnd = ko.observable(moment());
+    self.transactionDateLabel = ko.computed(function() {
+        return self.transactionSplit() ? 'Start Date' : 'Date';
+    });
+    self.toggleTransactionSplit = function() {
+        self.transactionSplit(!self.transactionSplit());
+    };
+    self.transactionSplitText = ko.computed(function() {
+        return self.transactionSplit() ? 'Use single date' : 'Split transaction over a range of dates';
+    });
+    self.unassociatedTransaction = ko.observable(false);
+    self.canSubmitTransaction = ko.computed(function() {
+        return true;
+    });
+
+    self.saveTransaction = function() {
+
+    };
 
     self.setItem = function(item, value) {
         if (typeof(Storage) !== "undefined") {
@@ -140,5 +177,5 @@ var HomeViewModel = function() {
             return null;
         }
     }
-    self.setItem('lastWithdrawalCurrency', null);
+    self.loadCashReserves();
 };

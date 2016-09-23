@@ -294,8 +294,16 @@ body.nav-expanded {
     margin-bottom: 15px;
 }
 
+.m-bottom-small {
+    margin-bottom: 5px;
+}
+
 .m-top {
     margin-top: 15px;
+}
+
+.m-top-small {
+    margin-top: 5px;
 }
 
 .form-error {
@@ -308,4 +316,13 @@ body.nav-expanded {
     font-weight: bold;
     display: inline-block;
     margin-bottom: 5px;
+}
+
+.select2 {
+    width: 100% !important;
+}
+
+.question {
+    padding: 4px;
+    background-color: transparent;
 }

@@ -3,6 +3,7 @@ extends layout
 block extraHeader
     script(type='text/javascript' src='/js/home.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
+    script(type='text/javascript' src='/js/bindings/popover.js')
     link(rel='stylesheet', href='/css/home.css')
 
 block content
@@ -32,9 +33,76 @@ block content
                 div.section.transactions
                     div.title.text-center
                         span Transactions
-                        
+                        button.btn.btn-primary(type='button', data-toggle='modal', data-target='#transactionModal') +
+
 
         //- Modals
+        #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                            span(aria-hidden='true') ×
+                        h4#transactionModalLabel.modal-title Record Transaction
+                    .modal-body
+                        span.error-message(data-bind='visible: transactionError, text: transactionError')
+                        div.form-group
+                            label.radio-inline
+                                input(type='radio', name='transactionType', value='cash', data-bind='checked: transactionType')
+                                | Cash
+                            label.radio-inline
+                                input(type='radio', name='transactionType', value='credit', data-bind='checked: transactionType')
+                                | Credit
+                        div.form-group.m-none
+                            div.row
+                                div.amount-input.col-md-8(data-bind='css: { "has-error": transactionAmount.canValidate() && transactionAmount.errors().length }')
+                                    label(for='transactionAmountInput') Transaction Amount
+                                    input.form-control(type='number', min='0', id='transactionAmountInput', data-bind='value: transactionAmount, valueUpdate: "afterkeydown"')
+                                    //ko if: transactionAmount.canValidate() && transactionAmount.errors().length
+                                    //ko foreach: transactionAmount.errors
+                                    span.form-error(data-bind='text: message')
+                                    // /ko
+                                    // /ko
+                                div.currency-input.col-md-4
+                                    label(for='transactionCurrency') Currency
+                                    select.form-control.currency-dropdown#transactionCurrency(required)
+                                        option
+                                    small.form-text.text-muted.m-bottom The currency in which you paid
+                                    br
+                        div.form-group.m-none
+                            div.row
+                                div.col-md-6
+                                    label(for='transactionDate', data-bind='text: transactionDateLabel')
+                                    div.input-group
+                                        input.form-control(id='transactionDate', data-bind='dateTimePicker: transactionDate', type='text')
+                                        span.input-group-addon
+                                            i.fa.fa-calendar
+                                div.col-md-6(data-bind='visible: transactionSplit')
+                                    label(for='transactionEnd') End Date
+                                    div.input-group
+                                        input.form-control(id='transactionEnd', data-bind='dateTimePicker: transactionEnd', type='text')
+                                        span.input-group-addon
+                                            i.fa.fa-calendar
+                            div.row.m-top-small
+                                div.col-md-12
+                                    a(href='#' data-bind='click: toggleTransactionSplit, text: transactionSplitText')
+
+                        div.form-group.m-none.m-top
+                            div.country-input
+                                label(for='withdrawalCountry') Country
+                                select.form-control.country-dropdown#withdrawalCountry(required)
+                                    option
+                        div.do-not-associate
+                            label.form-check-label
+                                input.form-check-input(type='checkbox', value='', data-bind='checked: unassociatedTransaction')
+                                | Do not associate this transaction with a country
+                                button.btn.btn-sm.question(data-bind='popover: { options: { content: "If selected, this transaction will not show up in any country\'s expenses.  It will show up in its own Unassigned category.", trigger: "hover" } }')
+                                    i.fa.fa-question-circle-o
+                    .modal-footer
+                        button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+                        button.btn.btn-primary(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
+
+
         #withdrawalModal.modal.fade(role='dialog', aria-labelledby='withdrawalModalLabel')
             .modal-dialog(role='document')
                 .modal-content
@@ -43,38 +111,40 @@ block content
                             span(aria-hidden='true') ×
                         h4#withdrawalModalLabel.modal-title Record Withdrawal
                     .modal-body
-                        form
-                            span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
-                            div.form-group.m-none(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
-                                label(for='withdrawalAmountInput') Withdrawal Amount
-                                input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
-                                //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
-                                //ko foreach: withdrawalAmount.errors
-                                span.form-error(data-bind='text: message')
-                                // /ko
-                                // /ko
-                            label.m-top(for='withdrawalCurrency') Currency
-                            select.form-control.currency-dropdown(required)
-                                option
-                            small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
-                            br
-                            label.m-top(for='withdrawalDate') Date
-                            div.input-group.m-none
-                                input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
-                                span.input-group-addon
-                                    i.fa.fa-calendar
-                            div.form-check
-                                label.form-check-label.m-top
-                                    input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
-                                    |    This withdrawal incurred a transaction fee
-                            div.input-group.m-none(data-bind='visible: isTransactionFee, css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
-                                label.m-top(for='transactionFee', data-bind='text: transactionFeeLabel')
-                                input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
-                                //ko if: transactionFee.canValidate() && transactionFee.errors().length
-                                //ko foreach: transactionFee.errors
-                                span.form-error(data-bind='text: message')
-                                // /ko
-                                // /ko
+                        span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
+                        div.row
+                            div.amount-input.col-md-9
+                                div.form-group.m-none(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
+                                    label(for='withdrawalAmountInput') Withdrawal Amount
+                                    input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
+                                    //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
+                                    //ko foreach: withdrawalAmount.errors
+                                    span.form-error(data-bind='text: message')
+                                    // /ko
+                                    // /ko
+                            div.currency-input.col-md-3
+                                label(for='withdrawalCurrency') Currency
+                                select.form-control.currency-dropdown#withdrawalCurrency(required)
+                                    option
+                                //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
+                                br
+                        label(for='withdrawalDate') Date
+                        div.input-group.m-none
+                            input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                            span.input-group-addon
+                                i.fa.fa-calendar
+                        div.form-check
+                            label.form-check-label.m-top
+                                input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
+                                | This withdrawal incurred a transaction fee
+                        div.input-group.m-none(data-bind='visible: isTransactionFee, css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                            label.m-top(for='transactionFee', data-bind='text: transactionFeeLabel')
+                            input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
+                            //ko if: transactionFee.canValidate() && transactionFee.errors().length
+                            //ko foreach: transactionFee.errors
+                            span.form-error(data-bind='text: message')
+                            // /ko
+                            // /ko
 
                     .modal-footer
                         button.btn.btn-default(type='button', data-dismiss='modal') Cancel
@@ -88,16 +158,27 @@ block content
         var countries = !{countries};
         vm.currencyArr = ko.observableArray(currencies);
         vm.currencyObj = ko.observable({});
-        vm.countries = ko.observable(countries);
+        vm.countryArr = ko.observableArray([]);
+        vm.countryObj = ko.observable(countries);
 
         // Preload flag images
         var images = new Array()
+        var noImage = ['BQ', 'BV', 'GF', 'GP', 'HM', 'IO', 'PM', 'RE', 'SJ', 'SX', 'UM', 'XK'];
         function preload(src) {
             images.push(new Image());
             images[images.length - 1].src = src;
         }
+        for(var key in vm.countryObj().countries) {
+            if(vm.countryObj().countries.hasOwnProperty(key)) {
+                var country = vm.countryObj().countries[key];
+                if(noImage.indexOf(key) == -1) {
+                    preload('images/flags/16/' + key + '.png');
+                }
+                country.id = key;
+                vm.countryArr.push(country);
+            }
+        }
         for(var i = 0; i < vm.currencyArr().length; i++) {
-            preload('images/flags/16/' + vm.currencyArr()[i].icon + '.png');
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }
         vm.formatCurrency(2000, 'COP');
@@ -142,9 +223,55 @@ block content
                 templateSelection: formatSelection,
                 theme: 'bootstrap'
             });
-            $('.select2-selection').css('height', 'auto');
+
+            var formatCountryOption = function(item) {
+                var code = item.id || '_unknown';
+                if(noImage.indexOf(code) > -1) {
+                    code = '_unknown';
+                }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + code + '.png" class="img-flag" /> ' + item.name + '</span>'
+                );
+                return $item;
+            };
+            $('.country-dropdown').select2({
+                data: vm.countryArr(),
+                matcher: function(params, data) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return data;
+                    }
+                    if(data.id === '') {
+                        return null;
+                    }
+                    if(data.name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    if(data.native.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    return null;
+                },
+                placeholder: {
+                    id: '',
+                    name: 'Select Country',
+                    icon: '_unknown'
+                },
+                templateResult: formatCountryOption,
+                templateSelection: formatCountryOption,
+                theme: 'bootstrap'
+            });
+            //- $('.select2-selection').css('height', 'auto');
+
+
+
+
             var lastWithdrawalCurrency = vm.getItem('lastWithdrawalCurrency');
             if(lastWithdrawalCurrency) {
-                $('.currency-dropdown').val(lastWithdrawalCurrency).trigger('change');
+                $('#withdrawalCurrency').val(lastWithdrawalCurrency).trigger('change');
+            }
+            var lastTransactionCurrency = vm.getItem('lastTransactionCurrency');
+            if(lastTransactionCurrency) {
+                $('#transactionCurrency').val(lastTransactionCurrency).trigger('change');
             }
         });
