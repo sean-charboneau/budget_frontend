@@ -12,18 +12,28 @@ block content
                 h1.text-center.login-title Home
         div.row
             div.col-md-4
-                div.cash-reserves
+                div.section.cash-reserves
                     div.title.text-center
                         span Cash Reserves
                     div.amount.text-center(data-bind='foreach: cashReserves')
-                        span(data-bind='text: amount + " " + currency') 
+                        span(data-bind='text: $root.formatCurrency(amount, currency)') 
                         br
                         span Worth: 
-                        span(data-bind='text: worth + " " + base')
+                        span(data-bind='text: $root.formatCurrency(worth, base)')
                         hr
                     div.withdraw
                         button.btn.btn-primary.btn-lg(type='button', data-toggle='modal', data-target='#withdrawalModal') + Withdrawal
-    
+            div.col-md-8
+                div.section.budget-tracker
+                    div.title.text-center
+                        span Budget
+        div.row
+            div.col-md-12
+                div.section.transactions
+                    div.title.text-center
+                        span Transactions
+                        
+
         //- Modals
         #withdrawalModal.modal.fade(role='dialog', aria-labelledby='withdrawalModalLabel')
             .modal-dialog(role='document')
@@ -34,9 +44,15 @@ block content
                         h4#withdrawalModalLabel.modal-title Record Withdrawal
                     .modal-body
                         form
-                            div.input-group.m-none
+                            span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
+                            div.form-group.m-none(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
                                 label(for='withdrawalAmountInput') Withdrawal Amount
-                                input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount')
+                                input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
+                                //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
+                                //ko foreach: withdrawalAmount.errors
+                                span.form-error(data-bind='text: message')
+                                // /ko
+                                // /ko
                             label.m-top(for='withdrawalCurrency') Currency
                             select.form-control.currency-dropdown(required)
                                 option
@@ -51,20 +67,40 @@ block content
                                 label.form-check-label.m-top
                                     input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
                                     |    This withdrawal incurred a transaction fee
-                            div.input-group.m-none(data-bind='visible: isTransactionFee')
-                                label.m-top(for='transactionFee') Fee Amount
-                                input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee')
+                            div.input-group.m-none(data-bind='visible: isTransactionFee, css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                                label.m-top(for='transactionFee', data-bind='text: transactionFeeLabel')
+                                input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
+                                //ko if: transactionFee.canValidate() && transactionFee.errors().length
+                                //ko foreach: transactionFee.errors
+                                span.form-error(data-bind='text: message')
+                                // /ko
+                                // /ko
 
                     .modal-footer
                         button.btn.btn-default(type='button', data-dismiss='modal') Cancel
-                        button.btn.btn-primary(type='button', data-bind='click: saveWithdrawal, disabled: savingWithdrawal') Save
+                        button.btn.btn-primary(type='button', data-bind='click: saveWithdrawal, enable: canSubmitWithdrawal') Save
 
 
 
     script.
         var vm = new HomeViewModel();
         var currencies = !{currency};
-        vm.currencies = ko.observableArray(currencies);
+        var countries = !{countries};
+        vm.currencyArr = ko.observableArray(currencies);
+        vm.currencyObj = ko.observable({});
+        vm.countries = ko.observable(countries);
+
+        // Preload flag images
+        var images = new Array()
+        function preload(src) {
+            images.push(new Image());
+            images[images.length - 1].src = src;
+        }
+        for(var i = 0; i < vm.currencyArr().length; i++) {
+            preload('images/flags/16/' + vm.currencyArr()[i].icon + '.png');
+            vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
+        }
+        vm.formatCurrency(2000, 'COP');
         
         $(document).ready(function() {
             ko.applyBindings(vm);
@@ -83,7 +119,7 @@ block content
                 return $item;
             };
             $('.currency-dropdown').select2({
-                data: vm.currencies(),
+                data: vm.currencyArr(),
                 matcher: function(params, data) {
                     var term = $.trim(params.term);
                     if (term === '') {
@@ -107,4 +143,8 @@ block content
                 theme: 'bootstrap'
             });
             $('.select2-selection').css('height', 'auto');
+            var lastWithdrawalCurrency = vm.getItem('lastWithdrawalCurrency');
+            if(lastWithdrawalCurrency) {
+                $('.currency-dropdown').val(lastWithdrawalCurrency).trigger('change');
+            }
         });

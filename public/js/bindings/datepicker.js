@@ -11,7 +11,7 @@ ko.bindingHandlers.dateTimePicker = {
         ko.utils.registerEventHandler(element, "dp.change", function (event) {
             var value = valueAccessor();
             if (ko.isObservable(value)) {
-                if (event.date != null && !(event.date instanceof Date)) {
+                if (event.date && !(event.date instanceof Date)) {
                     value(event.date.toDate());
                 } else {
                     value(event.date);
@@ -33,8 +33,11 @@ ko.bindingHandlers.dateTimePicker = {
         if (picker) {
             var koDate = ko.utils.unwrapObservable(valueAccessor());
 
-            //in case return from server datetime i am get in this form for example /Date(93989393)/ then fomat this
-            koDate = (typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
+            koDate = (koDate && typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
+            
+            if(!koDate) {
+                koDate = moment();
+            }
 
             picker.date(koDate);
         }

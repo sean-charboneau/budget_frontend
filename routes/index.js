@@ -108,7 +108,8 @@ router.get('/cashReserves', authenticate, function(req, res) {
 /* GET Home Page */
 router.get('/home', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
-	return res.render('home', {currency: JSON.stringify(currency)});
+	var countries = require('../data/countries.json');
+	return res.render('home', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
 });
 
 router.get('/profile', authenticate, function(req, res) {

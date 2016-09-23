@@ -7,9 +7,60 @@ var HomeViewModel = function() {
     
     self.isTransactionFee = ko.observable(false);
     self.savingWithdrawal = ko.observable(false);
-    self.transactionFee = ko.observable();
-    self.withdrawalAmount = ko.observable();
+    self.transactionFee = ko.observable().extend({
+        gt: {
+            val: 0,
+            message: 'Value must be positive'
+        },
+        required: {
+            val: true,
+            message: "Please enter the transaction fee"
+        },
+        deferValidation: true
+    });;
+    self.withdrawalAmount = ko.observable().extend({
+        gt: {
+            val: 0,
+            message: 'Value must be positive'
+        },
+        required: {
+            val: true,
+            message: "Please enter the amount you withdrew from the ATM"
+        },
+        deferValidation: true
+    });
     self.withdrawalDate = ko.observable(moment());
+    self.withdrawalCurrency = ko.observable();
+    self.withdrawalError = ko.observable();
+    $('.currency-dropdown').on('change', function() {
+        // Hacky way to make select2 observable
+        self.withdrawalCurrency(this.value);
+    });
+    self.transactionFeeLabel = ko.computed(function() {
+        var message = "Fee Amount";
+        if(self.withdrawalCurrency()) {
+            return message + " (in " + self.withdrawalCurrency() + ")";
+        }
+        return message;
+    });
+    self.canSubmitWithdrawal = ko.computed(function() {
+        if(self.savingWithdrawal()) {
+            return false;
+        }
+        if(self.withdrawalAmount.errors().length) {
+            return false;
+        }
+        if(!self.withdrawalCurrency()) {
+            return false;
+        }
+        if(!self.withdrawalDate()) {
+            return false;
+        }
+        if(self.isTransactionFee() && self.transactionFee.errors().length) {
+            return false;
+        }
+        return true;
+    });
 
     self.cashReserves = ko.observableArray([]);
     self.cashReservesClass = ko.computed(function() {
@@ -22,12 +73,17 @@ var HomeViewModel = function() {
             type: 'GET',
             url: '/cashReserves',
             success: function(data) {
-                console.log(typeof JSON.parse(data));
                 self.cashReserves(JSON.parse(data));
-                console.log(self.cashReserves());
                 self.cashReservesLoading(false);
             }
         })
+    };
+
+    self.formatCurrency = function(amount, currency) {
+        var currencyOptions = self.currencyObj()[currency];
+        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits}) +
+            ' ' +
+            currency;
     };
 
     self.saveWithdrawal = function() {
@@ -44,18 +100,45 @@ var HomeViewModel = function() {
                 currency: $('.currency-dropdown').val()
             },
             success: function(data) {
-                $('#withdrawalModal').modal('hide');
+                data = JSON.parse(data);
                 self.savingWithdrawal(false);
                 self.cashReservesLoading(false);
+                if(data.error) {
+                    self.withdrawalError("Error: " + data.error);
+                    return;
+                }
+                $('#withdrawalModal').modal('hide');
                 self.isTransactionFee(false);
                 self.withdrawalAmount(null);
                 self.transactionFee(null);
+                self.withdrawalError(null);
+                self.withdrawalAmount.canValidate(false);
+                self.transactionFee.canValidate(false);
                 self.withdrawalDate(moment());
-                console.log(data);
-                self.cashReserves(JSON.parse(data));
+                self.setItem('lastWithdrawalCurrency', $('.currency-dropdown').val());
+
+                self.cashReserves(data);
             }
         });
     };
 
     self.loadCashReserves();
+
+    self.setItem = function(item, value) {
+        if (typeof(Storage) !== "undefined") {
+            localStorage.setItem(item, value);
+        } else {
+            console.log('No support for localStorage in browser.');
+        }
+    }
+
+    self.getItem = function(item) {
+        if (typeof(Storage) !== "undefined") {
+            return localStorage.getItem(item);
+        } else {
+            console.log('No support for localStorage in browser.');
+            return null;
+        }
+    }
+    self.setItem('lastWithdrawalCurrency', null);
 };
