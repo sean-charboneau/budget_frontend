@@ -322,6 +322,20 @@ body.nav-expanded {
     width: 100% !important;
 }
 
+.category-option {
+    color: black;
+    text-align: center;
+}
+
+.category-option:hover {
+    cursor: pointer;
+    color: blue;
+}
+
+.category-icon {
+    font-size: 48px;
+}
+
 .question {
     padding: 4px;
     background-color: transparent;

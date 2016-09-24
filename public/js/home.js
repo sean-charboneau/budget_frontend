@@ -32,6 +32,21 @@ var HomeViewModel = function() {
     self.withdrawalDate = ko.observable(moment());
     self.withdrawalError = ko.observable();
     self.withdrawalCurrency = ko.observable();
+    self.isEarnedCash = ko.observable(false);
+    self.openWithdrawalModal = function() {
+        self.isEarnedCash(false);
+        $('#withdrawalModal').modal('show');
+    };
+    self.openCashModal = function() {
+        self.isEarnedCash(true);
+        $('#withdrawalModal').modal('show');
+    };
+    self.withdrawalModalTitleText = ko.computed(function() {
+        return self.isEarnedCash() ? 'Record Earned Cash' : 'Record Withdrawal';
+    });
+    self.withdrawalModalAmountText = ko.computed(function() {
+        return self.isEarnedCash() ? 'Amount Earned' : 'Amount Withdrawn';
+    });
     $('#withdrawalCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.withdrawalCurrency(this.value);
@@ -81,7 +96,7 @@ var HomeViewModel = function() {
 
     self.formatCurrency = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
-        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits}) +
+        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits}) +
             ' ' +
             currency;
     };
@@ -97,7 +112,8 @@ var HomeViewModel = function() {
                 date: self.withdrawalDate().toISOString(),
                 isFee: self.isTransactionFee(),
                 feeAmount: self.isTransactionFee() ? self.transactionFee() : 0,
-                currency: $('.currency-dropdown').val()
+                currency: $('#withdrawalCurrency').val(),
+                isEarnedCash: self.isEarnedCash()
             },
             success: function(data) {
                 data = JSON.parse(data);
@@ -115,7 +131,7 @@ var HomeViewModel = function() {
                 self.withdrawalAmount.canValidate(false);
                 self.transactionFee.canValidate(false);
                 self.withdrawalDate(moment());
-                self.setItem('lastWithdrawalCurrency', $('.currency-dropdown').val());
+                self.setItem('lastWithdrawalCurrency', $('#withdrawalCurrency').val());
 
                 self.cashReserves(data);
             }
@@ -151,6 +167,10 @@ var HomeViewModel = function() {
     };
     self.transactionSplitText = ko.computed(function() {
         return self.transactionSplit() ? 'Use single date' : 'Split transaction over a range of dates';
+    });
+    self.transactionDescription = ko.observable('');
+    self.descriptionRemainingLength = ko.computed(function() {
+        return self.transactionDescription() ? self.transactionDescription().length + '/255' : '';
     });
     self.unassociatedTransaction = ko.observable(false);
     self.canSubmitTransaction = ko.computed(function() {

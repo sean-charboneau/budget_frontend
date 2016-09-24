@@ -24,7 +24,7 @@
     right: 0;
 }
 
-.cash-reserves .withdraw button {
+.cash-reserves .withdraw .btn-group {
     width: 100%;
 }
 
