@@ -3,18 +3,7 @@ var express = require('express');
 var request = require('request');
 var router = express.Router();
 
-var redis = require('../redis');
-
 var authenticate = function(req, res, next) {
-	// redis.get(config.get('storage.token'), function (err, value) {
-	// 	if(err || !value) {
-	// 		// if the user is not authenticated then redirect him to the login page
-	// 		return res.redirect('/');
-	// 	}
-	// 	return next();
-	// });
-	console.log('AUTH');
-	console.log(req.cookies);
 	if(!req.cookies || !req.cookies['seanBudgetToken']) {
 		return res.redirect('/');
 	}
@@ -88,6 +77,32 @@ router.post('/withdrawal', authenticate, function(req, res) {
 			return logOut(req, res, {error: 1});
 		}
 
+		return res.json(body);
+	});
+});
+
+router.post('/transaction', authenticate, function(req, res) {
+	request.post({url: config.get('api.hostname') + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+
+		return res.json(body);
+	});
+})
+
+router.get('/categories', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
 		return res.json(body);
 	});
 });

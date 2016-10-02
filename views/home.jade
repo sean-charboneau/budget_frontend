@@ -96,8 +96,8 @@ block content
 
                         div.form-group.m-none.m-top
                             div.country-input
-                                label(for='withdrawalCountry') Country
-                                select.form-control.country-dropdown#withdrawalCountry(required)
+                                label(for='transactionCountry') Country
+                                select.form-control.country-dropdown#transactionCountry(required)
                                     option
                         div.do-not-associate
                             label.form-check-label
@@ -108,42 +108,15 @@ block content
                         div.form-group.m-none
                             label Category
                             div.row
+                                // ko foreach: categories
                                 div.col-md-2
-                                    div.row.category-option
+                                    div.row.category-option(data-bind='click: $root.categoryClicked, css: { "category-selected": $root.selectedCategory() && ($root.selectedCategory().id == id) }')
+                                        input.category-value(type='hidden', data-bind='value: id')
                                         div.col-md-12.category-icon
-                                            i.fa.fa-cutlery
-                                        div.col-md-12
-                                            span Food and Drink
-                                div.col-md-2
-                                    div.row.category-option
-                                        div.col-md-12.category-icon
-                                            i.fa.fa-bed
-                                        div.col-md-12
-                                            span Accommodation
-                                div.col-md-2
-                                    div.row.category-option
-                                        div.col-md-12.category-icon
-                                            i.fa.fa-car
-                                        div.col-md-12
-                                            span Transportation
-                                div.col-md-2
-                                    div.row.category-option
-                                        div.col-md-12.category-icon
-                                            i.fa.fa-binoculars
-                                        div.col-md-12
-                                            span Sightseeing
-                                div.col-md-2
-                                    div.row.category-option
-                                        div.col-md-12.category-icon
-                                            i.fa.fa-glass
-                                        div.col-md-12
-                                            span Alcohol
-                                div.col-md-2
-                                    div.row.category-option
-                                        div.col-md-12.category-icon
-                                            i.fa.fa-ellipsis-h
-                                        div.col-md-12
-                                            span Miscellaneous
+                                            i(data-bind='attr: { "class": "fa fa-" + icon }')
+                                        div.col-md-12.category-label
+                                            span(data-bind='text: $root.toTitleCase(category)')
+                                // /ko
                         div.form-group.m-none.m-top
                             label(for='descriptionInput') Description (optional)
                             label.pull-right(data-bind='text: descriptionRemainingLength')
@@ -319,6 +292,12 @@ block content
             });
             $('#transactionModal').on('shown.bs.modal', function() {
                 $('#transactionAmountInput').focus();
+            });
+            $('#transactionCurrency').on("select2:select", function (e) {
+                $('#transactionDate').focus();
+            });
+            $('#withdrawalCurrency').on("select2:select", function (e) {
+                $('#withdrawalDate').focus();
             });
 
             var lastWithdrawalCurrency = vm.getItem('lastWithdrawalCurrency');

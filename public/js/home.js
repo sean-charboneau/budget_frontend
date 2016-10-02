@@ -88,6 +88,7 @@ var HomeViewModel = function() {
             type: 'GET',
             url: '/cashReserves',
             success: function(data) {
+                console.log(data);
                 self.cashReserves(JSON.parse(data));
                 self.cashReservesLoading(false);
             }
@@ -112,7 +113,7 @@ var HomeViewModel = function() {
                 date: self.withdrawalDate().toISOString(),
                 isFee: self.isTransactionFee(),
                 feeAmount: self.isTransactionFee() ? self.transactionFee() : 0,
-                currency: $('#withdrawalCurrency').val(),
+                currency: self.withdrawalCurrency(),
                 isEarnedCash: self.isEarnedCash()
             },
             success: function(data) {
@@ -131,7 +132,7 @@ var HomeViewModel = function() {
                 self.withdrawalAmount.canValidate(false);
                 self.transactionFee.canValidate(false);
                 self.withdrawalDate(moment());
-                self.setItem('lastWithdrawalCurrency', $('#withdrawalCurrency').val());
+                self.setItem('lastWithdrawalCurrency', self.withdrawalCurrency());
 
                 self.cashReserves(data);
             }
@@ -139,6 +140,7 @@ var HomeViewModel = function() {
     };
 
     self.transactionError = ko.observable();
+    self.savingTransaction = ko.observable(false);
     self.transactionType = ko.observable('cash');
     self.transactionAmount = ko.observable().extend({
         gt: {
@@ -156,6 +158,11 @@ var HomeViewModel = function() {
         // Hacky way to make select2 observable
         self.transactionCurrency(this.value);
     });
+    self.transactionCountry = ko.observable();
+    $('#transactionCountry').on('change', function() {
+        // Hacky way to make select2 observable
+        self.transactionCountry(this.value);
+    });
     self.transactionDate = ko.observable(moment());
     self.transactionSplit = ko.observable(false);
     self.transactionEnd = ko.observable(moment());
@@ -172,13 +179,107 @@ var HomeViewModel = function() {
     self.descriptionRemainingLength = ko.computed(function() {
         return self.transactionDescription() ? self.transactionDescription().length + '/255' : '';
     });
+    self.categoriesLoading = ko.observable(false);
+    self.categories = ko.observableArray([]);
+    self.selectedCategory = ko.observable();
+    self.loadCategories = function() {
+        self.categoriesLoading(true);
+        $.ajax({
+            type: 'GET',
+            url: '/categories',
+            success: function(data) {
+                self.categories(JSON.parse(data));
+                self.categoriesLoading(false);
+            }
+        })
+    };
+    self.getCategoryById = function(id) {
+        console.log(id);
+        for(var i = 0; i < self.categories().length; i++) {
+            if(self.categories()[i].id == id) {
+                console.log(self.categories()[i]);
+                return self.categories()[i];
+            }
+        }
+    }
+    self.categoryClicked = function(item, event) {
+        var categoryId = $(event.currentTarget).find('input').val();
+        self.selectedCategory(self.getCategoryById(categoryId));
+    };
     self.unassociatedTransaction = ko.observable(false);
     self.canSubmitTransaction = ko.computed(function() {
+        if(self.savingTransaction()) {
+            return false;
+        }
+        if(self.transactionAmount.errors().length) {
+            return false;
+        }
+        if(!self.transactionCurrency()) {
+            return false;
+        }
+        if(!self.transactionDate()) {
+            return false;
+        }
+        if(!self.selectedCategory()) {
+            return false;
+        }
+        if(!self.unassociatedTransaction() && !self.transactionCountry()) {
+            return false;
+        }
+        if(!self.selectedCategory()) {
+            return false;
+        }
         return true;
     });
 
     self.saveTransaction = function() {
+        self.savingTransaction(true);
+        self.transactionsLoading(true);
+        var body = {
+            type: self.transactionType(),
+            amount: self.transactionAmount(),
+            currency: self.transactionCurrency(),
+            date: self.transactionDate().toISOString(),
+            categoryId: self.selectedCategory().id,
+            description: self.transactionDescription()
+        };
+        if(self.transactionSplit()) {
+            body.endDate = self.transactionEnd().toISOString();
+        }
+        if(!self.unassociatedTransaction()) {
+            body.country = self.transactionCountry();
+        }
+        $.ajax({
+            type: 'POST',
+            url: '/transaction',
+            data: body,
+            success: function(data) {
+                data = JSON.parse(data);
+                console.log(data);
+                self.savingTransaction(false);
+                self.transactionsLoading(false);
+                if(data.error) {
+                    self.transactionError("Error: " + data.error);
+                    return;
+                }
+                $('#transactionModal').modal('hide');
+                self.transactionAmount(null);
+                self.transactionError(null);
+                self.transactionAmount.canValidate(false);
+                self.transactionDate(moment());
+                self.transactionEnd(moment());
+                self.unassociatedTransaction(false);
+                self.transactionSplit(false);
+                self.setItem('lastTransactionCurrency', self.transactionCurrency());
+                self.setItem('lastTransactionCountry', self.transactionCountry());
 
+                // self.transactions(data);
+            }
+        });
+    };
+
+    self.toTitleCase = function(str) {
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
     };
 
     self.setItem = function(item, value) {
@@ -198,4 +299,5 @@ var HomeViewModel = function() {
         }
     }
     self.loadCashReserves();
+    self.loadCategories();
 };

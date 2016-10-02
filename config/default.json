@@ -4,10 +4,6 @@
         "key": "mykey"
     },
     "port": "8088",
-    "redis": {
-        "hostname": "127.0.0.1",
-        "port": "6379"
-    },
     "storage": {
         "token": "seanBudgetToken",
         "user": "seanBudgetUser"

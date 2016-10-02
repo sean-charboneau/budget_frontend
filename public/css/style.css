@@ -329,11 +329,19 @@ body.nav-expanded {
 
 .category-option:hover {
     cursor: pointer;
-    color: blue;
+    color: darkgray;
 }
 
 .category-icon {
     font-size: 48px;
+}
+
+.category-selected {
+    color: red;
+}
+
+.category-selected:hover {
+    color: darkred;
 }
 
 .question {
