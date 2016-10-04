@@ -41,7 +41,34 @@ block content
                     div.title.text-center
                         span Transactions
                         button.btn.btn-primary(type='button', data-toggle='modal', data-target='#transactionModal') +
-
+                    div.transaction-table
+                        table.table.table-striped
+                            thead
+                                tr
+                                    th #
+                                    th Type
+                                    th Amount
+                                    th Value
+                                    th Category
+                                    th Date
+                                    th Country
+                            tbody
+                                // ko foreach: transactions
+                                tr
+                                    td(data-bind='text: ($index() + 1)')
+                                    td(data-bind='text: $root.toTitleCase(type)')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
+                                        span(data-bind='text: amount + " " + currency')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
+                                        span(data-bind='text: base_amount + " " + base_currency')
+                                    td(data-bind='text: $root.toTitleCase(category)')
+                                    td(data-bind='text: moment(date).format("YYYY-MM-DD")')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
+                                        span(data-bind='text: $root.getNameForCountry(country)')
+                                // /ko
 
         //- Modals
         #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')
@@ -196,7 +223,11 @@ block content
             if(vm.countryObj().countries.hasOwnProperty(key)) {
                 var country = vm.countryObj().countries[key];
                 if(noImage.indexOf(key) == -1) {
+                    vm.countryObj().countries[key].icon = key;
                     preload('images/flags/16/' + key + '.png');
+                }
+                else {
+                    vm.countryObj().countries[key].icon = '_unknown';
                 }
                 country.id = key;
                 vm.countryArr.push(country);
@@ -307,5 +338,9 @@ block content
             var lastTransactionCurrency = vm.getItem('lastTransactionCurrency');
             if(lastTransactionCurrency) {
                 $('#transactionCurrency').val(lastTransactionCurrency).trigger('change');
+            }
+            var lastTransactionCountry = vm.getItem('lastTransactionCountry');
+            if(lastTransactionCountry) {
+                $('#transactionCountry').val(lastTransactionCountry).trigger('change');
             }
         });

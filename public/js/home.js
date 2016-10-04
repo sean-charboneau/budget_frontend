@@ -139,6 +139,7 @@ var HomeViewModel = function() {
         });
     };
 
+    self.transactions = ko.observableArray([]);
     self.transactionError = ko.observable();
     self.savingTransaction = ko.observable(false);
     self.transactionType = ko.observable('cash');
@@ -194,7 +195,6 @@ var HomeViewModel = function() {
         })
     };
     self.getCategoryById = function(id) {
-        console.log(id);
         for(var i = 0; i < self.categories().length; i++) {
             if(self.categories()[i].id == id) {
                 console.log(self.categories()[i]);
@@ -273,9 +273,37 @@ var HomeViewModel = function() {
                 self.setItem('lastTransactionCurrency', self.transactionCurrency());
                 self.setItem('lastTransactionCountry', self.transactionCountry());
 
-                // self.transactions(data);
+                self.transactions(data);
+                self.loadCashReserves();
             }
         });
+    };
+
+    self.loadRecentTransactions = function() {
+        $.ajax({
+            type: 'GET',
+            url: '/transaction',
+            success: function(data) {
+                data = JSON.parse(data);
+                console.log(data);
+                console.log(self.countryObj);
+                self.transactions(data);
+            }
+        })
+    };
+
+    self.getIconForCountry = function(country) {
+        if(!country) {
+            return 'images/flags/16/_unknown.png';
+        }
+        return 'images/flags/16/' + self.countryObj().countries[country].icon + '.png';
+    };
+
+    self.getNameForCountry = function(country) {
+        if(!country) {
+            return 'Unassociated';
+        }
+        return self.countryObj().countries[country].name;
     };
 
     self.toTitleCase = function(str) {
@@ -299,5 +327,6 @@ var HomeViewModel = function() {
         }
     }
     self.loadCashReserves();
+    self.loadRecentTransactions();
     self.loadCategories();
 };

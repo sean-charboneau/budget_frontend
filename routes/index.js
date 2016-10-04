@@ -92,7 +92,20 @@ router.post('/transaction', authenticate, function(req, res) {
 
 		return res.json(body);
 	});
-})
+});
+
+router.get('/transaction', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
+		return res.json(body);
+	});
+});
 
 router.get('/categories', authenticate, function(req, res) {
 	request.get({url: config.get('api.hostname') + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
