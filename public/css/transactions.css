@@ -1,0 +1,35 @@
+.section {
+    width: 100%;
+    padding: 16px;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.section .title {
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+.section .title .per-page {
+    font-size: 16px;
+}
+
+.amount-input {
+    padding-right: 0px;
+}
+
+.amount-input input {
+    border-radius: 4px 0px 0px 4px;
+}
+
+.currency-input {
+    padding-left: 0px;
+}
+
+.currency-input .select2-selection {
+    border-radius: 0px 4px 4px 0px;
+}
+
+.img-flag {
+    margin-right: 4px;
+}

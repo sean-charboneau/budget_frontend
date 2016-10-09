@@ -94,8 +94,15 @@ router.post('/transaction', authenticate, function(req, res) {
 	});
 });
 
+/* GET Transactions Page */
+router.get('/transactions', authenticate, function(req, res) {
+	var currency = require('../data/currency.json');
+	var countries = require('../data/countries.json');
+	return res.render('transactions', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+});
+
 router.get('/transaction', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}

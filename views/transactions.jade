@@ -1,0 +1,268 @@
+extends layout
+
+block extraHeader
+    script(type='text/javascript' src='/js/transactions.js')
+    script(type='text/javascript' src='/js/bindings/datepicker.js')
+    script(type='text/javascript' src='/js/bindings/popover.js')
+    link(rel='stylesheet', href='/css/transactions.css')
+
+block content
+    div.container
+        div.row
+            div.col-md-12
+                div.section.transactions
+                    div.title.text-center
+                        span Transactions
+                        button.btn.btn-primary(type='button', data-toggle='modal', data-target='#transactionModal') +
+                        div.pull-right.per-page
+                            span Per Page: 
+                            select(data-bind='options: filters.limitList, value: filters.limit')
+                    div.transaction-table
+                        .sk-folding-cube(data-bind='visible: transactionsLoading')
+                            .sk-cube1.sk-cube
+                            .sk-cube2.sk-cube
+                            .sk-cube4.sk-cube
+                            .sk-cube3.sk-cube
+                        table.table.table-striped(data-bind='visible: !transactionsLoading()')
+                            thead
+                                tr
+                                    th #
+                                    th Type
+                                    th Amount
+                                    th Value
+                                    th Category
+                                    th Date
+                                    th Country
+                            tbody
+                                // ko foreach: transactions
+                                tr
+                                    td(data-bind='text: ($index() + 1)')
+                                    td(data-bind='text: $root.toTitleCase(type)')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
+                                        span(data-bind='text: amount + " " + currency')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
+                                        span(data-bind='text: base_amount + " " + base_currency')
+                                    td(data-bind='text: $root.toTitleCase(category)')
+                                    td(data-bind='text: moment(date).format("YYYY-MM-DD")')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
+                                        span(data-bind='text: $root.getNameForCountry(country)')
+                                // /ko
+
+        //- Modals
+        #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')
+            .modal-dialog(role='document')
+                .modal-content
+                    .modal-header
+                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                            span(aria-hidden='true') ×
+                        h4#transactionModalLabel.modal-title Record Transaction
+                    .modal-body
+                        span.error-message(data-bind='visible: transactionError, text: transactionError')
+                        div.form-group
+                            label.radio-inline
+                                input(type='radio', name='transactionType', value='cash', data-bind='checked: transactionType')
+                                | Cash
+                            label.radio-inline
+                                input(type='radio', name='transactionType', value='credit', data-bind='checked: transactionType')
+                                | Credit
+                        div.form-group.m-none
+                            div.row
+                                div.amount-input.col-md-8(data-bind='css: { "has-error": transactionAmount.canValidate() && transactionAmount.errors().length }')
+                                    label(for='transactionAmountInput') Transaction Amount
+                                    input.form-control(type='number', min='0', id='transactionAmountInput', data-bind='value: transactionAmount, valueUpdate: "afterkeydown"')
+                                    //ko if: transactionAmount.canValidate() && transactionAmount.errors().length
+                                    //ko foreach: transactionAmount.errors
+                                    span.form-error(data-bind='text: message')
+                                    // /ko
+                                    // /ko
+                                div.currency-input.col-md-4
+                                    label(for='transactionCurrency') Currency
+                                    select.form-control.currency-dropdown#transactionCurrency(required)
+                                        option
+                                    small.form-text.text-muted.m-bottom The currency in which you paid
+                                    br
+                        div.form-group.m-none
+                            div.row
+                                div.col-md-6
+                                    label(for='transactionDate', data-bind='text: transactionDateLabel')
+                                    div.input-group
+                                        input.form-control(id='transactionDate', data-bind='dateTimePicker: transactionDate', type='text')
+                                        span.input-group-addon
+                                            i.fa.fa-calendar
+                                div.col-md-6(data-bind='visible: transactionSplit')
+                                    label(for='transactionEnd') End Date
+                                    div.input-group
+                                        input.form-control(id='transactionEnd', data-bind='dateTimePicker: transactionEnd', type='text')
+                                        span.input-group-addon
+                                            i.fa.fa-calendar
+                            div.row.m-top-small
+                                div.col-md-12
+                                    a(href='#' data-bind='click: toggleTransactionSplit, text: transactionSplitText')
+
+                        div.form-group.m-none.m-top
+                            div.country-input
+                                label(for='transactionCountry') Country
+                                select.form-control.country-dropdown#transactionCountry(required)
+                                    option
+                        div.do-not-associate
+                            label.form-check-label
+                                input.form-check-input(type='checkbox', value='', data-bind='checked: unassociatedTransaction')
+                                | Do not associate this transaction with a country
+                                button.btn.btn-sm.question(data-bind='popover: { options: { content: "If selected, this transaction will not show up in any country\'s expenses.  It will show up in its own Unassigned category.", trigger: "hover" } }')
+                                    i.fa.fa-question-circle-o
+                        div.form-group.m-none
+                            label Category
+                            div.row
+                                // ko foreach: categories
+                                div.col-md-2
+                                    div.row.category-option(data-bind='click: $root.categoryClicked, css: { "category-selected": $root.selectedCategory() && ($root.selectedCategory().id == id) }')
+                                        input.category-value(type='hidden', data-bind='value: id')
+                                        div.col-md-12.category-icon
+                                            i(data-bind='attr: { "class": "fa fa-" + icon }')
+                                        div.col-md-12.category-label
+                                            span(data-bind='text: $root.toTitleCase(category)')
+                                // /ko
+                        div.form-group.m-none.m-top
+                            label(for='descriptionInput') Description (optional)
+                            label.pull-right(data-bind='text: descriptionRemainingLength')
+                            textarea.form-control#descriptionInput(data-bind='value: transactionDescription, valueUpdate: "afterkeydown"')
+                                        
+                    .modal-footer
+                        button.btn.btn-default(type='button', data-dismiss='modal') Cancel
+                        button.btn.btn-primary(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
+
+
+    script.
+        var vm = new HomeViewModel();
+        var currencies = !{currency};
+        var countries = !{countries};
+        vm.currencyArr = ko.observableArray(currencies);
+        vm.currencyObj = ko.observable({});
+        vm.countryArr = ko.observableArray([]);
+        vm.countryObj = ko.observable(countries);
+
+        // Preload flag images
+        var images = new Array();
+        var noImage = ['BQ', 'BV', 'GF', 'GP', 'HM', 'IO', 'PM', 'RE', 'SJ', 'SX', 'UM', 'XK'];
+        function preload(src) {
+            images.push(new Image());
+            images[images.length - 1].src = src;
+        }
+        for(var key in vm.countryObj().countries) {
+            if(vm.countryObj().countries.hasOwnProperty(key)) {
+                var country = vm.countryObj().countries[key];
+                if(noImage.indexOf(key) == -1) {
+                    vm.countryObj().countries[key].icon = key;
+                    preload('images/flags/16/' + key + '.png');
+                }
+                else {
+                    vm.countryObj().countries[key].icon = '_unknown';
+                }
+                country.id = key;
+                vm.countryArr.push(country);
+            }
+        }
+        for(var i = 0; i < vm.currencyArr().length; i++) {
+            vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
+        }
+        vm.formatCurrency(2000, 'COP');
+        
+        $(document).ready(function() {
+            ko.applyBindings(vm);
+            var formatOption = function(item) {
+                if (!item.icon) { return item.display_name; }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.display_name + '</span>'
+                );
+                return $item;
+            };
+            var formatSelection = function(item) {
+                if (!item.icon) { return item.display_name; }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.id + '</span>'
+                );
+                return $item;
+            };
+            $('.currency-dropdown').select2({
+                data: vm.currencyArr(),
+                matcher: function(params, data) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return data;
+                    }
+                    if(data.id === '') {
+                        return null;
+                    }
+                    if(data.display_name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    return null;
+                },
+                placeholder: {
+                    id: '',
+                    display_name: 'Home Currency',
+                    icon: '_unknown'
+                },
+                templateResult: formatOption,
+                templateSelection: formatSelection,
+                theme: 'bootstrap'
+            });
+
+            var formatCountryOption = function(item) {
+                var code = item.id || '_unknown';
+                if(noImage.indexOf(code) > -1) {
+                    code = '_unknown';
+                }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + code + '.png" class="img-flag" /> ' + item.name + '</span>'
+                );
+                return $item;
+            };
+            $('.country-dropdown').select2({
+                data: vm.countryArr(),
+                matcher: function(params, data) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return data;
+                    }
+                    if(data.id === '') {
+                        return null;
+                    }
+                    if(data.name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    if(data.native.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    return null;
+                },
+                placeholder: {
+                    id: '',
+                    name: 'Select Country',
+                    icon: '_unknown'
+                },
+                templateResult: formatCountryOption,
+                templateSelection: formatCountryOption,
+                theme: 'bootstrap'
+            });
+            //- $('.select2-selection').css('height', 'auto');
+
+            $('#transactionModal').on('shown.bs.modal', function() {
+                $('#transactionAmountInput').focus();
+            });
+            $('#transactionCurrency').on("select2:select", function (e) {
+                $('#transactionDate').focus();
+            });
+
+            var lastTransactionCurrency = vm.getItem('lastTransactionCurrency');
+            if(lastTransactionCurrency) {
+                $('#transactionCurrency').val(lastTransactionCurrency).trigger('change');
+            }
+            var lastTransactionCountry = vm.getItem('lastTransactionCountry');
+            if(lastTransactionCountry) {
+                $('#transactionCountry').val(lastTransactionCountry).trigger('change');
+            }
+        });

@@ -92,6 +92,18 @@ ul.user-details{
     list-style: none;
 }
 
+.navbar {
+    min-height: 0px;
+}
+
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+}
+
 a.nav-expander {
   background: none repeat scroll 0 0 #FFFFFF;
   color: #000000;

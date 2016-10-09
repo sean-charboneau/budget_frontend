@@ -1,142 +1,14 @@
 var HomeViewModel = function() {
     var self = this;
 
-    self.cashReservesLoading = ko.observable(true);
-    self.trajectoryLoadng = ko.observable(true);
     self.transactionsLoading = ko.observable(true);
+    self.filtersLoading = ko.observable(true);
     
-    self.isTransactionFee = ko.observable(false);
-    self.savingWithdrawal = ko.observable(false);
-    self.transactionFee = ko.observable().extend({
-        gt: {
-            val: 0,
-            message: 'Value must be positive'
-        },
-        required: {
-            val: true,
-            message: "Please enter the transaction fee"
-        },
-        deferValidation: true
-    });
-    self.withdrawalAmount = ko.observable().extend({
-        gt: {
-            val: 0,
-            message: 'Value must be positive'
-        },
-        required: {
-            val: true,
-            message: "Please enter the amount you withdrew from the ATM"
-        },
-        deferValidation: true
-    });
-    self.withdrawalDate = ko.observable(moment());
-    self.withdrawalError = ko.observable();
-    self.withdrawalCurrency = ko.observable();
-    self.isEarnedCash = ko.observable(false);
-    self.openWithdrawalModal = function() {
-        self.isEarnedCash(false);
-        $('#withdrawalModal').modal('show');
-    };
-    self.openCashModal = function() {
-        self.isEarnedCash(true);
-        $('#withdrawalModal').modal('show');
-    };
-    self.withdrawalModalTitleText = ko.computed(function() {
-        return self.isEarnedCash() ? 'Record Earned Cash' : 'Record Withdrawal';
-    });
-    self.withdrawalModalAmountText = ko.computed(function() {
-        return self.isEarnedCash() ? 'Amount Earned' : 'Amount Withdrawn';
-    });
-    $('#withdrawalCurrency').on('change', function() {
-        // Hacky way to make select2 observable
-        self.withdrawalCurrency(this.value);
-    });
-    self.transactionFeeLabel = ko.computed(function() {
-        var message = "Fee Amount";
-        if(self.withdrawalCurrency()) {
-            return message + " (in " + self.withdrawalCurrency() + ")";
-        }
-        return message;
-    });
-    self.canSubmitWithdrawal = ko.computed(function() {
-        if(self.savingWithdrawal()) {
-            return false;
-        }
-        if(self.withdrawalAmount.errors().length) {
-            return false;
-        }
-        if(!self.withdrawalCurrency()) {
-            return false;
-        }
-        if(!self.withdrawalDate()) {
-            return false;
-        }
-        if(self.isTransactionFee() && self.transactionFee.errors().length) {
-            return false;
-        }
-        return true;
-    });
-
-    self.cashReserves = ko.observableArray([]);
-    self.cashReservesClass = ko.computed(function() {
-        return self.cashReserves() < 0 ? 'negative' : 'positive';
-    });
-
-    self.loadCashReserves = function() {
-        self.cashReservesLoading(true);
-        $.ajax({
-            type: 'GET',
-            url: '/cashReserves',
-            success: function(data) {
-                console.log(data);
-                self.cashReserves(JSON.parse(data));
-                self.cashReservesLoading(false);
-            }
-        })
-    };
-
     self.formatCurrency = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
         return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits}) +
             ' ' +
             currency;
-    };
-
-    self.saveWithdrawal = function() {
-        self.savingWithdrawal(true);
-        self.cashReservesLoading(true);
-        $.ajax({
-            type: 'POST',
-            url: '/withdrawal',
-            data: {
-                amount: self.withdrawalAmount(),
-                date: self.withdrawalDate().toISOString(),
-                isFee: self.isTransactionFee(),
-                feeAmount: self.isTransactionFee() ? self.transactionFee() : 0,
-                currency: self.withdrawalCurrency(),
-                isEarnedCash: self.isEarnedCash()
-            },
-            success: function(data) {
-                data = JSON.parse(data);
-                self.savingWithdrawal(false);
-                self.cashReservesLoading(false);
-                if(data.error) {
-                    self.withdrawalError("Error: " + data.error);
-                    return;
-                }
-                $('#withdrawalModal').modal('hide');
-                self.isTransactionFee(false);
-                self.withdrawalAmount(null);
-                self.transactionFee(null);
-                self.withdrawalError(null);
-                self.withdrawalAmount.canValidate(false);
-                self.transactionFee.canValidate(false);
-                self.withdrawalDate(moment());
-                self.setItem('lastWithdrawalCurrency', self.withdrawalCurrency());
-
-                self.cashReserves(data);
-            }
-        });
     };
 
     self.transactions = ko.observableArray([]);
@@ -180,6 +52,7 @@ var HomeViewModel = function() {
     self.descriptionRemainingLength = ko.computed(function() {
         return self.transactionDescription() ? self.transactionDescription().length + '/255' : '';
     });
+
     self.categoriesLoading = ko.observable(false);
     self.categories = ko.observableArray([]);
     self.selectedCategory = ko.observable();
@@ -279,15 +152,75 @@ var HomeViewModel = function() {
         });
     };
 
-    self.loadRecentTransactions = function() {
+    self.doSearch = function() {
+        if(self.filtersLoading()) {
+            return;
+        }
+        self.transactionsLoading(true);
+        var qs = self.buildQueryString();
+        console.log('/transaction' + (qs ? '?' + qs : ''));
         $.ajax({
             type: 'GET',
-            url: '/transaction',
+            url: '/transaction' + (qs ? '?' + qs : ''),
             success: function(data) {
-                data = JSON.parse(data);
-                self.transactions(data.results);
+                try {
+                    data = JSON.parse(data);
+                    console.log(data);
+                    self.transactions(data.results);
+                } catch(e) {
+                    self.transactions([]);
+                }
+                self.transactionsLoading(false);
             }
-        })
+        });
+    };
+    self.qsConcat = function(str1, str2) {
+        return (str1 ? str1 + '&' + str2 : str2);
+    }
+    self.buildQueryString = function() {
+        var qs = '';
+        if(self.filters.limit() !== self.defaultLimit) {
+            qs = self.qsConcat(qs, 'limit=' + self.filters.limit());
+        }
+        return qs;
+    };
+    self.defaultLimit = 10;
+    self.filters = {
+        limitList: ko.observableArray([10, 25, 50]),
+        limit: ko.observable(self.defaultLimit)
+    };
+    self.filters.limit.subscribe(function(val) {
+        console.log(val);
+        if(self.filtersLoading()) {
+            return;
+        }
+        var qs = self.buildQueryString();
+        history.pushState({id: 'filter'}, '', '/transactions' + (qs ? '?' + qs : ''));
+        console.log('change');
+        self.doSearch();
+    });
+
+    self.loadFiltersFromUrl = function() {
+        var limit = self.getQueryVariable('limit');
+        if(limit) {
+            try {
+                self.filters.limit(parseInt(limit));
+            } catch(e) {}
+        }
+        self.filtersLoading(false);
+        console.log('done loading filters');
+    };
+
+    self.getQueryVariable = function(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable) {
+                return pair[1];
+            }
+        }
+        return(false);
     };
 
     self.getIconForCountry = function(country) {
@@ -324,7 +257,7 @@ var HomeViewModel = function() {
             return null;
         }
     }
-    self.loadCashReserves();
-    self.loadRecentTransactions();
+    self.loadFiltersFromUrl();
+    self.doSearch();
     self.loadCategories();
 };
