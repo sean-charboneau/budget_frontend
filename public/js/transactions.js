@@ -195,10 +195,22 @@ var HomeViewModel = function() {
             return;
         }
         var qs = self.buildQueryString();
-        history.pushState({id: 'filter'}, '', '/transactions' + (qs ? '?' + qs : ''));
+        history.pushState({id: 'filters', limit: self.filters.limit()}, '', '/transactions' + (qs ? '?' + qs : ''));
         console.log('change');
         self.doSearch();
     });
+
+    window.onpopstate = function(e) {
+        self.filtersLoading(true);
+        if(e.state) {
+            self.filters.limit(e.state.limit);
+        }
+        else {
+            self.filters.limit(self.defaultLimit);
+        }
+        self.filtersLoading(false);
+        self.doSearch();
+    };
 
     self.loadFiltersFromUrl = function() {
         var limit = self.getQueryVariable('limit');
