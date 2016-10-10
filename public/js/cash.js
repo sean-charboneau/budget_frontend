@@ -127,20 +127,17 @@ var HomeViewModel = function() {
         }
         self.cashLoading(true);
         var qs = self.buildQueryString();
-        console.log('/withdrawal' + (qs ? '?' + qs : ''));
         $.ajax({
             type: 'GET',
             url: '/withdrawal' + (qs ? '?' + qs : ''),
             success: function(data) {
                 try {
                     data = JSON.parse(data);
-                    console.log(data);
                     for(var i = 0; i < data.results.length; i++) {
                         data.results[i].showDetails = ko.observable(false);
                         data.results[i].detailsFetched = ko.observable(false);
                         data.results[i].details = ko.observableArray([]);
                         data.results[i].toggleRowDetails = function() {
-                            //console.log(id);
                             var row = this;
                             row.showDetails(!row.showDetails());
                             if(row.detailsFetched()) {
@@ -178,7 +175,6 @@ var HomeViewModel = function() {
                                             });
                                         }
                                     }
-                                    console.log(data);
                                     row.details(transactionArr);
                                     row.detailsFetched(true);
                                 }
@@ -220,7 +216,6 @@ var HomeViewModel = function() {
         self.filters.page(1);
         var qs = self.buildQueryString();
         history.pushState({id: 'filters', limit: self.filters.limit()}, '', '/transactions' + (qs ? '?' + qs : ''));
-        console.log('change');
         self.doSearch();
     });
     self.pageDisplayText = ko.computed(function() {
@@ -234,7 +229,6 @@ var HomeViewModel = function() {
         return 'Displaying ' + (page * limit - limit + 1) + ' - ' + Math.min((page * limit), total) + ' of ' + total + ' results';
     });
     self.navigate = function(page) {
-        console.log(page);
         var lastPage = Math.ceil(self.totalResults() / self.filters.limit());
         if(page == 'first') {
             self.filters.page(1);
@@ -248,14 +242,8 @@ var HomeViewModel = function() {
         if(page == 'last') {
             self.filters.page(lastPage);
         }
-        console.log(self.filters.page());
         self.doSearch();
         return false;
-    };
-
-    self.toggleRowDetails = function(data, e) {
-        console.log(data);
-        console.log(e);
     };
 
     window.onpopstate = function(e) {
@@ -278,7 +266,6 @@ var HomeViewModel = function() {
             } catch(e) {}
         }
         self.filtersLoading(false);
-        console.log('done loading filters');
     };
 
     self.getQueryVariable = function(variable) {

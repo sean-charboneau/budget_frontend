@@ -168,8 +168,6 @@ router.get('/home', authenticate, function(req, res) {
 });
 
 router.get('/profile', authenticate, function(req, res) {
-	console.log('PAGE');
-	console.log(req.cookies['seanBudgetToken']);
 	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
@@ -184,7 +182,6 @@ router.get('/profile', authenticate, function(req, res) {
 
 /* Handle Logout */
 router.get('/signout', function(req, res) {
-	console.log(req.user);
 	req.logout();
 	res.redirect('/');
 });

@@ -88,7 +88,6 @@ var HomeViewModel = function() {
             type: 'GET',
             url: '/cashReserves',
             success: function(data) {
-                console.log(data);
                 self.cashReserves(JSON.parse(data));
                 self.cashReservesLoading(false);
             }
@@ -197,7 +196,6 @@ var HomeViewModel = function() {
     self.getCategoryById = function(id) {
         for(var i = 0; i < self.categories().length; i++) {
             if(self.categories()[i].id == id) {
-                console.log(self.categories()[i]);
                 return self.categories()[i];
             }
         }
@@ -255,7 +253,6 @@ var HomeViewModel = function() {
             data: body,
             success: function(data) {
                 data = JSON.parse(data);
-                console.log(data);
                 self.savingTransaction(false);
                 self.transactionsLoading(false);
                 if(data.error) {

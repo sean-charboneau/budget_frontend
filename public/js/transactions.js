@@ -70,7 +70,6 @@ var HomeViewModel = function() {
     self.getCategoryById = function(id) {
         for(var i = 0; i < self.categories().length; i++) {
             if(self.categories()[i].id == id) {
-                console.log(self.categories()[i]);
                 return self.categories()[i];
             }
         }
@@ -128,7 +127,6 @@ var HomeViewModel = function() {
             data: body,
             success: function(data) {
                 data = JSON.parse(data);
-                console.log(data);
                 self.savingTransaction(false);
                 self.transactionsLoading(false);
                 if(data.error) {
@@ -159,14 +157,12 @@ var HomeViewModel = function() {
         }
         self.transactionsLoading(true);
         var qs = self.buildQueryString();
-        console.log('/transaction' + (qs ? '?' + qs : ''));
         $.ajax({
             type: 'GET',
             url: '/transaction' + (qs ? '?' + qs : ''),
             success: function(data) {
                 try {
                     data = JSON.parse(data);
-                    console.log(data);
                     self.transactions(data.results);
                     self.totalResults(data.count);
                 } catch(e) {
@@ -216,7 +212,6 @@ var HomeViewModel = function() {
             limit: self.filters.limit(),
             withdrawalId: self.filters.withdrawalId()
         }, '', '/transactions' + (qs ? '?' + qs : ''));
-        console.log('change');
         self.doSearch();
     });
     self.pageDisplayText = ko.computed(function() {
@@ -230,7 +225,6 @@ var HomeViewModel = function() {
         return 'Displaying ' + (page * limit - limit + 1) + ' - ' + Math.min((page * limit), total) + ' of ' + total + ' results';
     });
     self.navigate = function(page) {
-        console.log(page);
         var lastPage = Math.ceil(self.totalResults() / self.filters.limit());
         if(page == 'first') {
             self.filters.page(1);
@@ -244,7 +238,6 @@ var HomeViewModel = function() {
         if(page == 'last') {
             self.filters.page(lastPage);
         }
-        console.log(self.filters.page());
         self.doSearch();
         return false;
     };
@@ -271,10 +264,8 @@ var HomeViewModel = function() {
             } catch(e) {}
         }
         var filters = self.getQueryVariable('filters');
-        console.log(filters);
         try {
             filters = JSON.parse(decodeURIComponent(filters));
-            console.log(filters);
         } catch(e) {
             filters = {};
         }
@@ -284,7 +275,6 @@ var HomeViewModel = function() {
             } catch(e) {}
         }
         self.filtersLoading(false);
-        console.log('done loading filters');
     };
 
     self.getQueryVariable = function(variable) {
