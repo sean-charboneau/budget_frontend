@@ -68,6 +68,26 @@ router.post('/register', function(req, res) {
 	});
 });
 
+/* GET Cash Page */
+router.get('/cash', authenticate, function(req, res) {
+	var currency = require('../data/currency.json');
+	var countries = require('../data/countries.json');
+	return res.render('cash', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+});
+
+router.get('/withdrawal', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
+		return res.json(body);
+	});
+});
+
 router.post('/withdrawal', authenticate, function(req, res) {
 	request.post({url: config.get('api.hostname') + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {

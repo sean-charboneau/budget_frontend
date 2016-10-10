@@ -10,6 +10,8 @@ html
     script(type='text/javascript', src='/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
     script(type='text/javascript', src='/bower_components/select2/dist/js/select2.min.js')
     script(type='text/javascript', src='/bower_components/underscore/underscore-min.js')
+    script(type='text/javascript', src='/js/material/ripples.min.js')
+    script(type='text/javascript', src='/js/material/material.min.js')
     script(type='text/javascript', src='/js/bindings/validation.js')
 
     link(rel='stylesheet', href='/bower_components/bootstrap/dist/css/bootstrap.min.css')
@@ -17,62 +19,105 @@ html
     link(rel='stylesheet', href='/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
     link(rel='stylesheet', href='/bower_components/select2/dist/css/select2.min.css')
     link(rel='stylesheet', href='/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.min.css')
-    link(rel='stylesheet', href='/css/style.css')
     link(rel='stylesheet', href='/css/loading.css')
+    link(rel='stylesheet', href='/css/material/ripples.min.css')
+    link(rel='stylesheet', href='/css/material/bootstrap-material-design.min.css')
+    link(rel='stylesheet', href='/css/style.css')
+
     block extraHeader
   body
-    .navbar.navbar-fixed-top
-      // Include your brand here
-      .navbar-header.pull-right
-        a#nav-expander.nav-expander.fixed
-          i.fa.fa-bars.fa-3x
-    nav
-      ul.list-unstyled.main-menu
-        // Include your navigation here
-        li.text-right
-          a#nav-close(href='#') X
-        li
-          a(href='/home')
-            i.fa.fa-home
-            | Home
-            span.icon
-        li
-          a(href='/transactions')
-            i.fa.fa-dollar
-            | Transactions
-            span.icon  
-        li
-          a(href='/profile')
-            i.fa.fa-user
-            | Profile
-            span.icon
-        li
-          a(href='#' onclick='signOut();')
-            i.fa.fa-sign-out
-            | Log Out
-            span.icon
+    section.wrapper
+        section.material-design-hamburger
+            button.material-design-hamburger__icon
+                span.material-design-hamburger__layer
+        section.menu.menu--off
+            div.menu-link(onclick='location.href = "/home"')
+                i.material-icons home
+                | Home
+            div.menu-link(onclick='location.href = "/transactions"')
+                i.material-icons show_chart
+                | Transactions
+            div.menu-link(onclick='location.href = "/cash"')
+                i.material-icons local_atm
+                | Cash
+            div.menu-link(onclick='location.href = "/profile"')
+                i.material-icons account_circle
+                | Profile
+            div.menu-link(onclick='signOut();')
+                i.material-icons power_settings_new
+                | Sign Out
+
+    //- .navbar.navbar-fixed-top
+    //-   // Include your brand here
+    //-   .navbar-header.pull-right
+    //-     a#nav-expander.nav-expander.fixed
+    //-       i.fa.fa-bars.fa-3x
+    //- nav
+    //-   ul.list-unstyled.main-menu
+    //-     // Include your navigation here
+    //-     li.text-right
+    //-       a#nav-close(href='#') X
+    //-     li
+    //-       a(href='/home')
+    //-         i.fa.fa-home
+    //-         | Home
+    //-         span.icon
+    //-     li
+    //-       a(href='/transactions')
+    //-         i.fa.fa-dollar
+    //-         | Transactions
+    //-         span.icon  
+    //-     li
+    //-       a(href='/profile')
+    //-         i.fa.fa-user
+    //-         | Profile
+    //-         span.icon
+    //-     li
+    //-       a(href='#' onclick='signOut();')
+    //-         i.fa.fa-sign-out
+    //-         | Log Out
+    //-         span.icon
     script.
       $(document).ready(function(){												
-
+        $.material.init()
         //Navigation Menu Slider
-        $('#nav-expander').on('click', function(e){
-      		e.preventDefault();
-      		$('body').toggleClass('nav-expanded');
-      	});
-      	$('#nav-close').on('click', function(e){
-      		e.preventDefault();
-      		$('body').removeClass('nav-expanded');
-      	});
+        //- $('#nav-expander').on('click', function(e){
+      	//- 	e.preventDefault();
+      	//- 	$('body').toggleClass('nav-expanded');
+      	//- });
+      	//- $('#nav-close').on('click', function(e){
+      	//- 	e.preventDefault();
+      	//- 	$('body').removeClass('nav-expanded');
+      	//- });
         $('.container').on('click', function(e) {
-          if($('body').hasClass('nav-expanded')) {
-            e.preventDefault();
-            $('body').removeClass('nav-expanded');
-          }
+            var child = $('.material-design-hamburger__layer');
+            if(child.hasClass('material-design-hamburger__icon--to-arrow')) {
+                e.preventDefault();
+                document.body.classList.toggle('background--blur');
+                $('.menu').removeClass('menu--on');
+                child.removeClass('material-design-hamburger__icon--to-arrow');
+                child.addClass('material-design-hamburger__icon--from-arrow');
+            }
+        });
+        document.querySelector('.material-design-hamburger__icon').addEventListener('click', function() {
+            var child;
+            
+            document.body.classList.toggle('background--blur');
+            this.parentNode.nextElementSibling.classList.toggle('menu--on');
+            child = this.childNodes[0].classList;
+
+            if (child.contains('material-design-hamburger__icon--to-arrow')) {
+                child.remove('material-design-hamburger__icon--to-arrow');
+                child.add('material-design-hamburger__icon--from-arrow');
+            } else {
+                child.remove('material-design-hamburger__icon--from-arrow');
+                child.add('material-design-hamburger__icon--to-arrow');
+            }
         });
 
         if(!document.cookie.match(/^(.*;)?seanBudgetToken=[^;]+(.*)?$/)) {
-          $('.navbar').remove();
-          $('nav').remove();
+            $('.navbar').remove();
+            $('nav').remove();
         }
       });
       

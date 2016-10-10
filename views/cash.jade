@@ -1,57 +1,79 @@
 extends layout
 
 block extraHeader
-    script(type='text/javascript' src='/js/transactions.js')
+    script(type='text/javascript' src='/js/cash.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
     script(type='text/javascript' src='/js/bindings/popover.js')
-    link(rel='stylesheet', href='/css/transactions.css')
+    link(rel='stylesheet', href='/css/cash.css')
 
 block content
     div.container
         div.row
             div.col-md-12
-                div.section.transactions
+                div.section.cash
                     .panel.panel-default.panel-table
                         .panel-heading
                             .row
                                 .col.col-xs-6
-                                    h3.panel-title Transactions
+                                    h3.panel-title Cash
                                 .col.col-xs-6.text-right
-                                    button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#transactionModal') Add New
+                                    button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#cashModal') Add New
                         .panel-body
-                            .sk-folding-cube(data-bind='visible: transactionsLoading')
+                            .sk-folding-cube(data-bind='visible: cashLoading')
                                 .sk-cube1.sk-cube
                                 .sk-cube2.sk-cube
                                 .sk-cube4.sk-cube
                                 .sk-cube3.sk-cube
-                            table.table.table-striped.table-bordered.table-list(display='none', data-bind='visible: !transactionsLoading()')
+                            table.table.table-striped.table-bordered.table-list(display='none', data-bind='visible: !cashLoading()')
                                 thead
                                     tr
                                         th #
                                         th Type
                                         th Amount
                                         th Value
-                                        th Category
                                         th Date
-                                        th Country
-                                        th Description
+                                        th Used
+                                        th.icon-column
                                 tbody
-                                    // ko foreach: transactions
-                                    tr
+                                    // ko foreach: cash
+                                    tr(data-bind='attr: { id: id }')
                                         td(data-bind='text: ($index() + 1)')
-                                        td(data-bind='text: $root.toTitleCase(type)')
+                                        td(data-bind='text: type')
                                         td
                                             img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
-                                            span(data-bind='text: amount + " " + currency')
+                                            span(data-bind='text: $root.formatCurrency(amount, currency)')
                                         td
                                             img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
-                                            span(data-bind='text: base_amount + " " + base_currency')
-                                        td(data-bind='text: $root.toTitleCase(category)')
+                                            span(data-bind='text: $root.formatCurrency(base_amount, base_currency)')
+                                            span.m-left-small(data-bind='visible: estimate') (E)
                                         td(data-bind='text: moment(date).format("YYYY-MM-DD")')
                                         td
-                                            img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
-                                            span(data-bind='text: $root.getNameForCountry(country)')
-                                        td(data-bind='text: description')
+                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
+                                            span(data-bind='text: $root.formatCurrency(used, currency) + " on " + transaction_count + " transactions"')
+                                        td.cursor-pointer(data-bind='click: toggleRowDetails')
+                                            i.details.material-icons(data-bind='text: showDetails() ? "keyboard_arrow_down" : "keyboard_arrow_right"')
+                                    tr(data-bind='visible: showDetails')
+                                        td(colspan='7', data-bind='visible: !detailsFetched()')
+                                            .sk-folding-cube
+                                                .sk-cube1.sk-cube
+                                                .sk-cube2.sk-cube
+                                                .sk-cube4.sk-cube
+                                                .sk-cube3.sk-cube
+                                        td(colspan='7', data-bind='visible: detailsFetched')
+                                            ul
+                                                // ko foreach: details
+                                                li
+                                                    span(data-bind='text:moment(date).format("YYYY-MM-DD")')
+                                                    ul
+                                                        // ko foreach: transactions
+                                                        li
+                                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
+                                                            span(data-bind='text: $root.formatCurrency(amount, currency) + " (worth "')
+                                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
+                                                            span(data-bind='text: $root.formatCurrency(base_amount, base_currency) + ") spent on " + category')
+                                                        // /ko
+                                                // /ko
+                                            a(data-bind='attr: { href: "/transactions?filters=" + encodeURIComponent(JSON.stringify({withdrawalId: id})) }') More Details
                                     // /ko
                         .panel-footer
                             .row
@@ -75,89 +97,53 @@ block content
                                             select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
-        #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')
+        #cashModal.modal.fade(role='dialog', aria-labelledby='cashModalLabel')
             .modal-dialog(role='document')
                 .modal-content
                     .modal-header
                         button.close(type='button', data-dismiss='modal', aria-label='Close')
                             span(aria-hidden='true') ×
-                        h4#transactionModalLabel.modal-title Record Transaction
+                        h4#cashModalLabel.modal-title(data-bind='text: cashModalTitleText')
                     .modal-body
-                        span.error-message(data-bind='visible: transactionError, text: transactionError')
-                        div.form-group
-                            label.radio-inline
-                                input(type='radio', name='transactionType', value='cash', data-bind='checked: transactionType')
-                                | Cash
-                            label.radio-inline
-                                input(type='radio', name='transactionType', value='credit', data-bind='checked: transactionType')
-                                | Credit
-                        div.form-group
-                            div.row
-                                div.amount-input.col-md-8(data-bind='css: { "has-error": transactionAmount.canValidate() && transactionAmount.errors().length }')
-                                    label(for='transactionAmountInput') Transaction Amount
-                                    input.form-control(type='number', min='0', id='transactionAmountInput', data-bind='value: transactionAmount, valueUpdate: "afterkeydown"')
-                                    //ko if: transactionAmount.canValidate() && transactionAmount.errors().length
-                                    //ko foreach: transactionAmount.errors
+                        span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
+                        div.row
+                            div.amount-input.col-md-9
+                                div.form-group(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
+                                    label(for='withdrawalAmountInput', data-bind='text: cashModalAmountText')
+                                    input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
+                                    //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
+                                    //ko foreach: withdrawalAmount.errors
                                     span.form-error(data-bind='text: message')
                                     // /ko
                                     // /ko
-                                div.currency-input.col-md-4
-                                    label(for='transactionCurrency') Currency
-                                    select.form-control.currency-dropdown#transactionCurrency(required)
-                                        option
-                                    small.form-text.text-muted The currency in which you paid
-                                    br
-                        div.form-group
-                            div.row
-                                div.col-md-6
-                                    label(for='transactionDate', data-bind='text: transactionDateLabel')
-                                    div.input-group
-                                        input.form-control(id='transactionDate', data-bind='dateTimePicker: transactionDate', type='text')
-                                        span.input-group-addon
-                                            i.material-icons date_range
-                                div.col-md-6(data-bind='visible: transactionSplit')
-                                    label(for='transactionEnd') End Date
-                                    div.input-group
-                                        input.form-control(id='transactionEnd', data-bind='dateTimePicker: transactionEnd', type='text')
-                                        span.input-group-addon
-                                            i.material-icons date_range
-                            div.row
-                                div.col-md-12
-                                    a(href='#' data-bind='click: toggleTransactionSplit, text: transactionSplitText')
-
-                        div.form-group
-                            div.country-input
-                                label(for='transactionCountry') Country
-                                select.form-control.country-dropdown#transactionCountry(required)
+                            div.currency-input.col-md-3
+                                label(for='withdrawalCurrency') Currency
+                                select.form-control.currency-dropdown#withdrawalCurrency(required)
                                     option
-                        div.form-group.m-none
+                                //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
+                                br
+                        label(for='withdrawalDate') Date
+                        div.input-group
+                            input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                            span.input-group-addon
+                                i.material-icons date_range
+                        div.form-group(data-bind='visible: !isEarnedCash()')
                             div.checkbox
                                 label
-                                    input(type='checkbox', value='', data-bind='checked: unassociatedTransaction')
-                                    small.m-left-small Do not associate this transaction with a country
-                                    //- button.btn.btn-sm.question(data-bind='popover: { options: { content: "If selected, this transaction will not show up in any country\'s expenses.  It will show up in its own Unassigned category.", trigger: "hover" } }')
-                                    //-     i.fa.fa-question-circle-o
-                        div.form-group
-                            label Category
-                            div.row
-                                // ko foreach: categories
-                                div.col-md-2
-                                    div.row.category-option(data-bind='click: $root.categoryClicked, css: { "category-selected": $root.selectedCategory() && ($root.selectedCategory().id == id) }')
-                                        input.category-value(type='hidden', data-bind='value: id')
-                                        div.col-md-12.category-icon
-                                            i.material-icons(data-bind='text: icon')
-                                            //- i(data-bind='attr: { "class": "fa fa-" + icon }')
-                                        div.col-md-12.category-label
-                                            span(data-bind='text: $root.toTitleCase(category)')
-                                // /ko
-                        div.form-group
-                            label(for='descriptionInput') Description (optional)
-                            label.pull-right(data-bind='text: descriptionRemainingLength')
-                            textarea.form-control#descriptionInput(data-bind='value: transactionDescription, valueUpdate: "afterkeydown"')
-                                        
+                                    input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
+                                    small.m-left-small This withdrawal incurred a transaction fee
+                        div.input-group(data-bind='visible: !isEarnedCash() && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                            label(for='transactionFee', data-bind='text: transactionFeeLabel')
+                            input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
+                            //ko if: transactionFee.canValidate() && transactionFee.errors().length
+                            //ko foreach: transactionFee.errors
+                            span.form-error(data-bind='text: message')
+                            // /ko
+                            // /ko
+
                     .modal-footer
                         button.btn.btn-default(type='button', data-dismiss='modal') Cancel
-                        button.btn.btn-primary(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
+                        button.btn.btn-primary(type='button', data-bind='click: saveWithdrawal, enable: canSubmitWithdrawal') Save
 
 
     script.

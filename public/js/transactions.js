@@ -152,6 +152,7 @@ var HomeViewModel = function() {
         });
     };
 
+    self.totalResults = ko.observable(0);
     self.doSearch = function() {
         if(self.filtersLoading()) {
             return;
@@ -167,6 +168,7 @@ var HomeViewModel = function() {
                     data = JSON.parse(data);
                     console.log(data);
                     self.transactions(data.results);
+                    self.totalResults(data.count);
                 } catch(e) {
                     self.transactions([]);
                 }
@@ -179,34 +181,83 @@ var HomeViewModel = function() {
     }
     self.buildQueryString = function() {
         var qs = '';
+        var filtersActive = false;
+        var filterObj = {};
         if(self.filters.limit() !== self.defaultLimit) {
             qs = self.qsConcat(qs, 'limit=' + self.filters.limit());
+        }
+        if(self.filters.page() !== 1) {
+            qs = self.qsConcat(qs, 'page=' + self.filters.page());
+        }
+        if(self.filters.withdrawalId()) {
+            filterObj.withdrawalId = self.filters.withdrawalId();
+            filtersActive = true;
+        }
+        if(filtersActive) {
+            qs = self.qsConcat(qs, 'filters=' + JSON.stringify(filterObj));
         }
         return qs;
     };
     self.defaultLimit = 10;
     self.filters = {
         limitList: ko.observableArray([10, 25, 50]),
-        limit: ko.observable(self.defaultLimit)
+        limit: ko.observable(self.defaultLimit),
+        page: ko.observable(1),
+        withdrawalId: ko.observable()
     };
     self.filters.limit.subscribe(function(val) {
-        console.log(val);
         if(self.filtersLoading()) {
             return;
         }
+        self.filters.page(1);
         var qs = self.buildQueryString();
-        history.pushState({id: 'filters', limit: self.filters.limit()}, '', '/transactions' + (qs ? '?' + qs : ''));
+        history.pushState({
+            id: 'filters',
+            limit: self.filters.limit(),
+            withdrawalId: self.filters.withdrawalId()
+        }, '', '/transactions' + (qs ? '?' + qs : ''));
         console.log('change');
         self.doSearch();
     });
+    self.pageDisplayText = ko.computed(function() {
+        if(!self.totalResults()) {
+            return '';
+        }
+        var page = self.filters.page();
+        var limit = self.filters.limit();
+        var total = self.totalResults();
+
+        return 'Displaying ' + (page * limit - limit + 1) + ' - ' + Math.min((page * limit), total) + ' of ' + total + ' results';
+    });
+    self.navigate = function(page) {
+        console.log(page);
+        var lastPage = Math.ceil(self.totalResults() / self.filters.limit());
+        if(page == 'first') {
+            self.filters.page(1);
+        }
+        if(page == 'prev') {
+            self.filters.page(Math.max(self.filters.page() - 1, 1));
+        }
+        if(page == 'next') {
+            self.filters.page(Math.min(lastPage, self.filters.page() + 1));
+        }
+        if(page == 'last') {
+            self.filters.page(lastPage);
+        }
+        console.log(self.filters.page());
+        self.doSearch();
+        return false;
+    };
 
     window.onpopstate = function(e) {
         self.filtersLoading(true);
         if(e.state) {
             self.filters.limit(e.state.limit);
+            self.filters.withdrawalId(e.state.withdrawalId);
         }
         else {
             self.filters.limit(self.defaultLimit);
+            self.filters.withdrawalId(null);
         }
         self.filtersLoading(false);
         self.doSearch();
@@ -217,6 +268,19 @@ var HomeViewModel = function() {
         if(limit) {
             try {
                 self.filters.limit(parseInt(limit));
+            } catch(e) {}
+        }
+        var filters = self.getQueryVariable('filters');
+        console.log(filters);
+        try {
+            filters = JSON.parse(decodeURIComponent(filters));
+            console.log(filters);
+        } catch(e) {
+            filters = {};
+        }
+        if(filters.withdrawalId) {
+            try {
+                self.filters.withdrawalId(parseInt(filters.withdrawalId));
             } catch(e) {}
         }
         self.filtersLoading(false);

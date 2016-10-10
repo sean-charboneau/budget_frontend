@@ -33,18 +33,18 @@ var HomeViewModel = function() {
     self.withdrawalError = ko.observable();
     self.withdrawalCurrency = ko.observable();
     self.isEarnedCash = ko.observable(false);
-    self.openWithdrawalModal = function() {
+    self.openCashModal = function() {
         self.isEarnedCash(false);
-        $('#withdrawalModal').modal('show');
+        $('#cashModal').modal('show');
     };
     self.openCashModal = function() {
         self.isEarnedCash(true);
-        $('#withdrawalModal').modal('show');
+        $('#cashModal').modal('show');
     };
-    self.withdrawalModalTitleText = ko.computed(function() {
+    self.cashModalTitleText = ko.computed(function() {
         return self.isEarnedCash() ? 'Record Earned Cash' : 'Record Withdrawal';
     });
-    self.withdrawalModalAmountText = ko.computed(function() {
+    self.cashModalAmountText = ko.computed(function() {
         return self.isEarnedCash() ? 'Amount Earned' : 'Amount Withdrawn';
     });
     $('#withdrawalCurrency').on('change', function() {
@@ -124,7 +124,7 @@ var HomeViewModel = function() {
                     self.withdrawalError("Error: " + data.error);
                     return;
                 }
-                $('#withdrawalModal').modal('hide');
+                $('#cashModal').modal('hide');
                 self.isTransactionFee(false);
                 self.withdrawalAmount(null);
                 self.transactionFee(null);
