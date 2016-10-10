@@ -24,17 +24,59 @@ block content
                                 .sk-cube2.sk-cube
                                 .sk-cube4.sk-cube
                                 .sk-cube3.sk-cube
-                            table.table.table-striped.table-bordered.table-list(display='none', data-bind='visible: !transactionsLoading()')
+                            table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !transactionsLoading()')
                                 thead
                                     tr
                                         th #
-                                        th Type
-                                        th Amount
-                                        th Value
-                                        th Category
-                                        th Date
-                                        th Country
-                                        th Description
+                                        th.cursor-pointer(data-bind='click: function() { sort("type"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Type
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "asc"') keyboard_arrow_up
+                                        th.cursor-pointer(data-bind='click: function() { sort("amount"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Amount
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"') keyboard_arrow_up
+                                        th.cursor-pointer(data-bind='click: function() { sort("value"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Value
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "asc"') keyboard_arrow_up
+                                        th.cursor-pointer(data-bind='click: function() { sort("category"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Category
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "asc"') keyboard_arrow_up
+                                        th.cursor-pointer(data-bind='click: function() { sort("date"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Date
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "asc"') keyboard_arrow_up
+                                        th.cursor-pointer(data-bind='click: function() { sort("country"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Country
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "asc"') keyboard_arrow_up
+                                        th.cursor-pointer(data-bind='click: function() { sort("description"); }')
+                                            div.row
+                                                div.col-md-9
+                                                    span Description
+                                                div.col-md-3
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "desc"') keyboard_arrow_down
+                                                    i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "asc"') keyboard_arrow_up
                                 tbody
                                     // ko foreach: transactions
                                     tr

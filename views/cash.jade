@@ -24,7 +24,7 @@ block content
                                 .sk-cube2.sk-cube
                                 .sk-cube4.sk-cube
                                 .sk-cube3.sk-cube
-                            table.table.table-striped.table-bordered.table-list(display='none', data-bind='visible: !cashLoading()')
+                            table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !cashLoading()')
                                 thead
                                     tr
                                         th #
@@ -68,9 +68,9 @@ block content
                                                         // ko foreach: transactions
                                                         li
                                                             img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
-                                                            span(data-bind='text: $root.formatCurrency(amount, currency) + " (worth "')
+                                                            span(data-bind='text: $root.formatCurrency(debit_amount, currency) + " (worth "')
                                                             img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
-                                                            span(data-bind='text: $root.formatCurrency(base_amount, base_currency) + ") spent on " + category')
+                                                            span(data-bind='text: $root.formatCurrency(base_amount * (debit_amount / amount), base_currency) + ") spent on " + category')
                                                         // /ko
                                                 // /ko
                                             a(data-bind='attr: { href: "/transactions?filters=" + encodeURIComponent(JSON.stringify({withdrawalId: id})) }') More Details
@@ -93,7 +93,8 @@ block content
                                             a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
                                 .col-md-2.per-page
                                     .input-group
-                                            span.input-group-addon Per Page: 
+                                        span.input-group-addon Per Page:
+                                        .form-group.m-none
                                             select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
@@ -122,8 +123,8 @@ block content
                                     option
                                 //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
                                 br
-                        label(for='withdrawalDate') Date
                         div.input-group
+                            label(for='withdrawalDate') Date
                             input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
                             span.input-group-addon
                                 i.material-icons date_range

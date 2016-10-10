@@ -106,7 +106,6 @@ var HomeViewModel = function() {
 
     self.saveTransaction = function() {
         self.savingTransaction(true);
-        self.transactionsLoading(true);
         var body = {
             type: self.transactionType(),
             amount: self.transactionAmount(),
@@ -128,7 +127,6 @@ var HomeViewModel = function() {
             success: function(data) {
                 data = JSON.parse(data);
                 self.savingTransaction(false);
-                self.transactionsLoading(false);
                 if(data.error) {
                     self.transactionError("Error: " + data.error);
                     return;
@@ -139,13 +137,14 @@ var HomeViewModel = function() {
                 self.transactionAmount.canValidate(false);
                 self.transactionDate(moment());
                 self.transactionEnd(moment());
+                self.transactionDescription(null);
                 self.unassociatedTransaction(false);
                 self.transactionSplit(false);
                 self.setItem('lastTransactionCurrency', self.transactionCurrency());
                 self.setItem('lastTransactionCountry', self.transactionCountry());
 
-                self.transactions(data);
-                self.loadCashReserves();
+                self.transactions(data.results);
+                self.totalResults(data.count);
             }
         });
     };
@@ -155,8 +154,8 @@ var HomeViewModel = function() {
         if(self.filtersLoading()) {
             return;
         }
-        self.transactionsLoading(true);
         var qs = self.buildQueryString();
+        console.log(qs);
         $.ajax({
             type: 'GET',
             url: '/transaction' + (qs ? '?' + qs : ''),
@@ -185,15 +184,40 @@ var HomeViewModel = function() {
         if(self.filters.page() !== 1) {
             qs = self.qsConcat(qs, 'page=' + self.filters.page());
         }
+        if(self.sortField() != self.defaultSortField || self.sortOrder() != self.defaultSortOrder) {
+            qs = self.qsConcat(qs, 'sort=' + encodeURIComponent(JSON.stringify({ order: self.sortOrder(), field: self.sortField() })));
+        }
         if(self.filters.withdrawalId()) {
             filterObj.withdrawalId = self.filters.withdrawalId();
             filtersActive = true;
         }
         if(filtersActive) {
-            qs = self.qsConcat(qs, 'filters=' + JSON.stringify(filterObj));
+            qs = self.qsConcat(qs, 'filters=' + encodeURIComponent(JSON.stringify(filterObj)));
         }
         return qs;
     };
+    // Column Sorting
+    self.defaultSortField = 'date';
+    self.defaultSortOrder = 'desc';
+    self.sortField = ko.observable(self.defaultSortField);
+    self.sortOrder = ko.observable(self.defaultSortOrder);
+    self.sort = function(field) {
+        console.log(field);
+        var swap = {
+            'asc': 'desc',
+            'desc': 'asc'
+        };
+        if(field == self.sortField()) {
+            self.sortOrder(swap[self.sortOrder()]);
+        }
+        else {
+            self.sortField(field);
+            self.sortOrder('asc');
+        }
+        self.filters.page(1);
+        self.doSearch();
+    }
+    /////////////////
     self.defaultLimit = 10;
     self.filters = {
         limitList: ko.observableArray([10, 25, 50]),
@@ -210,7 +234,9 @@ var HomeViewModel = function() {
         history.pushState({
             id: 'filters',
             limit: self.filters.limit(),
-            withdrawalId: self.filters.withdrawalId()
+            withdrawalId: self.filters.withdrawalId(),
+            sortOrder: self.sortOrder(),
+            sortField: self.sortField()
         }, '', '/transactions' + (qs ? '?' + qs : ''));
         self.doSearch();
     });
@@ -247,10 +273,14 @@ var HomeViewModel = function() {
         if(e.state) {
             self.filters.limit(e.state.limit);
             self.filters.withdrawalId(e.state.withdrawalId);
+            self.sortField(e.state.sortField);
+            self.sortOrder(e.state.sortOrder);
         }
         else {
             self.filters.limit(self.defaultLimit);
             self.filters.withdrawalId(null);
+            self.sortField(self.defaultSortField);
+            self.sortOrder(self.defaultSortOrder);
         }
         self.filtersLoading(false);
         self.doSearch();
@@ -273,6 +303,18 @@ var HomeViewModel = function() {
             try {
                 self.filters.withdrawalId(parseInt(filters.withdrawalId));
             } catch(e) {}
+        }
+        var sort = self.getQueryVariable('sort');
+        try {
+            sort = JSON.parse(decodeURIComponent(sort));
+        } catch(e) {
+            sort = {};
+        }
+        if(sort.field) {
+            self.sortField(sort.field);
+        }
+        if(sort.order) {
+            self.sortOrder(sort.order);
         }
         self.filtersLoading(false);
     };

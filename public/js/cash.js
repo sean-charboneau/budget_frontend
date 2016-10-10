@@ -86,7 +86,7 @@ var HomeViewModel = function() {
 
     self.saveWithdrawal = function() {
         self.savingWithdrawal(true);
-        self.cashReservesLoading(true);
+        // self.cashReservesLoading(true);
         $.ajax({
             type: 'POST',
             url: '/withdrawal',
@@ -101,7 +101,7 @@ var HomeViewModel = function() {
             success: function(data) {
                 data = JSON.parse(data);
                 self.savingWithdrawal(false);
-                self.cashReservesLoading(false);
+                // self.cashReservesLoading(false);
                 if(data.error) {
                     self.withdrawalError("Error: " + data.error);
                     return;
@@ -116,7 +116,7 @@ var HomeViewModel = function() {
                 self.withdrawalDate(moment());
                 self.setItem('lastWithdrawalCurrency', self.withdrawalCurrency());
 
-                self.cashReserves(data);
+                // self.cashReserves(data);
             }
         });
     };
@@ -125,7 +125,6 @@ var HomeViewModel = function() {
         if(self.filtersLoading()) {
             return;
         }
-        self.cashLoading(true);
         var qs = self.buildQueryString();
         $.ajax({
             type: 'GET',
