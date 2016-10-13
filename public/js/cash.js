@@ -39,21 +39,7 @@ var HomeViewModel = function() {
     self.withdrawalDate = ko.observable(moment());
     self.withdrawalError = ko.observable();
     self.withdrawalCurrency = ko.observable();
-    self.isEarnedCash = ko.observable(false);
-    self.openCashModal = function() {
-        self.isEarnedCash(false);
-        $('#cashModal').modal('show');
-    };
-    self.openCashModal = function() {
-        self.isEarnedCash(true);
-        $('#cashModal').modal('show');
-    };
-    self.cashModalTitleText = ko.computed(function() {
-        return self.isEarnedCash() ? 'Record Earned Cash' : 'Record Withdrawal';
-    });
-    self.cashModalAmountText = ko.computed(function() {
-        return self.isEarnedCash() ? 'Amount Earned' : 'Amount Withdrawn';
-    });
+    self.withdrawalType = ko.observable('atm');
     $('#withdrawalCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.withdrawalCurrency(this.value);
@@ -96,7 +82,7 @@ var HomeViewModel = function() {
                 isFee: self.isTransactionFee(),
                 feeAmount: self.isTransactionFee() ? self.transactionFee() : 0,
                 currency: self.withdrawalCurrency(),
-                isEarnedCash: self.isEarnedCash()
+                isEarnedCash: self.withdrawalType() == 'earned'
             },
             success: function(data) {
                 data = JSON.parse(data);
@@ -116,6 +102,7 @@ var HomeViewModel = function() {
                 self.withdrawalDate(moment());
                 self.setItem('lastWithdrawalCurrency', self.withdrawalCurrency());
 
+                self.doSearch();
                 // self.cashReserves(data);
             }
         });
@@ -200,8 +187,32 @@ var HomeViewModel = function() {
         if(self.filters.page() !== 1) {
             qs = self.qsConcat(qs, 'page=' + self.filters.page());
         }
+        if(self.sortField() != self.defaultSortField || self.sortOrder() != self.defaultSortOrder) {
+            qs = self.qsConcat(qs, 'sort=' + encodeURIComponent(JSON.stringify({ order: self.sortOrder(), field: self.sortField() })));
+        }
         return qs;
     };
+    // Column Sorting
+    self.defaultSortField = 'date';
+    self.defaultSortOrder = 'desc';
+    self.sortField = ko.observable(self.defaultSortField);
+    self.sortOrder = ko.observable(self.defaultSortOrder);
+    self.sort = function(field) {
+        var swap = {
+            'asc': 'desc',
+            'desc': 'asc'
+        };
+        if(field == self.sortField()) {
+            self.sortOrder(swap[self.sortOrder()]);
+        }
+        else {
+            self.sortField(field);
+            self.sortOrder('asc');
+        }
+        self.filters.page(1);
+        self.doSearch();
+    }
+    /////////////////
     self.defaultLimit = 10;
     self.filters = {
         limitList: ko.observableArray([10, 25, 50]),
@@ -214,7 +225,12 @@ var HomeViewModel = function() {
         }
         self.filters.page(1);
         var qs = self.buildQueryString();
-        history.pushState({id: 'filters', limit: self.filters.limit()}, '', '/transactions' + (qs ? '?' + qs : ''));
+        history.pushState({
+            id: 'filters',
+            limit: self.filters.limit(),
+            sortOrder: self.sortOrder(),
+            sortField: self.sortField()
+        }, '', '/transactions' + (qs ? '?' + qs : ''));
         self.doSearch();
     });
     self.pageDisplayText = ko.computed(function() {
@@ -249,9 +265,13 @@ var HomeViewModel = function() {
         self.filtersLoading(true);
         if(e.state) {
             self.filters.limit(e.state.limit);
+            self.sortField(e.state.sortField);
+            self.sortOrder(e.state.sortOrder);
         }
         else {
             self.filters.limit(self.defaultLimit);
+            self.sortField(self.defaultSortField);
+            self.sortOrder(self.defaultSortOrder);
         }
         self.filtersLoading(false);
         self.doSearch();
@@ -263,6 +283,18 @@ var HomeViewModel = function() {
             try {
                 self.filters.limit(parseInt(limit));
             } catch(e) {}
+        }
+        var sort = self.getQueryVariable('sort');
+        try {
+            sort = JSON.parse(decodeURIComponent(sort));
+        } catch(e) {
+            sort = {};
+        }
+        if(sort.field) {
+            self.sortField(sort.field);
+        }
+        if(sort.order) {
+            self.sortOrder(sort.order);
         }
         self.filtersLoading(false);
     };

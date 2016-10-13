@@ -202,7 +202,6 @@ var HomeViewModel = function() {
     self.sortField = ko.observable(self.defaultSortField);
     self.sortOrder = ko.observable(self.defaultSortOrder);
     self.sort = function(field) {
-        console.log(field);
         var swap = {
             'asc': 'desc',
             'desc': 'asc'

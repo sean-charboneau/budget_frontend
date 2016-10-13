@@ -17,7 +17,7 @@ block content
                                 .col.col-xs-6
                                     h3.panel-title Cash
                                 .col.col-xs-6.text-right
-                                    button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#cashModal') Add New
+                                    button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#cashModal') Add Cash
                         .panel-body
                             .sk-folding-cube(data-bind='visible: cashLoading')
                                 .sk-cube1.sk-cube
@@ -33,6 +33,36 @@ block content
                                         th Value
                                         th Date
                                         th Used
+                                        //- th #
+                                        //- th.cursor-pointer(data-bind='click: function() { sort("type"); }')
+                                        //-     div.row
+                                        //-         div.col-md-9
+                                        //-             span Type
+                                        //-         div.col-md-3
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "desc"') keyboard_arrow_down
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "asc"') keyboard_arrow_up
+                                        //- th.cursor-pointer(data-bind='click: function() { sort("amount"); }')
+                                        //-     div.row
+                                        //-         div.col-md-9
+                                        //-             span Amount
+                                        //-         div.col-md-3
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"') keyboard_arrow_down
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"') keyboard_arrow_up
+                                        //- th.cursor-pointer(data-bind='click: function() { sort("value"); }')
+                                        //-     div.row
+                                        //-         div.col-md-9
+                                        //-             span Value
+                                        //-         div.col-md-3
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "desc"') keyboard_arrow_down
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "asc"') keyboard_arrow_up
+                                        //- th.cursor-pointer(data-bind='click: function() { sort("date"); }')
+                                        //-     div.row
+                                        //-         div.col-md-9
+                                        //-             span Date
+                                        //-         div.col-md-3
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "desc"') keyboard_arrow_down
+                                        //-             i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "asc"') keyboard_arrow_up
+                                        //- th Used
                                         th.icon-column
                                 tbody
                                     // ko foreach: cash
@@ -104,13 +134,20 @@ block content
                     .modal-header
                         button.close(type='button', data-dismiss='modal', aria-label='Close')
                             span(aria-hidden='true') ×
-                        h4#cashModalLabel.modal-title(data-bind='text: cashModalTitleText')
+                        h4#cashModalLabel.modal-title Add Cash
                     .modal-body
                         span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
+                        div.form-group
+                            label.radio-inline
+                                input(type='radio', name='withdrawalType', value='atm', data-bind='checked: withdrawalType')
+                                | ATM Withdrawal
+                            label.radio-inline
+                                input(type='radio', name='withdrawalType', value='earned', data-bind='checked: withdrawalType')
+                                | Earned Cash
                         div.row
                             div.amount-input.col-md-9
                                 div.form-group(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
-                                    label(for='withdrawalAmountInput', data-bind='text: cashModalAmountText')
+                                    label(for='withdrawalAmountInput') Amount
                                     input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
                                     //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
                                     //ko foreach: withdrawalAmount.errors
@@ -128,12 +165,12 @@ block content
                             input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
                             span.input-group-addon
                                 i.material-icons date_range
-                        div.form-group(data-bind='visible: !isEarnedCash()')
+                        div.form-group(data-bind='visible: withdrawalType() == "atm"')
                             div.checkbox
                                 label
                                     input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
                                     small.m-left-small This withdrawal incurred a transaction fee
-                        div.input-group(data-bind='visible: !isEarnedCash() && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                        div.input-group(data-bind='visible: withdrawalType() ==  "atm" && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
                             label(for='transactionFee', data-bind='text: transactionFeeLabel')
                             input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
                             //ko if: transactionFee.canValidate() && transactionFee.errors().length
@@ -262,19 +299,12 @@ block content
             });
             //- $('.select2-selection').css('height', 'auto');
 
-            $('#transactionModal').on('shown.bs.modal', function() {
-                $('#transactionAmountInput').focus();
-            });
-            $('#transactionCurrency').on("select2:select", function (e) {
-                $('#transactionDate').focus();
+            $('#cashModal').on('shown.bs.modal', function() {
+                $('#withdrawalAmountInput').focus();
             });
 
-            var lastTransactionCurrency = vm.getItem('lastTransactionCurrency');
-            if(lastTransactionCurrency) {
-                $('#transactionCurrency').val(lastTransactionCurrency).trigger('change');
-            }
-            var lastTransactionCountry = vm.getItem('lastTransactionCountry');
-            if(lastTransactionCountry) {
-                $('#transactionCountry').val(lastTransactionCountry).trigger('change');
+            var lastWithdrawalCurrency = vm.getItem('lastWithdrawalCurrency');
+            if(lastWithdrawalCurrency) {
+                $('#withdrawalCurrency').val(lastWithdrawalCurrency).trigger('change');
             }
         });

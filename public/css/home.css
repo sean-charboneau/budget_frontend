@@ -12,22 +12,6 @@
     margin-bottom: 20px;
 }
 
-.cash-reserves .amount {
-    font-size: 16px;
-    /*font-size: 16vw;*/
-}
-
-.cash-reserves .withdraw {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-}
-
-.cash-reserves .withdraw .btn-group {
-    width: 100%;
-}
-
 .amount-input {
     padding-right: 0px;
 }

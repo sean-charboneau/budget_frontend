@@ -10,111 +10,110 @@ block content
     div.container
         div.row
             div.col-md-12
-                div.section.transactions
-                    .panel.panel-default.panel-table
-                        .panel-heading
-                            .row
-                                .col.col-xs-6
-                                    h3.panel-title Transactions
-                                .col.col-xs-6.text-right
-                                    button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#transactionModal') Add New
-                        .panel-body
-                            .sk-folding-cube(data-bind='visible: transactionsLoading')
-                                .sk-cube1.sk-cube
-                                .sk-cube2.sk-cube
-                                .sk-cube4.sk-cube
-                                .sk-cube3.sk-cube
-                            table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !transactionsLoading()')
-                                thead
-                                    tr
-                                        th #
-                                        th.cursor-pointer(data-bind='click: function() { sort("type"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Type
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "asc"') keyboard_arrow_up
-                                        th.cursor-pointer(data-bind='click: function() { sort("amount"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Amount
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"') keyboard_arrow_up
-                                        th.cursor-pointer(data-bind='click: function() { sort("value"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Value
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "asc"') keyboard_arrow_up
-                                        th.cursor-pointer(data-bind='click: function() { sort("category"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Category
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "asc"') keyboard_arrow_up
-                                        th.cursor-pointer(data-bind='click: function() { sort("date"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Date
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "asc"') keyboard_arrow_up
-                                        th.cursor-pointer(data-bind='click: function() { sort("country"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Country
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "asc"') keyboard_arrow_up
-                                        th.cursor-pointer(data-bind='click: function() { sort("description"); }')
-                                            div.row
-                                                div.col-md-9
-                                                    span Description
-                                                div.col-md-3
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "desc"') keyboard_arrow_down
-                                                    i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "asc"') keyboard_arrow_up
-                                tbody
-                                    // ko foreach: transactions
-                                    tr
-                                        td(data-bind='text: ($index() + 1)')
-                                        td(data-bind='text: $root.toTitleCase(type)')
-                                        td
-                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
-                                            span(data-bind='text: amount + " " + currency')
-                                        td
-                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
-                                            span(data-bind='text: base_amount + " " + base_currency')
-                                        td(data-bind='text: $root.toTitleCase(category)')
-                                        td(data-bind='text: moment(date).format("YYYY-MM-DD")')
-                                        td
-                                            img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
-                                            span(data-bind='text: $root.getNameForCountry(country)')
-                                        td(data-bind='text: description')
-                                    // /ko
-                        .panel-footer
-                            .row
-                                .col-md-2.page-display
-                                    span(data-bind='text: pageDisplayText')
-                                .col-md-8.text-center
-                                    ul.pagination.hidden-md
-                                        li
-                                            a(href='#', data-bind='click: function(e) { navigate("first") }, clickBubble: false') <<
-                                        li
-                                            a(href='#', data-bind='click: function(e) { navigate("prev") }, clickBubble: false') <
-                                        li.disabled
-                                            a(href='#', data-bind='text: filters.page') 1
-                                        li
-                                            a(href='#', data-bind='click: function(e) { navigate("next") }, clickBubble: false') >
-                                        li
-                                            a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
-                                .col-md-2.per-page
-                                    .input-group
-                                            span.input-group-addon Per Page: 
-                                            select.form-control(data-bind='options: filters.limitList, value: filters.limit')
+                .panel.panel-default.panel-table
+                    .panel-heading
+                        .row
+                            .col.col-xs-6
+                                h3.panel-title Transactions
+                            .col.col-xs-6.text-right
+                                button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#transactionModal') Add New
+                    .panel-body
+                        .sk-folding-cube(data-bind='visible: transactionsLoading')
+                            .sk-cube1.sk-cube
+                            .sk-cube2.sk-cube
+                            .sk-cube4.sk-cube
+                            .sk-cube3.sk-cube
+                        table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !transactionsLoading()')
+                            thead
+                                tr
+                                    th #
+                                    th.cursor-pointer(data-bind='click: function() { sort("type"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Type
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "asc"') keyboard_arrow_up
+                                    th.cursor-pointer(data-bind='click: function() { sort("amount"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Amount
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"') keyboard_arrow_up
+                                    th.cursor-pointer(data-bind='click: function() { sort("value"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Value
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "asc"') keyboard_arrow_up
+                                    th.cursor-pointer(data-bind='click: function() { sort("category"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Category
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "asc"') keyboard_arrow_up
+                                    th.cursor-pointer(data-bind='click: function() { sort("date"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Date
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "asc"') keyboard_arrow_up
+                                    th.cursor-pointer(data-bind='click: function() { sort("country"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Country
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "asc"') keyboard_arrow_up
+                                    th.cursor-pointer(data-bind='click: function() { sort("description"); }')
+                                        div.row
+                                            div.col-md-9
+                                                span Description
+                                            div.col-md-3
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "desc"') keyboard_arrow_down
+                                                i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "asc"') keyboard_arrow_up
+                            tbody
+                                // ko foreach: transactions
+                                tr
+                                    td(data-bind='text: ($index() + 1)')
+                                    td(data-bind='text: $root.toTitleCase(type)')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
+                                        span(data-bind='text: amount + " " + currency')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
+                                        span(data-bind='text: base_amount + " " + base_currency')
+                                    td(data-bind='text: $root.toTitleCase(category)')
+                                    td(data-bind='text: moment(date).format("YYYY-MM-DD")')
+                                    td
+                                        img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
+                                        span(data-bind='text: $root.getNameForCountry(country)')
+                                    td(data-bind='text: description')
+                                // /ko
+                    .panel-footer
+                        .row
+                            .col-md-2.page-display
+                                span(data-bind='text: pageDisplayText')
+                            .col-md-8.text-center
+                                ul.pagination.hidden-md
+                                    li
+                                        a(href='#', data-bind='click: function(e) { navigate("first") }, clickBubble: false') <<
+                                    li
+                                        a(href='#', data-bind='click: function(e) { navigate("prev") }, clickBubble: false') <
+                                    li.disabled
+                                        a(href='#', data-bind='text: filters.page') 1
+                                    li
+                                        a(href='#', data-bind='click: function(e) { navigate("next") }, clickBubble: false') >
+                                    li
+                                        a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
+                            .col-md-2.per-page
+                                .input-group
+                                        span.input-group-addon Per Page: 
+                                        select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
         #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')

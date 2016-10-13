@@ -1,6 +1,7 @@
 var HomeViewModel = function() {
     var self = this;
 
+    self.budgetOverviewLoading = ko.observable(true);
     self.cashReservesLoading = ko.observable(true);
     self.trajectoryLoadng = ko.observable(true);
     self.transactionsLoading = ko.observable(true);
@@ -32,21 +33,7 @@ var HomeViewModel = function() {
     self.withdrawalDate = ko.observable(moment());
     self.withdrawalError = ko.observable();
     self.withdrawalCurrency = ko.observable();
-    self.isEarnedCash = ko.observable(false);
-    self.openCashModal = function() {
-        self.isEarnedCash(false);
-        $('#cashModal').modal('show');
-    };
-    self.openCashModal = function() {
-        self.isEarnedCash(true);
-        $('#cashModal').modal('show');
-    };
-    self.cashModalTitleText = ko.computed(function() {
-        return self.isEarnedCash() ? 'Record Earned Cash' : 'Record Withdrawal';
-    });
-    self.cashModalAmountText = ko.computed(function() {
-        return self.isEarnedCash() ? 'Amount Earned' : 'Amount Withdrawn';
-    });
+    self.withdrawalType = ko.observable('atm');
     $('#withdrawalCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.withdrawalCurrency(this.value);
@@ -113,7 +100,7 @@ var HomeViewModel = function() {
                 isFee: self.isTransactionFee(),
                 feeAmount: self.isTransactionFee() ? self.transactionFee() : 0,
                 currency: self.withdrawalCurrency(),
-                isEarnedCash: self.isEarnedCash()
+                isEarnedCash: self.withdrawalType() == 'earned'
             },
             success: function(data) {
                 data = JSON.parse(data);
@@ -277,14 +264,29 @@ var HomeViewModel = function() {
     };
 
     self.loadRecentTransactions = function() {
+        self.transactionsLoading(true);
         $.ajax({
             type: 'GET',
             url: '/transaction',
             success: function(data) {
                 data = JSON.parse(data);
                 self.transactions(data.results);
+                self.transactionsLoading(false);
             }
-        })
+        });
+    };
+
+    self.loadBudgetOverview = function() {
+        self.budgetOverviewLoading(true);
+        $.ajax({
+            type: 'GET',
+            url: '/budgetOverview',
+            success: function(data) {
+                data = JSON.parse(data);
+                self.budgetOverviewLoading(false);
+                console.log(data);
+            }
+        });
     };
 
     self.getIconForCountry = function(country) {
@@ -324,4 +326,5 @@ var HomeViewModel = function() {
     self.loadCashReserves();
     self.loadRecentTransactions();
     self.loadCategories();
+    self.loadBudgetOverview();
 };
