@@ -75,7 +75,7 @@ router.get('/cash', authenticate, function(req, res) {
 	return res.render('cash', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
 });
 
-router.get('/budgetOverview', authenticate, function(req, res) {
+router.get('/tripOverview', authenticate, function(req, res) {
 	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});

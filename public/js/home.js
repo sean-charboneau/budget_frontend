@@ -1,7 +1,7 @@
 var HomeViewModel = function() {
     var self = this;
 
-    self.budgetOverviewLoading = ko.observable(true);
+    self.tripOverviewLoading = ko.observable(true);
     self.cashReservesLoading = ko.observable(true);
     self.trajectoryLoadng = ko.observable(true);
     self.transactionsLoading = ko.observable(true);
@@ -276,15 +276,17 @@ var HomeViewModel = function() {
         });
     };
 
-    self.loadBudgetOverview = function() {
-        self.budgetOverviewLoading(true);
+    self.trip = ko.observable({});
+    self.loadTripOverview = function() {
+        self.tripOverviewLoading(true);
         $.ajax({
             type: 'GET',
-            url: '/budgetOverview',
+            url: '/tripOverview',
             success: function(data) {
                 data = JSON.parse(data);
-                self.budgetOverviewLoading(false);
+                self.tripOverviewLoading(false);
                 console.log(data);
+                self.trip(data);
             }
         });
     };
@@ -326,5 +328,5 @@ var HomeViewModel = function() {
     self.loadCashReserves();
     self.loadRecentTransactions();
     self.loadCategories();
-    self.loadBudgetOverview();
+    self.loadTripOverview();
 };
