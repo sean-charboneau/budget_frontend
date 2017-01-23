@@ -4,30 +4,52 @@ block extraHeader
     script(type='text/javascript' src='/js/createTrip.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
     script(type='text/javascript' src='/js/bindings/popover.js')
-    link(rel='stylesheet', href='/css/cash.css')
+    link(rel='stylesheet', href='/css/createTrip.css')
 
 block content
-    div.container
-        div.row
-            div.col-md-12
-                div.section.cash
-                    .panel.panel-default.panel-table
+    .container
+        .row
+            .col-md-12
+                .section.details
+                    .panel.panel-default
                         .panel-heading
-                            .row
-                                .col.col-xs-12
-                                    h3.panel-title Trip Details
+                            h3.panel-title Trip Details
                         .panel-body
-                            .row
-                                form
-                                    .col-md-6
-                                        .form-group.m-none
-                                            input(type='text', name='tripName', id='tripName', class='form-control', placeholder='Trip Name', autofocus)
-                                    .col-md-6
-                                        .form-group.m-none
-                                            .input-group
-                                                input.form-control(type='text', name='tripStartDate', id='tripStartDate', class='form-control', placeholder='Start Date', data-bind='dateTimePicker: tripStartDate')
-                                                span.input-group-addon
-                                                    i.material-icons date_range
+                            form
+                                .col-md-6
+                                    .form-group.m-none
+                                        input(type='text', name='tripName', id='tripName', class='form-control', placeholder='Trip Name')
+                                .col-md-6
+                                    .form-group.m-none
+                                        .input-group
+                                            input.form-control(type='text', name='tripStartDate', id='tripStartDate', class='form-control', placeholder='Start Date', data-bind='dateTimePicker: tripStartDate')
+                                            span.input-group-addon
+                                                i.material-icons date_range
+        .row
+            .col-md-8.m-right-none
+                .section.segments
+                    .panel.panel-default
+                        .panel-heading
+                            h3.panel-title Trip Segments
+                        .panel-body
+                            span asdf
+            .col-md-4
+                .row
+                    .col-md-12
+                        .section.oneoff
+                            .panel.panel-default
+                                .panel-heading
+                                    h3.panel-title oneoff
+                                .panel-body
+                                    span asdf
+                .row
+                    .col-md-12
+                        .section.overview
+                            .panel.panel-default
+                                .panel-heading
+                                    h3.panel-title overview
+                                .panel-body
+                                    span asdf
 
     script.
         var vm = new CreateTripViewModel();

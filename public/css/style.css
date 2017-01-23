@@ -473,12 +473,20 @@ body {
     margin-bottom: 5px;
 }
 
+.m-bottom-none {
+  margin-bottom: 0px;
+}
+
 .m-top {
     margin-top: 15px;
 }
 
 .m-top-small {
     margin-top: 5px;
+}
+
+.m-top-none {
+  margin-top: 0px;
 }
 
 .m-left {
@@ -489,12 +497,20 @@ body {
     margin-left: 5px;
 }
 
+.m-left-none {
+  margin-left: 0px;
+}
+
 .m-right {
     margin-right: 15px;
 }
 
 .m-right-small {
     margin-right: 5px;
+}
+
+.m-right-none {
+  margin-right: 0px;
 }
 
 .is-empty {
