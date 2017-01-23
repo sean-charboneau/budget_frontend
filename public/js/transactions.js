@@ -1,4 +1,4 @@
-var HomeViewModel = function() {
+var TransactionsViewModel = function() {
     var self = this;
 
     self.transactionsLoading = ko.observable(true);

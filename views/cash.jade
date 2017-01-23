@@ -185,7 +185,7 @@ block content
 
 
     script.
-        var vm = new HomeViewModel();
+        var vm = new CashViewModel();
         var currencies = !{currency};
         var countries = !{countries};
         vm.currencyArr = ko.observableArray(currencies);
@@ -217,7 +217,6 @@ block content
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }
-        vm.formatCurrency(2000, 'COP');
         
         $(document).ready(function() {
             ko.applyBindings(vm);

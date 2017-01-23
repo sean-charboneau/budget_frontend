@@ -75,6 +75,25 @@ router.get('/cash', authenticate, function(req, res) {
 	return res.render('cash', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
 });
 
+router.get('/createTrip', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + '/tripOverview', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		if(err || !body) {
+			return logOut(req, res, {error: 0});
+		}
+		body = JSON.parse(body);
+		if(body.message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		if(body.tripId) {
+			return res.redirect('/home');
+		}
+		
+		var currency = require('../data/currency.json');
+		var countries = require('../data/countries.json');
+		return res.render('createTrip', { trip: body, currency: JSON.stringify(currency), countries: JSON.stringify(countries) });
+	});
+});
+
 router.get('/tripOverview', authenticate, function(req, res) {
 	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
 		if(err) {

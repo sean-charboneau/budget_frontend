@@ -36,7 +36,8 @@ ko.bindingHandlers.dateTimePicker = {
             koDate = (koDate && typeof (koDate) !== 'object') ? new Date(parseFloat(koDate.replace(/[^0-9]/g, ''))) : koDate;
             
             if(!koDate) {
-                koDate = moment();
+                // koDate = moment();
+                koDate = null;
             }
 
             picker.date(koDate);

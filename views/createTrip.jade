@@ -1,0 +1,144 @@
+extends layout
+
+block extraHeader
+    script(type='text/javascript' src='/js/createTrip.js')
+    script(type='text/javascript' src='/js/bindings/datepicker.js')
+    script(type='text/javascript' src='/js/bindings/popover.js')
+    link(rel='stylesheet', href='/css/cash.css')
+
+block content
+    div.container
+        div.row
+            div.col-md-12
+                div.section.cash
+                    .panel.panel-default.panel-table
+                        .panel-heading
+                            .row
+                                .col.col-xs-12
+                                    h3.panel-title Trip Details
+                        .panel-body
+                            .row
+                                form
+                                    .col-md-6
+                                        .form-group.m-none
+                                            input(type='text', name='tripName', id='tripName', class='form-control', placeholder='Trip Name', autofocus)
+                                    .col-md-6
+                                        .form-group.m-none
+                                            .input-group
+                                                input.form-control(type='text', name='tripStartDate', id='tripStartDate', class='form-control', placeholder='Start Date', data-bind='dateTimePicker: tripStartDate')
+                                                span.input-group-addon
+                                                    i.material-icons date_range
+
+    script.
+        var vm = new CreateTripViewModel();
+        var currencies = !{currency};
+        var countries = !{countries};
+        vm.currencyArr = ko.observableArray(currencies);
+        vm.currencyObj = ko.observable({});
+        vm.countryArr = ko.observableArray([]);
+        vm.countryObj = ko.observable(countries);
+
+        // Preload flag images
+        var images = new Array();
+        var noImage = ['BQ', 'BV', 'GF', 'GP', 'HM', 'IO', 'PM', 'RE', 'SJ', 'SX', 'UM', 'XK'];
+        function preload(src) {
+            images.push(new Image());
+            images[images.length - 1].src = src;
+        }
+        for(var key in vm.countryObj().countries) {
+            if(vm.countryObj().countries.hasOwnProperty(key)) {
+                var country = vm.countryObj().countries[key];
+                if(noImage.indexOf(key) == -1) {
+                    vm.countryObj().countries[key].icon = key;
+                    preload('images/flags/16/' + key + '.png');
+                }
+                else {
+                    vm.countryObj().countries[key].icon = '_unknown';
+                }
+                country.id = key;
+                vm.countryArr.push(country);
+            }
+        }
+        for(var i = 0; i < vm.currencyArr().length; i++) {
+            vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
+        }
+        
+        $(document).ready(function() {
+            ko.applyBindings(vm);
+            var formatOption = function(item) {
+                if (!item.icon) { return item.display_name; }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.display_name + '</span>'
+                );
+                return $item;
+            };
+            var formatSelection = function(item) {
+                if (!item.icon) { return item.display_name; }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.id + '</span>'
+                );
+                return $item;
+            };
+            $('.currency-dropdown').select2({
+                data: vm.currencyArr(),
+                matcher: function(params, data) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return data;
+                    }
+                    if(data.id === '') {
+                        return null;
+                    }
+                    if(data.display_name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    return null;
+                },
+                placeholder: {
+                    id: '',
+                    display_name: 'Home Currency',
+                    icon: '_unknown'
+                },
+                templateResult: formatOption,
+                templateSelection: formatSelection,
+                theme: 'bootstrap'
+            });
+
+            var formatCountryOption = function(item) {
+                var code = item.id || '_unknown';
+                if(noImage.indexOf(code) > -1) {
+                    code = '_unknown';
+                }
+                var $item = $(
+                    '<span><img src="images/flags/16/' + code + '.png" class="img-flag" /> ' + item.name + '</span>'
+                );
+                return $item;
+            };
+            $('.country-dropdown').select2({
+                data: vm.countryArr(),
+                matcher: function(params, data) {
+                    var term = $.trim(params.term);
+                    if (term === '') {
+                        return data;
+                    }
+                    if(data.id === '') {
+                        return null;
+                    }
+                    if(data.name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    if(data.native.toUpperCase().indexOf(term.toUpperCase()) > -1) {
+                        return data;
+                    }
+                    return null;
+                },
+                placeholder: {
+                    id: '',
+                    name: 'Select Country',
+                    icon: '_unknown'
+                },
+                templateResult: formatCountryOption,
+                templateSelection: formatCountryOption,
+                theme: 'bootstrap'
+            });
+        });

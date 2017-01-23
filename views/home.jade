@@ -44,7 +44,7 @@ block content
                         .trip.text-center(style='display: none', data-bind='visible: !tripOverviewLoading()')
                             div(data-bind='visible: !trip().tripId')
                                 h4 It doesn't look like you have an active trip.  
-                                    a(href='#') Set one up now!
+                                    a(href='/createTrip') Set one up now!
                             div(data-bind='visible: trip().tripId')
                                 span Trip
         .row
@@ -263,7 +263,6 @@ block content
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }
-        vm.formatCurrency(2000, 'COP');
         
         $(document).ready(function() {
             ko.applyBindings(vm);
