@@ -22,7 +22,7 @@ block content
                                 .col-md-6
                                     .form-group.m-none
                                         .input-group
-                                            input.form-control(type='text', name='tripStartDate', id='tripStartDate', class='form-control', placeholder='Start Date', data-bind='dateTimePicker: tripStartDate')
+                                            input.form-control(type='text', name='tripStartDate', id='tripStartDate', placeholder='Start Date', data-bind='dateTimePicker: tripStartDate')
                                             span.input-group-addon
                                                 i.material-icons date_range
         .row
@@ -32,7 +32,31 @@ block content
                         .panel-heading
                             h3.panel-title Trip Segments
                         .panel-body
-                            span asdf
+                            .segment-details(style='display: none', data-bind='visible: tripSegments().length > 0, foreach: tripSegments')
+                                .panel.panel-info
+                                    .panel-heading.segment-head(data-bind='click: toggle')
+                                        .pull-left
+                                            img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country()) }')
+                                        .pull-left.segment-head-text(data-bind='text: $root.getNameForCountry(country())')
+                                        .pull-right.segment-head-text(data-bind='text: getBudgetText()')
+                                    .panel-body.segment-body(data-bind='visible: expanded')
+                                        .form-group.m-top-none
+                                            .country-input
+                                                select.form-control.country-dropdown#transactionCountry(data-bind='value: country')
+                                                    option
+                                        .form-group
+                                            .row
+                                                .col-md-3
+                                                    .input-group
+                                                        span.input-group-addon
+                                                            i.material-icons.lock-icon(data-bind='text: daysLocked() ? "lock" : "lock_open", click: toggleDaysLock')
+                                                        input.form-control(type='text', name='daysAmount', id='daysAmount', data-bind='value: days')
+                                                        span.input-group-addon
+                                                            label(for='daysAmount') days
+                                                .col-md-9
+                                                    .slider.slider-info#my-slider
+                            .add-segment(data-bind='click: addSegment')
+                                span Add Segment
             .col-md-4
                 .row
                     .col-md-12
@@ -55,10 +79,14 @@ block content
         var vm = new CreateTripViewModel();
         var currencies = !{currency};
         var countries = !{countries};
+        var trip = !{trip};
+        var user = !{user};
         vm.currencyArr = ko.observableArray(currencies);
         vm.currencyObj = ko.observable({});
         vm.countryArr = ko.observableArray([]);
         vm.countryObj = ko.observable(countries);
+        vm.trip = ko.observable(trip);
+        vm.user = ko.observable(user);
 
         // Preload flag images
         var images = new Array();
@@ -125,42 +153,5 @@ block content
                 templateSelection: formatSelection,
                 theme: 'bootstrap'
             });
-
-            var formatCountryOption = function(item) {
-                var code = item.id || '_unknown';
-                if(noImage.indexOf(code) > -1) {
-                    code = '_unknown';
-                }
-                var $item = $(
-                    '<span><img src="images/flags/16/' + code + '.png" class="img-flag" /> ' + item.name + '</span>'
-                );
-                return $item;
-            };
-            $('.country-dropdown').select2({
-                data: vm.countryArr(),
-                matcher: function(params, data) {
-                    var term = $.trim(params.term);
-                    if (term === '') {
-                        return data;
-                    }
-                    if(data.id === '') {
-                        return null;
-                    }
-                    if(data.name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
-                        return data;
-                    }
-                    if(data.native.toUpperCase().indexOf(term.toUpperCase()) > -1) {
-                        return data;
-                    }
-                    return null;
-                },
-                placeholder: {
-                    id: '',
-                    name: 'Select Country',
-                    icon: '_unknown'
-                },
-                templateResult: formatCountryOption,
-                templateSelection: formatCountryOption,
-                theme: 'bootstrap'
-            });
+            vm.initCountryDropdown();
         });

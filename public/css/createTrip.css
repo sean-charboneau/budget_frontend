@@ -1,3 +1,51 @@
 .section {
     padding: 0px;
 }
+
+.add-segment {
+    /*height: 30px;*/
+    padding: 20px;
+    border: 2px dotted darkgray;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    text-align: center;
+    cursor: pointer;
+    cursor: hand;
+    color: darkgray;
+    font-size: 16px;
+}
+
+.add-segment:hover {
+    color: gray;
+    border: 2px dotted gray;
+}
+
+.segment-head {
+    cursor: pointer;
+    cursor: hand;
+    font-size: 16px;
+    height: 48px;
+}
+
+.segment-head-text {
+    margin-top: 8px;
+    margin-left: 4px;
+}
+
+.segment-body {
+    transition: visibility 0s, opacity 0.5s linear;
+}
+
+.lock-icon {
+    cursor: pointer;
+    cursor: hand;
+}
+
+.lock-icon:hover {
+    color: gray;
+}
+
+.noUi-handle {
+    height: 16px;
+    width: 16px;
+}

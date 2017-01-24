@@ -80,17 +80,25 @@ router.get('/createTrip', authenticate, function(req, res) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
-		body = JSON.parse(body);
-		if(body.message == 'jwt expired') {
+		var trip = JSON.parse(body);
+		if(trip.message == 'jwt expired') {
 			return logOut(req, res, {error: 1});
 		}
-		if(body.tripId) {
+		if(trip.tripId) {
 			return res.redirect('/home');
 		}
-		
-		var currency = require('../data/currency.json');
-		var countries = require('../data/countries.json');
-		return res.render('createTrip', { trip: body, currency: JSON.stringify(currency), countries: JSON.stringify(countries) });
+		request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+			if(err || !body) {
+				return logOut(req, res, {error: 0});
+			}
+			if(JSON.parse(body).message == 'jwt expired') {
+				return logOut(req, res, {error: 1});
+			}
+			
+			var currency = require('../data/currency.json');
+			var countries = require('../data/countries.json');
+			return res.render('createTrip', { user: body, trip: JSON.stringify(trip), currency: JSON.stringify(currency), countries: JSON.stringify(countries) });
+		});
 	});
 });
 

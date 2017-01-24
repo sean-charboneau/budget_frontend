@@ -9,6 +9,7 @@
     "knockout": "^3.4.0",
     "select2-bootstrap-theme": "^0.1.0-beta.9",
     "underscore": "^1.8.3",
-    "material-design-icons": "^3.0.1"
+    "material-design-icons": "^3.0.1",
+    "nouislider": "^9.2.0"
   }
 }
