@@ -3,6 +3,7 @@ extends layout
 block extraHeader
     script(type='text/javascript' src='/js/createTrip.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
+    script(type='text/javascript' src='/js/bindings/noUiSlider.js')
     script(type='text/javascript' src='/js/bindings/popover.js')
     link(rel='stylesheet', href='/css/createTrip.css')
 
@@ -54,7 +55,7 @@ block content
                                                         span.input-group-addon
                                                             label(for='daysAmount') days
                                                 .col-md-9
-                                                    .slider.slider-info#my-slider
+                                                    .slider.slider-info#my-slider(data-bind='noUiSlider: { min: 1, max: 365, value: days }')
                             .add-segment(data-bind='click: addSegment')
                                 span Add Segment
             .col-md-4
@@ -114,6 +115,7 @@ block content
         }
         
         $(document).ready(function() {
+            console.log('asdf');
             ko.applyBindings(vm);
             var formatOption = function(item) {
                 if (!item.icon) { return item.display_name; }

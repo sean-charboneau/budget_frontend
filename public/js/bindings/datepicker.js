@@ -27,7 +27,6 @@ ko.bindingHandlers.dateTimePicker = {
         });
     },
     update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
-
         var picker = $(element).data("DateTimePicker");
         //when the view model is updated, update the widget
         if (picker) {

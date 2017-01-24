@@ -5,11 +5,13 @@ var CreateTripViewModel = function() {
 
     self.addSegment = function() {
         self.tripSegments.push({
+            index: ko.observable(self.tripSegments().length),
+
             budget: ko.observable(1500),
             country: ko.observable(),
             days: ko.observable(30),
-            expanded: ko.observable(true),
 
+            expanded: ko.observable(true),
             budgetLocked: ko.observable(false),
             daysLocked: ko.observable(false),
             perDayLocked: ko.observable(false),
@@ -27,18 +29,18 @@ var CreateTripViewModel = function() {
                 this.daysLocked(!this.daysLocked());
             }
         });
-        var handlesSlider = document.getElementById('my-slider');
+        // var handlesSlider = document.getElementById('my-slider');
 
-        noUiSlider.create(handlesSlider, {
-            start: [ 30 ],
-            range: {
-                'min': [  1 ],
-                'max': [ 365 ]
-            }
-        });
-        handlesSlider.noUiSlider.on('update', function(val) {
-            console.log(Math.floor(val[0]));
-        });
+        // noUiSlider.create(handlesSlider, {
+        //     start: [ 30 ],
+        //     range: {
+        //         'min': [  1 ],
+        //         'max': [ 365 ]
+        //     }
+        // });
+        // handlesSlider.noUiSlider.on('update', function(val) {
+        //     console.log(Math.floor(val[0]));
+        // });
         self.initCountryDropdown();
     };
 
