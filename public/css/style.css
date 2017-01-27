@@ -567,3 +567,8 @@ td {
     padding: 4px;
     background-color: transparent;
 }
+
+.force-disable {
+    cursor: not-allowed;
+    pointer-events: none;
+}

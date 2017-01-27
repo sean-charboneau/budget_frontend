@@ -4,13 +4,15 @@ var CreateTripViewModel = function() {
     self.tripSegments = ko.observableArray([]);
 
     self.addSegment = function() {
-        self.tripSegments.push({
+        var newSegment = {
             index: ko.observable(self.tripSegments().length),
 
-            budget: ko.observable(1500),
+            budget: ko.observable(150),
             country: ko.observable(),
-            days: ko.observable(30),
+            days: ko.observable(3),
+            perDay: ko.observable(50),
 
+            adjusting: ko.observable(false),
             expanded: ko.observable(true),
             budgetLocked: ko.observable(false),
             daysLocked: ko.observable(false),
@@ -25,22 +27,70 @@ var CreateTripViewModel = function() {
             toggle: function() {
                 this.expanded(!this.expanded());
             },
+            toggleBudgetLock: function() {
+                this.budgetLocked(!this.budgetLocked());
+                if(this.budgetLocked()) {
+                    this.daysLocked(false);
+                    this.perDayLocked(false);
+                }
+            },
             toggleDaysLock: function() {
                 this.daysLocked(!this.daysLocked());
+                if(this.daysLocked()) {
+                    this.budgetLocked(false);
+                    this.perDayLocked(false);
+                }
+            },
+            togglePerDayLock: function() {
+                this.perDayLocked(!this.perDayLocked());
+                if(this.perDayLocked()) {
+                    this.daysLocked(false);
+                    this.budgetLocked(false);
+                }
             }
+        };
+        newSegment.days.subscribe(function(val) {
+            if(newSegment.adjusting()) {
+                return;
+            }
+            newSegment.adjusting(true);
+            if(newSegment.budgetLocked()) {
+                var newPerDay = self.formatCurrencyAmount(newSegment.budget() / newSegment.days(), self.user().base_currency);
+                newSegment.perDay(newPerDay);
+            }
+            else {
+                newSegment.budget(Math.floor(newSegment.perDay() * newSegment.days()));
+            }
+            newSegment.adjusting(false);
         });
-        // var handlesSlider = document.getElementById('my-slider');
-
-        // noUiSlider.create(handlesSlider, {
-        //     start: [ 30 ],
-        //     range: {
-        //         'min': [  1 ],
-        //         'max': [ 365 ]
-        //     }
-        // });
-        // handlesSlider.noUiSlider.on('update', function(val) {
-        //     console.log(Math.floor(val[0]));
-        // });
+        newSegment.budget.subscribe(function(val) {
+            if(newSegment.adjusting()) {
+                return;
+            }
+            newSegment.adjusting(true);
+            if(newSegment.perDayLocked()) {
+                newSegment.days(Math.ceil(newSegment.budget() / newSegment.perDay()));
+            }
+            else {
+                var newPerDay = self.formatCurrencyAmount(newSegment.budget() / newSegment.days(), self.user().base_currency);
+                newSegment.perDay(newPerDay);
+            }
+            newSegment.adjusting(false);
+        });
+        newSegment.perDay.subscribe(function(val) {
+            if(newSegment.adjusting()) {
+                return;
+            }
+            newSegment.adjusting(true);
+            if(newSegment.daysLocked()) {
+                newSegment.budget(Math.floor(newSegment.perDay() * newSegment.days()));
+            }
+            else {
+                newSegment.days(Math.ceil(newSegment.budget() / newSegment.perDay()));
+            }
+            newSegment.adjusting(false);
+        });
+        self.tripSegments.push(newSegment);
         self.initCountryDropdown();
     };
 
@@ -85,9 +135,13 @@ var CreateTripViewModel = function() {
         });
     };
 
-    self.formatCurrency = function(amount, currency) {
+    self.formatCurrencyAmount = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
-        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits}) +
+        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
+    };
+
+    self.formatCurrency = function(amount, currency) {
+         return self.formatCurrencyAmount(amount, currency) +
             ' ' +
             currency;
     };

@@ -47,15 +47,37 @@ block content
                                                     option
                                         .form-group
                                             .row
-                                                .col-md-3
+                                                .col-md-4
                                                     .input-group
                                                         span.input-group-addon
                                                             i.material-icons.lock-icon(data-bind='text: daysLocked() ? "lock" : "lock_open", click: toggleDaysLock')
-                                                        input.form-control(type='text', name='daysAmount', id='daysAmount', data-bind='value: days')
+                                                        input.form-control(type='text', name='daysAmount', id='daysAmount', data-bind='value: days, disable: daysLocked')
                                                         span.input-group-addon
                                                             label(for='daysAmount') days
-                                                .col-md-9
-                                                    .slider.slider-info#my-slider(data-bind='noUiSlider: { min: 1, max: 365, value: days }')
+                                                .col-md-8
+                                                    .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 365, value: days, id: "days" }, css: { "force-disable": daysLocked }')
+                                        .form-group.m-none
+                                            .row
+                                                .col-md-4
+                                                    .input-group
+                                                        span.input-group-addon
+                                                            i.material-icons.lock-icon(data-bind='text: budgetLocked() ? "lock" : "lock_open", click: toggleBudgetLock')
+                                                        input.form-control(type='text', name='budgetAmount', id='budgetAmount', data-bind='value: budget, disable: budgetLocked')
+                                                        span.input-group-addon
+                                                            label(for='budgetAmount', data-bind='text: $root.user().base_currency')
+                                                .col-md-8
+                                                    .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 10000, value: budget, id: "budget" }, css: { "force-disable": budgetLocked }')
+                                        .form-group.m-none
+                                            .row
+                                                .col-md-4
+                                                    .input-group
+                                                        span.input-group-addon
+                                                            i.material-icons.lock-icon(data-bind='text: perDayLocked() ? "lock" : "lock_open", click: togglePerDayLock')
+                                                        input.form-control(type='text', name='perDayAmount', id='perDayAmount', data-bind='value: perDay, disable: perDayLocked')
+                                                        span.input-group-addon
+                                                            label(for='perDayAmount', data-bind='text: $root.user().base_currency + "/Day"')
+                                                .col-md-8
+                                                    .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 200, value: perDay, step: 0.01, id: "perDay" }, css: { "force-disable": perDayLocked }')
                             .add-segment(data-bind='click: addSegment')
                                 span Add Segment
             .col-md-4
