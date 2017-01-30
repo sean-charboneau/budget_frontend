@@ -80,23 +80,42 @@ block content
                                                     .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 200, value: perDay, step: 0.01, id: "perDay" }, css: { "force-disable": perDayLocked }')
                             .add-segment(data-bind='click: addSegment')
                                 span Add Segment
+
             .col-md-4
                 .row
                     .col-md-12
                         .section.oneoff
                             .panel.panel-default
                                 .panel-heading
-                                    h3.panel-title oneoff
+                                    h3.panel-title
+                                        span One-Off Expenses
+                                        i.material-icons.md-18.help(data-bind='popover: { options: { content: "Enter single expenses, such as initial flights, vaccinations, or visa fees.", trigger: "hover" } }') help
                                 .panel-body
-                                    span asdf
+                                    .segment-details(style='display: none', data-bind='visible: tripOneOffExpenses().length > 0, foreach: tripOneOffExpenses')
+                                        .panel.panel-info
+                                            .panel-heading.segment-head(data-bind='click: toggle')
+                                                .pull-left.segment-head-text(data-bind='text: getText()')
+                                            .panel-body.segment-body(data-bind='visible: expanded')
+                                                .form-group.m-top-none
+                                                    input.form-control(type='text', name='oneOffTitle', id='oneOffTitle', placeholder='Expense Title', data-bind='value: title')
+                                                .form-group
+                                                    .input-group
+                                                        input.form-control(type='number', name='oneOffAmount', id='oneOffAmount', placeholder='100', data-bind='value: amount')
+                                                        span.input-group-addon
+                                                            label(for='oneOffAmount', data-bind='text: $root.user().base_currency')
+                                            
+                                    .add-segment(data-bind='click: addOneOff')
+                                        span Add One-Off Expense
                 .row
                     .col-md-12
                         .section.overview
                             .panel.panel-default
                                 .panel-heading
-                                    h3.panel-title overview
+                                    h3.panel-title Overview
                                 .panel-body
-                                    span asdf
+                                    span One-Off Expenses
+                                    .oneoff-summary(data-bind='foreach: tripOneOffExpenses')
+                                        span(data-bind='text: getText()')
 
     script.
         var vm = new CreateTripViewModel();

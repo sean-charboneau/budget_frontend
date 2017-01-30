@@ -2,11 +2,10 @@ var CreateTripViewModel = function() {
     var self = this;
     self.tripStartDate = ko.observable();
     self.tripSegments = ko.observableArray([]);
+    self.tripOneOffExpenses = ko.observableArray([]);
 
     self.addSegment = function() {
         var newSegment = {
-            index: ko.observable(self.tripSegments().length),
-
             budget: ko.observable(150),
             country: ko.observable(),
             days: ko.observable(3),
@@ -94,6 +93,36 @@ var CreateTripViewModel = function() {
         self.initCountryDropdown();
     };
 
+    self.addOneOff = function() {
+        var newOneOff = {
+            title: ko.observable(),
+            amount: ko.observable(),
+            expanded: ko.observable(true),
+
+            getText: function() {
+                var amountString = self.formatCurrency(this.amount(), self.user().base_currency);
+                return (this.title() || 'Expense') + ' - ' + amountString;
+            },
+            toggle: function() {
+                this.expanded(!this.expanded());
+            }
+        };
+
+        self.tripOneOffExpenses.push(newOneOff);
+    };
+
+    self.getOverviewText = function() {
+        var oneOffTotal = 0;
+        var segmentTotal = 0;
+
+        var oneOffText = '';
+        var segmentText = '';
+
+        var currency = self.user().base_currency;
+
+        
+    };
+
     self.initCountryDropdown = function() {
         var formatCountryOption = function(item) {
             var code = item.id || '_unknown';
@@ -137,7 +166,7 @@ var CreateTripViewModel = function() {
 
     self.formatCurrencyAmount = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
-        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
+        return (amount || 0).toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
     };
 
     self.formatCurrency = function(amount, currency) {

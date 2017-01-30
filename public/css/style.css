@@ -563,9 +563,11 @@ td {
     color: #007d71;
 }
 
-.question {
+.help {
     padding: 4px;
     background-color: transparent;
+    cursor: pointer;
+    cursor: hand;
 }
 
 .force-disable {
