@@ -49,3 +49,25 @@
     height: 16px;
     width: 16px;
 }
+
+.summary-section {
+    font-size: 14px;
+}
+
+.summary-item {
+    margin-bottom: 8px;
+}
+
+.total-divider {
+    margin-top: -8px;
+}
+
+.save-panel {
+    padding: 0px !important;
+    text-align: center;
+}
+
+.save-button {
+    width: 100%;
+    padding: 30px;
+}

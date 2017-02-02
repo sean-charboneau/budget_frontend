@@ -2,10 +2,13 @@ var CreateTripViewModel = function() {
     var self = this;
     self.tripStartDate = ko.observable();
     self.tripSegments = ko.observableArray([]);
+    self.tripSegmentsAdded = 0;
     self.tripOneOffExpenses = ko.observableArray([]);
+    self.tripOneOffExpensesAdded = 0;
 
     self.addSegment = function() {
         var newSegment = {
+            id: self.tripSegmentsAdded,
             budget: ko.observable(150),
             country: ko.observable(),
             days: ko.observable(3),
@@ -22,6 +25,9 @@ var CreateTripViewModel = function() {
                 var perDay = this.budget() / d;
                 var pdString = self.formatCurrency(perDay, self.user().base_currency);
                 return this.days() + ' Days -- ' + pdString + '/Day';
+            },
+            summary: function() {
+                return this.days() + (this.days() == 1 ? ' Day in ' : ' Days in ' + self.getNameForCountry(this.country()));
             },
             toggle: function() {
                 this.expanded(!this.expanded());
@@ -89,12 +95,35 @@ var CreateTripViewModel = function() {
             }
             newSegment.adjusting(false);
         });
+        self.tripSegmentsAdded++;
         self.tripSegments.push(newSegment);
         self.initCountryDropdown();
     };
 
+    self.deleteSegment = function(id) {
+        console.log(id);
+        for(var i = 0; i < self.tripSegments().length; i++) {
+            console.log(self.tripSegments()[i].id);
+            if(self.tripSegments()[i].id == id) {
+                console.log('deleting');
+                self.tripSegments.splice(i, 1);
+                return;
+            }
+        }
+    };
+
+    self.deleteOneOffExpense = function(id) {
+        for(var i = 0; i < self.tripOneOffExpenses().length; i++) {
+            if(self.tripOneOffExpenses()[i].id == id) {
+                self.tripOneOffExpenses.splice(i, 1);
+                return;
+            }
+        }
+    }
+
     self.addOneOff = function() {
         var newOneOff = {
+            id: self.tripOneOffExpensesAdded,
             title: ko.observable(),
             amount: ko.observable(),
             expanded: ko.observable(true),
@@ -108,19 +137,23 @@ var CreateTripViewModel = function() {
             }
         };
 
+        self.tripOneOffExpensesAdded++;
         self.tripOneOffExpenses.push(newOneOff);
     };
 
-    self.getOverviewText = function() {
-        var oneOffTotal = 0;
-        var segmentTotal = 0;
+    self.getTotalBudget = function() {
+        var total = 0;
+        for(var i = 0; i < self.tripOneOffExpenses().length; i++) {
+            total += parseFloat(self.tripOneOffExpenses()[i].amount() || 0);
+        }
+        for(var i = 0; i < self.tripSegments().length; i++) {
+            total += parseFloat(self.tripSegments()[i].budget() || 0);
+        }
+        return total;
+    };
 
-        var oneOffText = '';
-        var segmentText = '';
-
-        var currency = self.user().base_currency;
-
-        
+    self.getTotalBudgetText = function() {
+        return self.formatCurrencyShort(self.getTotalBudget(), self.user().base_currency);
     };
 
     self.initCountryDropdown = function() {
@@ -164,9 +197,14 @@ var CreateTripViewModel = function() {
         });
     };
 
+    self.formatCurrencyShort = function(amount, currency) {
+        console.log(amount);
+        return self.currencyObj()[currency].symbol_native + self.formatCurrencyAmount(amount, currency);
+    };
+
     self.formatCurrencyAmount = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
-        return (amount || 0).toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
+        return parseFloat(amount || 0).toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
     };
 
     self.formatCurrency = function(amount, currency) {

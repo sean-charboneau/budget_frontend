@@ -78,6 +78,10 @@ block content
                                                             label(for='perDayAmount', data-bind='text: $root.user().base_currency + "/Day"')
                                                 .col-md-8
                                                     .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 200, value: perDay, step: 0.01, id: "perDay" }, css: { "force-disable": perDayLocked }')
+                                        .form-group.m-none
+                                            .row
+                                                .col-md-12
+                                                    button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteSegment(id) }') Delete Segment
                             .add-segment(data-bind='click: addSegment')
                                 span Add Segment
 
@@ -103,6 +107,10 @@ block content
                                                         input.form-control(type='number', name='oneOffAmount', id='oneOffAmount', placeholder='100', data-bind='value: amount')
                                                         span.input-group-addon
                                                             label(for='oneOffAmount', data-bind='text: $root.user().base_currency')
+                                                .form-group.m-none
+                                                    .row
+                                                        .col-md-12
+                                                            button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteOneOffExpense(id) }') Delete Expense
                                             
                                     .add-segment(data-bind='click: addOneOff')
                                         span Add One-Off Expense
@@ -113,10 +121,31 @@ block content
                                 .panel-heading
                                     h3.panel-title Overview
                                 .panel-body
-                                    span One-Off Expenses
-                                    .oneoff-summary(data-bind='foreach: tripOneOffExpenses')
-                                        span(data-bind='text: getText()')
+                                    .summary-section(data-bind='foreach: tripOneOffExpenses')
+                                        .row.summary-item
+                                            .col-md-12
+                                                span.pull-left(data-bind='text: title')
+                                                span.pull-right(data-bind='text: $root.formatCurrencyShort(amount(), $root.user().base_currency)')
+                                    .summary-section(data-bind='foreach: tripSegments')
+                                        .row.summary-item
+                                            .col-md-12
+                                                span.pull-left(data-bind='text: summary()')
+                                                span.pull-right(data-bind='text: $root.formatCurrencyShort(budget(), $root.user().base_currency)')
+                                    .summary-section.total
+                                        .row.total-divider(data-bind='visible: (tripOneOffExpenses().length + tripSegments().length) > 0')
+                                            hr
+                                        .row
+                                            .col-md-12
+                                                span.pull-left Total
+                                                span.pull-right(data-bind='text: $root.getTotalBudgetText()')
 
+    
+        .row
+            .col-md-12
+                .section.save
+                    .panel.panel-default
+                        .panel-body.save-panel
+                            button.btn.btn-success.m-none.save-button Save Trip
     script.
         var vm = new CreateTripViewModel();
         var currencies = !{currency};
