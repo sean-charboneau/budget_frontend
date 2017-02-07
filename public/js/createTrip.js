@@ -1,10 +1,11 @@
 var CreateTripViewModel = function() {
     var self = this;
-    self.tripStartDate = ko.observable();
-    self.tripSegments = ko.observableArray([]);
-    self.tripSegmentsAdded = 0;
+    self.tripName = ko.observable();
     self.tripOneOffExpenses = ko.observableArray([]);
     self.tripOneOffExpensesAdded = 0;
+    self.tripSegments = ko.observableArray([]);
+    self.tripSegmentsAdded = 0;
+    self.tripStartDate = ko.observable();
 
     self.addSegment = function() {
         var newSegment = {
@@ -101,7 +102,6 @@ var CreateTripViewModel = function() {
     };
 
     self.deleteSegment = function(id) {
-        console.log(id);
         for(var i = 0; i < self.tripSegments().length; i++) {
             console.log(self.tripSegments()[i].id);
             if(self.tripSegments()[i].id == id) {
@@ -154,6 +154,24 @@ var CreateTripViewModel = function() {
 
     self.getTotalBudgetText = function() {
         return self.formatCurrencyShort(self.getTotalBudget(), self.user().base_currency);
+    };
+
+    self.saveTrip = function() {
+        console.log(self.tripStartDate());
+        $.ajax({
+            type: 'POST',
+            url: '/trip',
+            data: {
+                currency: self.user().base_currency,
+                name: self.tripName(),
+                startDate: self.tripStartDate().toISOString(),
+                segments: ko.toJSON(self.tripSegments),
+                oneOffExpenses: ko.toJSON(self.tripOneOffExpenses)
+            },
+            success: function(data) {
+                document.location = '/home';
+            }
+        });
     };
 
     self.initCountryDropdown = function() {

@@ -19,7 +19,7 @@ block content
                             form
                                 .col-md-6
                                     .form-group.m-none
-                                        input(type='text', name='tripName', id='tripName', class='form-control', placeholder='Trip Name')
+                                        input(type='text', name='tripName', id='tripName', class='form-control', placeholder='Trip Name', data-bind='value: tripName')
                                 .col-md-6
                                     .form-group.m-none
                                         .input-group
@@ -145,7 +145,7 @@ block content
                 .section.save
                     .panel.panel-default
                         .panel-body.save-panel
-                            button.btn.btn-success.m-none.save-button Save Trip
+                            button.btn.btn-success.m-none.save-button(data-bind='click: saveTrip') Save Trip
     script.
         var vm = new CreateTripViewModel();
         var currencies = !{currency};

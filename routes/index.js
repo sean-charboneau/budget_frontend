@@ -128,6 +128,19 @@ router.get('/withdrawal', authenticate, function(req, res) {
 	});
 });
 
+router.post('/trip', authenticate, function(req, res) {
+	request.post({url: config.get('api.hostname') + '/trip', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+
+		return res.json(body);
+	});
+});
+
 router.post('/withdrawal', authenticate, function(req, res) {
 	request.post({url: config.get('api.hostname') + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
