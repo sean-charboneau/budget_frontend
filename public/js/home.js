@@ -297,6 +297,7 @@ var HomeViewModel = function() {
             url: '/tripOverview',
             success: function(data) {
                 data = JSON.parse(data);
+                console.log(data);
                 self.tripOverviewLoading(false);
                 self.trip(data);
                 
