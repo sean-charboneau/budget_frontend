@@ -137,16 +137,16 @@ block content
                         h4#cashModalLabel.modal-title Add Cash
                     .modal-body
                         span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
-                        div.form-group
+                        .form-group
                             label.radio-inline
                                 input(type='radio', name='withdrawalType', value='atm', data-bind='checked: withdrawalType')
                                 | ATM Withdrawal
                             label.radio-inline
                                 input(type='radio', name='withdrawalType', value='earned', data-bind='checked: withdrawalType')
                                 | Earned Cash
-                        div.row
-                            div.amount-input.col-md-9
-                                div.form-group(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
+                        .form-group.m-none
+                            .row
+                                .amount-input.col-md-8(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
                                     label(for='withdrawalAmountInput') Amount
                                     input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
                                     //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
@@ -154,24 +154,24 @@ block content
                                     span.form-error(data-bind='text: message')
                                     // /ko
                                     // /ko
-                            div.currency-input.col-md-3
-                                label(for='withdrawalCurrency') Currency
-                                select.form-control.currency-dropdown#withdrawalCurrency(required)
-                                    option
-                                //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
-                                br
-                        div.input-group
+                                .currency-input.col-md-4
+                                    label(for='withdrawalCurrency') Currency
+                                    select.form-control.currency-dropdown#withdrawalCurrency(required)
+                                        option
+                                    //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
+                                    br
+                        .form-group.m-none
                             label(for='withdrawalDate') Date
-                            input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
-                            span.input-group-addon
-                                i.material-icons date_range
-                        div.form-group(data-bind='visible: withdrawalType() == "atm"')
-                            div.checkbox
-                                label
+                            .input-group
+                                input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                                span.input-group-addon
+                                    i.fa.fa-calendar
+                            .form-check(data-bind='visible: withdrawalType() == "atm"')
+                                label.form-check-label.m-top
                                     input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
-                                    small.m-left-small This withdrawal incurred a transaction fee
-                        div.input-group(data-bind='visible: withdrawalType() ==  "atm" && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
-                            label(for='transactionFee', data-bind='text: transactionFeeLabel')
+                                    | This withdrawal incurred a transaction fee
+                        .form-group.m-none(data-bind='visible: withdrawalType() == "atm" && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                            label.m-top(for='transactionFee', data-bind='text: transactionFeeLabel')
                             input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
                             //ko if: transactionFee.canValidate() && transactionFee.errors().length
                             //ko foreach: transactionFee.errors

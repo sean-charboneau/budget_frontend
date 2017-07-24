@@ -144,6 +144,14 @@ var HomeViewModel = function() {
     $('#transactionCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.transactionCurrency(this.value);
+        
+        var curr = self.currencyObj()[self.transactionCurrency()];
+        // For now, only change the country if we only have one option
+        // Otherwise we're just guessing.
+        // TODO: Maybe guess based on their itinerary?  Or most common?
+        if(curr.countries.length === 1) {
+            $('#transactionCountry').val(curr.countries[0]).trigger('change');
+        }
     });
     self.transactionCountry = ko.observable();
     $('#transactionCountry').on('change', function() {
@@ -257,17 +265,22 @@ var HomeViewModel = function() {
                 self.setItem('lastTransactionCurrency', self.transactionCurrency());
                 self.setItem('lastTransactionCountry', self.transactionCountry());
 
-                self.transactions(data);
+                console.log(data);
+                self.transactions(data.results);
                 self.loadCashReserves();
+            },
+            error: function(err) {
+                console.log(err);
             }
         });
     };
 
     self.loadRecentTransactions = function() {
         self.transactionsLoading(true);
+        var filters = {tripId: self.trip().tripId};
         $.ajax({
             type: 'GET',
-            url: '/transaction',
+            url: '/transaction?filters=' + encodeURIComponent(JSON.stringify(filters)),
             success: function(data) {
                 data = JSON.parse(data);
                 self.transactions(data.results);
@@ -285,8 +298,14 @@ var HomeViewModel = function() {
             success: function(data) {
                 data = JSON.parse(data);
                 self.tripOverviewLoading(false);
-                console.log(data);
                 self.trip(data);
+                
+                if(self.trip().tripId) {
+                    self.loadRecentTransactions();
+                }
+                else {
+                    self.transactionsLoading(false);
+                }
             }
         });
     };
@@ -326,7 +345,6 @@ var HomeViewModel = function() {
         }
     }
     self.loadCashReserves();
-    self.loadRecentTransactions();
     self.loadCategories();
     self.loadTripOverview();
 };

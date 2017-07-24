@@ -23,12 +23,7 @@
 }
 
 .currency-input {
-    padding-top: 28px;
     padding-left: 0px;
-}
-
-.currency-input .form-group  {
-    margin-top: 0px;
 }
 
 .currency-input .select2-selection {

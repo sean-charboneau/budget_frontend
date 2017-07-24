@@ -30,6 +30,14 @@ var TransactionsViewModel = function() {
     $('#transactionCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.transactionCurrency(this.value);
+        
+        var curr = self.currencyObj()[self.transactionCurrency()];
+        // For now, only change the country if we only have one option
+        // Otherwise we're just guessing.
+        // TODO: Maybe guess based on their itinerary?  Or most common?
+        if(curr.countries.length === 1) {
+            $('#transactionCountry').val(curr.countries[0]).trigger('change');
+        }
     });
     self.transactionCountry = ko.observable();
     $('#transactionCountry').on('change', function() {

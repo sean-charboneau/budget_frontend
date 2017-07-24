@@ -16,6 +16,7 @@ block content
                         .panel-heading
                             h3.panel-title Trip Details
                         .panel-body
+                            span.error-message(data-bind='visible: detailsError, text: detailsError')
                             form
                                 .col-md-6
                                     .form-group.m-none
@@ -31,8 +32,11 @@ block content
                 .section.segments
                     .panel.panel-default
                         .panel-heading
-                            h3.panel-title Trip Segments
+                            h3.panel-title
+                                span Trip Segments
+                                i.material-icons.md-18.help(data-bind='popover: { options: { content: "Add segments dividing your budget between different countries or regions.  Alternatively, add one segment for your entire trip.", trigger: "hover" } }') help
                         .panel-body
+                            span.error-message(data-bind='visible: segmentsError, text: segmentsError')
                             .segment-details(style='display: none', data-bind='visible: tripSegments().length > 0, foreach: tripSegments')
                                 .panel.panel-info
                                     .panel-heading.segment-head(data-bind='click: toggle')
@@ -145,7 +149,7 @@ block content
                 .section.save
                     .panel.panel-default
                         .panel-body.save-panel
-                            button.btn.btn-success.m-none.save-button(data-bind='click: saveTrip') Save Trip
+                            button.btn.btn-success.m-none.save-button(data-bind='saveTripEnabled, click: saveTrip') Save Trip
     script.
         var vm = new CreateTripViewModel();
         var currencies = !{currency};

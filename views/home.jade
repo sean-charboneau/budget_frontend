@@ -23,12 +23,18 @@ block content
                             .sk-cube2.sk-cube
                             .sk-cube4.sk-cube
                             .sk-cube3.sk-cube
-                        .amount.text-center(style='display: none', data-bind='visible: !cashReservesLoading(), foreach: cashReserves')
-                            span(data-bind='text: $root.formatCurrency(amount, currency)') 
-                            br
-                            span Worth: 
-                            span(data-bind='text: $root.formatCurrency(worth, base)')
-                            hr
+                        .amount.text-center(style='display: none', data-bind='visible: !cashReservesLoading()')
+                            div(data-bind='visible: !cashReserves')
+                                h4 No Cash
+                                    //- a(href='/createTrip') Set one up now!
+                            div(data-bind='visible: cashReserves')
+                                // ko foreach: cashReserves
+                                span(data-bind='text: $root.formatCurrency(amount, currency)') 
+                                br
+                                span Worth: 
+                                span(data-bind='text: $root.formatCurrency(worth, base)')
+                                hr(data-bind='visible: $index() != ($parent.cashReserves().length - 1)')
+                                // /ko
             .col-md-8
                 .panel.panel-default
                     .panel-heading
@@ -54,7 +60,7 @@ block content
                         .row
                             .col.col-xs-6
                                 h3.panel-title Transactions
-                            .col.col-xs-6.text-right
+                            .col.col-xs-6.text-right(style='display: none', data-bind='visible: !transactionsLoading() && trip().tripId')
                                 button.btn.btn-sm.btn-primary.btn-create.m-none(type='button', data-toggle='modal', data-target='#transactionModal') Add New
                     .panel-body
                         .sk-folding-cube(data-bind='visible: transactionsLoading')
@@ -62,33 +68,38 @@ block content
                             .sk-cube2.sk-cube
                             .sk-cube4.sk-cube
                             .sk-cube3.sk-cube
-                        table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !transactionsLoading()')
-                            thead
-                                tr
-                                    th #
-                                    th Type
-                                    th Amount
-                                    th Value
-                                    th Category
-                                    th Date
-                                    th Country
-                            tbody
-                                // ko foreach: transactions
-                                tr
-                                    td(data-bind='text: ($index() + 1)')
-                                    td(data-bind='text: $root.toTitleCase(type)')
-                                    td
-                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
-                                        span(data-bind='text: amount + " " + currency')
-                                    td
-                                        img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
-                                        span(data-bind='text: base_amount + " " + base_currency')
-                                    td(data-bind='text: $root.toTitleCase(category)')
-                                    td(data-bind='text: moment(date).format("YYYY-MM-DD")')
-                                    td
-                                        img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
-                                        span(data-bind='text: $root.getNameForCountry(country)')
-                                // /ko
+                        .transactions.text-center(style='display: none', data-bind='visible: !transactionsLoading()')
+                            div.text-center(data-bind='visible: !trip().tripId')
+                                h4 Please 
+                                    a(href='/createTrip') set up a trip 
+                                    | to add transactions
+                            table.table.table-striped.table-bordered.table-list(data-bind='visible: trip().tripId')
+                                thead
+                                    tr
+                                        th #
+                                        th Type
+                                        th Amount
+                                        th Value
+                                        th Category
+                                        th Date
+                                        th Country
+                                tbody
+                                    // ko foreach: transactions
+                                    tr
+                                        td(data-bind='text: ($index() + 1)')
+                                        td(data-bind='text: $root.toTitleCase(type)')
+                                        td
+                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
+                                            span(data-bind='text: amount + " " + currency')
+                                        td
+                                            img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[base_currency].icon + ".png" }')
+                                            span(data-bind='text: base_amount + " " + base_currency')
+                                        td(data-bind='text: $root.toTitleCase(category)')
+                                        td(data-bind='text: moment(date).format("YYYY-MM-DD")')
+                                        td
+                                            img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country) }')
+                                            span(data-bind='text: $root.getNameForCountry(country)')
+                                    // /ko
 
         //- Modals
         #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')
@@ -190,9 +201,9 @@ block content
                             label.radio-inline
                                 input(type='radio', name='withdrawalType', value='earned', data-bind='checked: withdrawalType')
                                 | Earned Cash
-                        .row
-                            .amount-input.col-md-9
-                                .form-group.m-none(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
+                        .form-group.m-none
+                            .row
+                                .amount-input.col-md-8(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
                                     label(for='withdrawalAmountInput') Amount
                                     input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
                                     //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
@@ -200,22 +211,23 @@ block content
                                     span.form-error(data-bind='text: message')
                                     // /ko
                                     // /ko
-                            .currency-input.col-md-3
-                                label(for='withdrawalCurrency') Currency
-                                select.form-control.currency-dropdown#withdrawalCurrency(required)
-                                    option
-                                //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
-                                br
-                        label(for='withdrawalDate') Date
-                        .input-group.m-none
-                            input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
-                            span.input-group-addon
-                                i.fa.fa-calendar
-                        .form-check(data-bind='visible: withdrawalType() == "atm"')
-                            label.form-check-label.m-top
-                                input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
-                                | This withdrawal incurred a transaction fee
-                        .input-group.m-none(data-bind='visible: withdrawalType() == "atm" && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                                .currency-input.col-md-4
+                                    label(for='withdrawalCurrency') Currency
+                                    select.form-control.currency-dropdown#withdrawalCurrency(required)
+                                        option
+                                    //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
+                                    br
+                        .form-group.m-none
+                            label(for='withdrawalDate') Date
+                            .input-group
+                                input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                                span.input-group-addon
+                                    i.fa.fa-calendar
+                            .form-check(data-bind='visible: withdrawalType() == "atm"')
+                                label.form-check-label.m-top
+                                    input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
+                                    | This withdrawal incurred a transaction fee
+                        .form-group.m-none(data-bind='visible: withdrawalType() == "atm" && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
                             label.m-top(for='transactionFee', data-bind='text: transactionFeeLabel')
                             input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
                             //ko if: transactionFee.canValidate() && transactionFee.errors().length

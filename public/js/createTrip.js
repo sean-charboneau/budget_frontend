@@ -7,6 +7,9 @@ var CreateTripViewModel = function() {
     self.tripSegmentsAdded = 0;
     self.tripStartDate = ko.observable();
 
+    self.detailsError = ko.observable('');
+    self.segmentsError = ko.observable('');
+
     self.addSegment = function() {
         var newSegment = {
             id: self.tripSegmentsAdded,
@@ -155,9 +158,31 @@ var CreateTripViewModel = function() {
     self.getTotalBudgetText = function() {
         return self.formatCurrencyShort(self.getTotalBudget(), self.user().base_currency);
     };
-
+    
     self.saveTrip = function() {
         console.log(self.tripStartDate());
+        self.detailsError('');
+        self.segmentsError('');
+
+        if(!self.tripName() && !self.tripStartDate()) {
+            self.detailsError('Please enter a trip name and start date');
+        }
+        else if(!self.tripName()) {
+            self.detailsError('Please enter a trip name');
+        }
+        else if(!self.tripStartDate()) {
+            self.detailsError('Please enter a start date');
+        }
+
+        if(!self.tripSegments().length) {
+            self.segmentsError('Please enter at least one trip segment');
+        }
+
+        if(self.detailsError() || self.segmentsError()) {
+            $("html, body").animate({ scrollTop: 0 }, "slow");
+            return;
+        }
+        
         $.ajax({
             type: 'POST',
             url: '/trip',
