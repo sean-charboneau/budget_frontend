@@ -19,7 +19,19 @@ var HomeViewModel = function() {
         },
         deferValidation: true
     });
-    self.withdrawalAmount = ko.observable().extend({
+    self.withdrawalAmount = ko.observable();
+    self.withdrawalATMAmount = ko.observable().extend({
+        gt: {
+            val: 0,
+            message: 'Value must be positive'
+        },
+        required: {
+            val: true,
+            message: "Please enter the amount you withdrew from the ATM"
+        },
+        deferValidation: true
+    });
+    self.withdrawalEarnedAmount = ko.observable().extend({
         gt: {
             val: 0,
             message: 'Value must be positive'
@@ -34,7 +46,11 @@ var HomeViewModel = function() {
     self.withdrawalError = ko.observable();
     self.withdrawalCurrency = ko.observable();
     self.withdrawalType = ko.observable('atm');
-    $('#withdrawalCurrency').on('change', function() {
+    $('#withdrawalATMCurrency').on('change', function() {
+        // Hacky way to make select2 observable
+        self.withdrawalCurrency(this.value);
+    });
+    $('#withdrawalEarnedCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.withdrawalCurrency(this.value);
     });
@@ -45,11 +61,29 @@ var HomeViewModel = function() {
         }
         return message;
     });
-    self.canSubmitWithdrawal = ko.computed(function() {
+    self.canSubmitATMWithdrawal = ko.computed(function() {
         if(self.savingWithdrawal()) {
             return false;
         }
-        if(self.withdrawalAmount.errors().length) {
+        if(self.withdrawalATMAmount.errors().length) {
+            return false;
+        }
+        if(!self.withdrawalCurrency()) {
+            return false;
+        }
+        if(!self.withdrawalDate()) {
+            return false;
+        }
+        if(self.isTransactionFee() && self.transactionFee.errors().length) {
+            return false;
+        }
+        return true;
+    });
+    self.canSubmitEarnedWithdrawal = ko.computed(function() {
+        if(self.savingWithdrawal()) {
+            return false;
+        }
+        if(self.withdrawalEarnedAmount.errors().length) {
             return false;
         }
         if(!self.withdrawalCurrency()) {
@@ -88,6 +122,18 @@ var HomeViewModel = function() {
             currency;
     };
 
+    self.saveATMWithdrawal = function() {
+        self.withdrawalType('atm');
+        self.withdrawalAmount(self.withdrawalATMAmount());
+        self.saveWithdrawal();
+    };
+
+    self.saveEarnedWithdrawal = function() {
+        self.withdrawalType('earned');
+        self.withdrawalAmount(self.withdrawalEarnedAmount());
+        self.saveWithdrawal();
+    }
+
     self.saveWithdrawal = function() {
         self.savingWithdrawal(true);
         self.cashReservesLoading(true);
@@ -113,9 +159,12 @@ var HomeViewModel = function() {
                 $('#cashModal').modal('hide');
                 self.isTransactionFee(false);
                 self.withdrawalAmount(null);
+                self.withdrawalATMAmount(null);
+                self.withdrawalEarnedAmount(null);
                 self.transactionFee(null);
                 self.withdrawalError(null);
-                self.withdrawalAmount.canValidate(false);
+                self.withdrawalATMAmount.canValidate(false);
+                self.withdrawalEarnedAmount.canValidate(false);
                 self.transactionFee.canValidate(false);
                 self.withdrawalDate(moment());
                 self.setItem('lastWithdrawalCurrency', self.withdrawalCurrency());
@@ -128,7 +177,7 @@ var HomeViewModel = function() {
     self.transactions = ko.observableArray([]);
     self.transactionError = ko.observable();
     self.savingTransaction = ko.observable(false);
-    self.transactionType = ko.observable('cash');
+    self.transactionCredit = ko.observable(false);
     self.transactionAmount = ko.observable().extend({
         gt: {
             val: 0,
@@ -172,7 +221,7 @@ var HomeViewModel = function() {
     });
     self.transactionDescription = ko.observable('');
     self.descriptionRemainingLength = ko.computed(function() {
-        return self.transactionDescription() ? self.transactionDescription().length + '/255' : '';
+        return 'Optional Description ' + (self.transactionDescription() ? self.transactionDescription().length + '/255' : '');
     });
     self.categoriesLoading = ko.observable(false);
     self.categories = ko.observableArray([]);
@@ -228,8 +277,9 @@ var HomeViewModel = function() {
     self.saveTransaction = function() {
         self.savingTransaction(true);
         self.transactionsLoading(true);
+        
         var body = {
-            type: self.transactionType(),
+            type: self.transactionCredit() ? 'credit' : 'cash',
             amount: self.transactionAmount(),
             currency: self.transactionCurrency(),
             date: self.transactionDate().toISOString(),

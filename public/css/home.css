@@ -15,19 +15,3 @@
 .amount-input {
     padding-right: 0px;
 }
-
-.amount-input input {
-    border-radius: 4px 0px 0px 4px;
-}
-
-.currency-input {
-    padding-left: 0px;
-}
-
-.currency-input .select2-selection {
-    border-radius: 0px 4px 4px 0px;
-}
-
-.img-flag {
-    margin-right: 4px;
-}

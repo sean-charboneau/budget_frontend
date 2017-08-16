@@ -24,7 +24,3 @@ var IndexViewModel = function() {
         return false;
     };
 };
-
-$(document).ready(function() {
-    ko.applyBindings(new IndexViewModel());
-});

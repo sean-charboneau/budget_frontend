@@ -461,12 +461,64 @@ body {
     text-align: left;
 }
 
+.select2-results__option {
+  font-size: 10px;
+}
+
 .p-none {
   padding: 0px !important;
 }
 
+.p-bottom {
+  padding-bottom: 15px;
+}
+
+.p-bottom-small {
+  padding-bottom: 5px;
+}
+
+.p-bottom-none {
+  padding-bottom: 0px;
+}
+
+.p-top {
+  padding-top: 15px;
+}
+
+.p-top-small {
+  padding-top: 5px;
+}
+
+.p-top-none {
+  padding-top: 0px;
+}
+
+.p-left {
+  padding-left: 15px;
+}
+
+.p-left-small {
+  padding-left: 5px;
+}
+
+.p-left-none {
+  padding-left: 0px;
+}
+
+.p-right {
+  padding-right: 15px;
+}
+
+.p-right-small {
+  padding-right: 5px;
+}
+
+.p-right-none {
+  padding-right: 0px;
+}
+
 .m-none {
-    margin: 0px !important;
+  margin: 0px !important;
 }
 
 .m-bottom {
@@ -567,6 +619,15 @@ td {
     color: #007d71;
 }
 
+.currency-input {
+    padding-left: 0px;
+    margin-top: -10px;
+}
+
+.currency-input .select2-selection {
+    border-radius: 0px 4px 4px 0px;
+}
+
 .help {
     padding: 4px;
     background-color: transparent;
@@ -577,4 +638,31 @@ td {
 .force-disable {
     cursor: not-allowed;
     pointer-events: none;
+}
+
+.form-header {
+    color: #fff;
+    text-align: center;
+    margin-top: -50px;
+    margin-bottom: 3rem;
+    padding: 1rem;
+    border-radius: 2px;
+}
+
+.img-flag {
+    margin-right: 4px;
+    display: inline !important;
+}
+
+.switch-input {
+  margin-bottom: 4rem;
+}
+
+.category-label {
+  font-size: 65%;
+}
+
+.page-display {
+  padding-left: 20px;
+  font-size: 75%;
 }

@@ -58,7 +58,7 @@ var TransactionsViewModel = function() {
     });
     self.transactionDescription = ko.observable('');
     self.descriptionRemainingLength = ko.computed(function() {
-        return self.transactionDescription() ? self.transactionDescription().length + '/255' : '';
+        return 'Optional Description ' + (self.transactionDescription() ? self.transactionDescription().length + '/255' : '');
     });
 
     self.categoriesLoading = ko.observable(false);
@@ -255,7 +255,7 @@ var TransactionsViewModel = function() {
         var limit = self.filters.limit();
         var total = self.totalResults();
 
-        return 'Displaying ' + (page * limit - limit + 1) + ' - ' + Math.min((page * limit), total) + ' of ' + total + ' results';
+        return  (page * limit - limit + 1) + ' - ' + Math.min((page * limit), total) + ' of ' + total + ' results';
     });
     self.navigate = function(page) {
         var lastPage = Math.ceil(self.totalResults() / self.filters.limit());

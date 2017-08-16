@@ -1,28 +1,34 @@
 extends layout
 
 block extraHeader
+    link(rel='stylesheet', href='/css/transactions.css')
+
+block extraScripts
     script(type='text/javascript' src='/js/transactions.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
     script(type='text/javascript' src='/js/bindings/popover.js')
-    link(rel='stylesheet', href='/css/transactions.css')
 
 block content
     div.container
         div.row
             div.col-md-12
-                .panel.panel-default.panel-table
-                    .panel-heading
+                .card
+                    .card-header.default-color.lighten-1.white-text
                         .row
                             .col.col-xs-6
-                                h3.panel-title Transactions
-                            .col.col-xs-6.text-right
-                                button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#transactionModal') Add New
-                    .panel-body
-                        .sk-folding-cube(data-bind='visible: transactionsLoading')
-                            .sk-cube1.sk-cube
-                            .sk-cube2.sk-cube
-                            .sk-cube4.sk-cube
-                            .sk-cube3.sk-cube
+                                span Transactions
+                            .col.col-xs-6.text-right(style='display: none', data-bind='visible: !transactionsLoading()')
+                                button.btn.btn-sm.btn-primary.btn-create.waves-effect(type='button', data-toggle='modal', data-target='#transactionModal') Add New
+                    .card-body.p-none
+                        .text-center(data-bind='visible: transactionsLoading')
+                            .preloader-wrapper.big.active.m-top.m-bottom
+                                .spinner-layer.spinner-blue-only
+                                    .circle-clipper.left
+                                        .circle
+                                    .gap-patch
+                                        .circle
+                                    .circle-clipper.right
+                                        .circle
                         table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !transactionsLoading()')
                             thead
                                 tr
@@ -94,11 +100,11 @@ block content
                                         span(data-bind='text: $root.getNameForCountry(country)')
                                     td(data-bind='text: description')
                                 // /ko
-                    .panel-footer
+                    .panel-footer(style='display: none', data-bind='visible: !transactionsLoading()')
                         .row
-                            .col-md-2.page-display
+                            .col-md-5.page-display
                                 span(data-bind='text: pageDisplayText')
-                            .col-md-8.text-center
+                            .col-md-5.text-center
                                 ul.pagination.hidden-md
                                     li
                                         a(href='#', data-bind='click: function(e) { navigate("first") }, clickBubble: false') <<
@@ -112,93 +118,99 @@ block content
                                         a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
                             .col-md-2.per-page
                                 .input-group
-                                        span.input-group-addon Per Page: 
-                                        select.form-control(data-bind='options: filters.limitList, value: filters.limit')
+                                    span.input-group-addon Per Page: 
+                                    select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
-        #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel')
-            .modal-dialog(role='document')
+        #transactionModal.modal.fade(role='dialog', aria-labelledby='transactionModalLabel', aria-hidden='true')
+            .modal-dialog.cascading-modal(role='document')
+                // Content
                 .modal-content
-                    .modal-header
-                        button.close(type='button', data-dismiss='modal', aria-label='Close')
+                    // Header
+                    .modal-header.default-color.darken-3.white-text
+                        h4.title
+                            i.fa.fa-money
+                            |  Record Transaction
+                        button.close.waves-effect.waves-light(type='button', data-dismiss='modal', aria-label='Close')
                             span(aria-hidden='true') ×
-                        h4#transactionModalLabel.modal-title Record Transaction
-                    .modal-body
+                    // Body
+                    .modal-body.mb-0
                         span.error-message(data-bind='visible: transactionError, text: transactionError')
-                        div.form-group
-                            label.radio-inline
-                                input(type='radio', name='transactionType', value='cash', data-bind='checked: transactionType')
-                                | Cash
-                            label.radio-inline
-                                input(type='radio', name='transactionType', value='credit', data-bind='checked: transactionType')
-                                | Credit
-                        div.form-group
-                            div.row
-                                div.amount-input.col-md-8(data-bind='css: { "has-error": transactionAmount.canValidate() && transactionAmount.errors().length }')
-                                    label(for='transactionAmountInput') Transaction Amount
-                                    input.form-control(type='number', min='0', id='transactionAmountInput', data-bind='value: transactionAmount, valueUpdate: "afterkeydown"')
+                        .md-form.switch-input
+                            .switch
+                                label
+                                    | Cash
+                                    input(type='checkbox', data-bind='transactionCredit')
+                                    span.lever
+                                    |       Credit
+
+                        .form-group.m-none
+                            .row
+                                .amount-input.col-md-8(data-bind='css: { "has-error": transactionAmount.canValidate() && transactionAmount.errors().length }')
+                                    .md-form
+                                        input#transactionAmountInput.form-control(type='number', min='0', data-bind='value: transactionAmount, valueUpdate: "afterkeydown"')
+                                        label(for='transactionAmountInput') Transaction Amount
                                     //ko if: transactionAmount.canValidate() && transactionAmount.errors().length
                                     //ko foreach: transactionAmount.errors
                                     span.form-error(data-bind='text: message')
                                     // /ko
                                     // /ko
-                                div.currency-input.col-md-4
+                                .currency-input.col-md-4
                                     label(for='transactionCurrency') Currency
                                     select.form-control.currency-dropdown#transactionCurrency(required)
                                         option
-                                    small.form-text.text-muted The currency in which you paid
+                                    //- small.form-text.text-muted.m-bottom The currency in which you paid
                                     br
-                        div.form-group
-                            div.row
-                                div.col-md-6
+                        .form-group.m-none
+                            .row
+                                .col-md-6
                                     label(for='transactionDate', data-bind='text: transactionDateLabel')
-                                    div.input-group
+                                    .input-group
                                         input.form-control(id='transactionDate', data-bind='dateTimePicker: transactionDate', type='text')
                                         span.input-group-addon
-                                            i.material-icons date_range
-                                div.col-md-6(data-bind='visible: transactionSplit')
+                                            i.fa.fa-calendar
+                                .col-md-6(data-bind='visible: transactionSplit')
                                     label(for='transactionEnd') End Date
-                                    div.input-group
+                                    .input-group
                                         input.form-control(id='transactionEnd', data-bind='dateTimePicker: transactionEnd', type='text')
                                         span.input-group-addon
-                                            i.material-icons date_range
-                            div.row
-                                div.col-md-12
-                                    a(href='#' data-bind='click: toggleTransactionSplit, text: transactionSplitText')
+                                            i.fa.fa-calendar
+                            .row.m-top-small.m-bottom
+                                .col-md-12
+                                    a(href='#' style='font-size: 70%', data-bind='click: toggleTransactionSplit, text: transactionSplitText')
 
-                        div.form-group
-                            div.country-input
+                        .form-group(data-bind='visible: !unassociatedTransaction()')
+                            .country-input
                                 label(for='transactionCountry') Country
                                 select.form-control.country-dropdown#transactionCountry(required)
                                     option
-                        div.form-group.m-none
-                            div.checkbox
-                                label
-                                    input(type='checkbox', value='', data-bind='checked: unassociatedTransaction')
-                                    small.m-left-small Do not associate this transaction with a country
-                                    //- button.btn.btn-sm.question(data-bind='popover: { options: { content: "If selected, this transaction will not show up in any country\'s expenses.  It will show up in its own Unassigned category.", trigger: "hover" } }')
-                                    //-     i.fa.fa-question-circle-o
-                        div.form-group
+                        .do-not-associate
+                            .form-group
+                                input#doNotAssociateCheckbox(type='checkbox', value='', data-bind='checked: unassociatedTransaction')
+                                label(for='doNotAssociateCheckbox') Do not associate this transaction with a country
+                                i.fa.fa-question-circle-o.help(data-bind='popover: { options: { content: "If selected, this transaction will not show up in any country\'s expenses.  It will show up in its own Unassigned category.", trigger: "hover" } }')
+                                    
+                        .form-group
                             label Category
-                            div.row
+                            .row
                                 // ko foreach: categories
-                                div.col-md-2
-                                    div.row.category-option(data-bind='click: $root.categoryClicked, css: { "category-selected": $root.selectedCategory() && ($root.selectedCategory().id == id) }')
+                                .col-md-2
+                                    .row.category-option(data-bind='click: $root.categoryClicked, css: { "category-selected": $root.selectedCategory() && ($root.selectedCategory().id == id) }')
                                         input.category-value(type='hidden', data-bind='value: id')
-                                        div.col-md-12.category-icon
-                                            i.material-icons(data-bind='text: icon')
-                                            //- i(data-bind='attr: { "class": "fa fa-" + icon }')
-                                        div.col-md-12.category-label
+                                        .col-md-12.category-icon
+                                            i(data-bind='attr: { "class": "fa fa-" + icon }')
+                                        .col-md-12.category-label
                                             span(data-bind='text: $root.toTitleCase(category)')
                                 // /ko
-                        div.form-group
-                            label(for='descriptionInput') Description (optional)
-                            label.pull-right(data-bind='text: descriptionRemainingLength')
-                            textarea.form-control#descriptionInput(data-bind='value: transactionDescription, valueUpdate: "afterkeydown"')
+                        .form-group
+                            .md-form
+                                textarea.md-textarea#descriptionInput(type='text', data-bind='value: transactionDescription, valueUpdate: "afterkeydown"')
+                                label(for='descriptionInput', data-bind='text: descriptionRemainingLength')
                                         
+
                     .modal-footer
-                        button.btn.btn-default(type='button', data-dismiss='modal') Cancel
-                        button.btn.btn-primary(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
+                        button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
+                        button.btn.btn-primary.waves-effect(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
 
 
     script.

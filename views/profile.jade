@@ -5,16 +5,16 @@ block extraHeader
 
 block content
 	div.container
-		div.row
-			div.col-sm-6.col-md-4.col-md-offset-4
-				#user
+		div.row.justify-content-md-center
+			.card(style='width: 28rem;')
+				.card-body
 					h1.text-center.login-title Welcome #{user.first_name}. Account Info:
-						div.signup-wall
-							ul.user-details
-								li Username ---> #{user.username}
-								li Email    ---> #{user.email}
-								li First Name ---> #{user.first_name} 
-								li Last Name ---> #{user.last_name}
+					.text-center
+						ul.user-details
+							li Username ---> #{user.username}
+							li Email    ---> #{user.email}
+							li First Name ---> #{user.first_name} 
+							li Last Name ---> #{user.last_name}
 
 	script.
 		var vm = new ProfileViewModel();
