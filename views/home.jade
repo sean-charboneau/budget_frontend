@@ -67,7 +67,7 @@ block content
                                             |  Back
                         .col.col-md-4.text-center
                             .card-wrapper
-                                #card-1.card-rotating.effect__click
+                                #card-2.card-rotating.effect__click
                                     .face.front
                                         .card-up.default-color.lighten-1.white-text.p-top-small
                                             h4 Country
@@ -76,19 +76,19 @@ block content
                                         .card-body
                                             h4(data-bind='text: overText("country")')
                                             p(data-bind='text: budgetText("country")')
-                                            a.rotate-btn(data-card='card-1')
+                                            a.rotate-btn(data-card='card-2')
                                                 i.fa.fa-repeat
                                                 |  More details
                                     .face.back
                                         h4 Country's Budget
                                         hr
                                         p(data-bind='text: budgetText("country")')
-                                        a.rotate-btn(data-card='card-1')
+                                        a.rotate-btn(data-card='card-2')
                                             i.fa.fa-undo
                                             |  Back
                         .col.col-md-4.text-center
                             .card-wrapper
-                                #card-1.card-rotating.effect__click
+                                #card-3.card-rotating.effect__click
                                     .face.front
                                         .card-up.default-color.lighten-1.white-text.p-top-small
                                             h4 Trip
@@ -97,14 +97,14 @@ block content
                                         .card-body
                                             h4(data-bind='text: overText("trip")')
                                             p(data-bind='text: budgetText("trip")')
-                                            a.rotate-btn(data-card='card-1')
+                                            a.rotate-btn(data-card='card-3')
                                                 i.fa.fa-repeat
                                                 |  More details
                                     .face.back
                                         h4 Trip's Budget
                                         hr
                                         p(data-bind='text: budgetText("trip")')
-                                        a.rotate-btn(data-card='card-1')
+                                        a.rotate-btn(data-card='card-3')
                                             i.fa.fa-undo
                                             |  Back
                 .card(data-bind='visible: tripOverviewLoading() || !trip().tripId')
