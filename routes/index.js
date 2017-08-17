@@ -217,7 +217,16 @@ router.get('/cashReserves', authenticate, function(req, res) {
 router.get('/home', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
 	var countries = require('../data/countries.json');
-	return res.render('home', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		if(err || !body) {
+			return logOut(req, res, {error: 0});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+
+		return res.render('home', {user: body, currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+	});
 });
 
 router.get('/profile', authenticate, function(req, res) {

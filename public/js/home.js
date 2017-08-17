@@ -115,9 +115,17 @@ var HomeViewModel = function() {
         })
     };
 
-    self.formatCurrency = function(amount, currency) {
+    self.formatCurrencyShort = function(amount, currency) {
+        return self.currencyObj()[currency].symbol_native + self.formatCurrencyAmount(amount, currency);
+    };
+
+    self.formatCurrencyAmount = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
-        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits}) +
+        return parseFloat(amount || 0).toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
+    };
+
+    self.formatCurrency = function(amount, currency) {
+         return self.formatCurrencyAmount(amount, currency) +
             ' ' +
             currency;
     };
@@ -335,6 +343,7 @@ var HomeViewModel = function() {
                 data = JSON.parse(data);
                 self.transactions(data.results);
                 self.transactionsLoading(false);
+                self.initializeProgressBars();
             }
         });
     };
@@ -359,6 +368,57 @@ var HomeViewModel = function() {
                 }
             }
         });
+    };
+
+    self.initializeProgressBar = function(container, amount, budget) {
+        var getColor = function(value) {
+            //value from 0 to 1
+            var hue=((1-value)*120).toString(10);
+            return ["hsl(",hue,",100%,50%)"].join("");
+        };
+
+        var percentage = Math.min(amount / budget, 1);
+        new ProgressBar.Circle(container, {
+            color: '#000',
+            strokeWidth: 6,
+            trailWidth: 1,
+            easing: 'easeInOut',
+            duration: 3000,
+            from: { width: 3 },
+            to: { width: 6 },
+
+            // Set step function for all animate calls
+            step: function(state, circle) {
+                circle.path.setAttribute('stroke', getColor(circle.value()));
+                circle.path.setAttribute('stroke-width', state.width);
+
+                var value = self.formatCurrencyShort(circle.value() * Math.max(amount, budget), self.user().base_currency);
+                circle.setText(value);
+            }
+        }).animate(percentage);
+    }
+
+    self.initializeProgressBars = function() {
+        var todayContainer = $('#today-progress')[0];
+        var countryContainer = $('#country-progress')[0];
+        var tripContainer = $('#trip-progress')[0];
+
+        // Today Budget
+        var todaySpending = self.trip().spending.today.amount;
+        var todayBudget = self.trip().budget.today.amount;
+        self.initializeProgressBar(todayContainer, todaySpending, todayBudget);
+
+        // Country Budget
+        var countrySpending = self.trip().spending.country.amount;
+        var countryBudget = self.trip().budget.country.amount;
+        self.initializeProgressBar(countryContainer, countrySpending, countryBudget);
+
+        // Trip Budget
+        var tripSpending = self.trip().spending.trip.amount;
+        var tripBudget = self.trip().budget.trip.amount;
+        self.initializeProgressBar(tripContainer, tripSpending, tripBudget);
+        
+        
     };
 
     self.getIconForCountry = function(country) {

@@ -64,39 +64,26 @@ block content
                             div(data-bind='visible: trip().tripId')
                                 .row
                                     .col.col-md-4.text-center
-                                        .row
+                                        .row.m-bottom
                                             .col.col-md-12
                                                 span Today
-                                        .row
-                                            .col.col-md-12
-                                                .c100.p25.green
-                                                    span $12.75
-                                                    .slice
-                                                        .bar
-                                                        .fill
+                                        .row.justify-content-md-center
+                                            .col.col-md-9
+                                                #today-progress.budget-progress.cursor-pointer
                                     .col.col-md-4.text-center
-                                        .row
+                                        .row.m-bottom
                                             .col.col-md-12
-                                                span Today
-                                        .row
-                                            .col.col-md-12
-                                                .c100.p25.green
-                                                    span $12.75
-                                                    .slice
-                                                        .bar
-                                                        .fill
+                                                span Country
+                                        .row.justify-content-md-center
+                                            .col.col-md-9
+                                                #country-progress.budget-progress.cursor-pointer
                                     .col.col-md-4.text-center
-                                        .row
+                                        .row.m-bottom
                                             .col.col-md-12
-                                                span Today
-                                        .row
-                                            .col.col-md-12
-                                                .c100.p25.green
-                                                    span $12.75
-                                                    .slice
-                                                        .bar
-                                                        .fill
-
+                                                span Trip
+                                        .row.justify-content-md-center
+                                            .col.col-md-9
+                                                #trip-progress.budget-progress.cursor-pointer
 
         .row.m-top
             .col-md-12
@@ -109,7 +96,7 @@ block content
                                 button.btn.btn-sm.btn-primary.btn-create.m-none.waves-effect(type='button' data-toggle='modal', data-target='#transactionModal') Add New
                     .card-body.p-none
                         .text-center(data-bind='visible: transactionsLoading')
-                            .preloader-wrapper.big.active.m-top
+                            .preloader-wrapper.big.active.m-top.m-bottom
                                 .spinner-layer.spinner-blue-only
                                     .circle-clipper.left
                                         .circle
@@ -326,10 +313,12 @@ block content
         var vm = new HomeViewModel();
         var currencies = !{currency};
         var countries = !{countries};
+        var user = !{user};
         vm.currencyArr = ko.observableArray(currencies);
         vm.currencyObj = ko.observable({});
         vm.countryArr = ko.observableArray([]);
         vm.countryObj = ko.observable(countries);
+        vm.user = ko.observable(user);
 
         // Preload flag images
         var images = new Array()

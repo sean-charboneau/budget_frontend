@@ -1,7 +1,7 @@
 body {
     /*margin-top: 40px;*/
     /*padding: 20px;*/
-    font: 100%/1.4em 'Calibre Light', 'Helvetica Neue', Helvetica, Arial, sans-serif
+    /*font: 100%/1.4em 'Calibre Light', 'Helvetica Neue', Helvetica, Arial, sans-serif*/
 }
 
 a {
@@ -422,6 +422,7 @@ body {
 
 .cursor-pointer {
     cursor: pointer;
+    cursor: hand;
 }
 
 .button {
@@ -665,4 +666,13 @@ td {
 .page-display {
   padding-left: 20px;
   font-size: 75%;
+}
+
+.budget-progress {
+  -webkit-transition: font-size .5s;
+  transition: font-size .5s;
+}
+
+.budget-progress:hover {
+  font-size: 30px;
 }

@@ -241,7 +241,6 @@ var CreateTripViewModel = function() {
     };
 
     self.formatCurrencyShort = function(amount, currency) {
-        console.log(amount);
         return self.currencyObj()[currency].symbol_native + self.formatCurrencyAmount(amount, currency);
     };
 
