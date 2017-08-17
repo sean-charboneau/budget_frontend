@@ -379,7 +379,7 @@ var HomeViewModel = function() {
 
         var percentage = Math.min(amount / budget, 1);
         new ProgressBar.Circle(container, {
-            color: '#000',
+            color: '#fff',
             strokeWidth: 6,
             trailWidth: 1,
             easing: 'easeInOut',
@@ -417,7 +417,42 @@ var HomeViewModel = function() {
         var tripSpending = self.trip().spending.trip.amount;
         var tripBudget = self.trip().budget.trip.amount;
         self.initializeProgressBar(tripContainer, tripSpending, tripBudget);
-        
+    };
+
+    self.overText = function(section) {
+        if(!self.trip || !self.trip() || !self.trip().budget || !self.trip().budget[section]) {
+            return '';
+        }
+
+        return (self.trip().spending[section].amount > self.trip().budget[section].amount) ? 'Over Budget' : 'On Track';
+    };
+
+    self.budgetText = function(section, verbose) {
+        if(!self.trip || !self.trip() || !self.trip().budget || !self.trip().budget[section]) {
+            return '';
+        }
+
+        var currency = self.user().base_currency;
+        var spent = self.formatCurrencyShort(self.trip().spending[section].amount, currency);
+        var budget = self.formatCurrencyShort(self.trip().budget[section].amount, currency);
+        var sectionText = {
+            'today': 'today',
+            'country': 'in ' +self.getNameForCountry(self.trip().budget.country.country),
+            'trip': 'on your trip'
+        };
+
+        //TODO verbose text for back of cards
+        if(!verbose) {
+            return spent +
+                ' spent out of your '  +
+                budget +
+                ' budget ' +
+                sectionText[section] +
+                '.';
+        }
+    };
+
+    self.viewTransactionsFor = function(section) {
         
     };
 
@@ -445,7 +480,7 @@ var HomeViewModel = function() {
         } else {
             console.log('No support for localStorage in browser.');
         }
-    }
+    };
 
     self.getItem = function(item) {
         if (typeof(Storage) !== "undefined") {
@@ -454,7 +489,8 @@ var HomeViewModel = function() {
             console.log('No support for localStorage in browser.');
             return null;
         }
-    }
+    };
+    
     self.loadCashReserves();
     self.loadCategories();
     self.loadTripOverview();

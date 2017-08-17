@@ -671,8 +671,9 @@ td {
 .budget-progress {
   -webkit-transition: font-size .5s;
   transition: font-size .5s;
+  padding: 10px;
 }
 
 .budget-progress:hover {
-  font-size: 30px;
+  font-size: 24px;
 }
