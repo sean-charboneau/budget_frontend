@@ -51,7 +51,7 @@ block content
                                         .card-up.default-color.lighten-1.white-text.p-top-small
                                             h4 Today
                                         .avatar.default-color.lighten-1
-                                            #today-progress.budget-progress.cursor-pointer(data-bind='click: viewTransactionsFor("today")')
+                                            #today-progress.budget-progress.cursor-pointer
                                         .card-body
                                             h4(data-bind='text: overText("today")')
                                             p(data-bind='text: budgetText("today")')
@@ -61,7 +61,7 @@ block content
                                     .face.back
                                         h4 Today's Budget
                                         hr
-                                        p(data-bind='text: budgetText("today")')
+                                        p(data-bind='text: budgetText("today", true)')
                                         a.rotate-btn(data-card='card-1')
                                             i.fa.fa-undo
                                             |  Back
@@ -70,9 +70,9 @@ block content
                                 #card-2.card-rotating.effect__click
                                     .face.front
                                         .card-up.default-color.lighten-1.white-text.p-top-small
-                                            h4 Country
+                                            h4(data-bind='text: getNameForCurrentCountry()')
                                         .avatar.default-color.lighten-1
-                                            #country-progress.budget-progress.cursor-pointer(data-bind='click: viewTransactionsFor("today")')
+                                            #country-progress.budget-progress.cursor-pointer
                                         .card-body
                                             h4(data-bind='text: overText("country")')
                                             p(data-bind='text: budgetText("country")')
@@ -82,7 +82,7 @@ block content
                                     .face.back
                                         h4 Country's Budget
                                         hr
-                                        p(data-bind='text: budgetText("country")')
+                                        p(data-bind='text: budgetText("country", true)')
                                         a.rotate-btn(data-card='card-2')
                                             i.fa.fa-undo
                                             |  Back
@@ -93,7 +93,7 @@ block content
                                         .card-up.default-color.lighten-1.white-text.p-top-small
                                             h4 Trip
                                         .avatar.default-color.lighten-1
-                                            #trip-progress.budget-progress.cursor-pointer(data-bind='click: viewTransactionsFor("today")')
+                                            #trip-progress.budget-progress.cursor-pointer
                                         .card-body
                                             h4(data-bind='text: overText("trip")')
                                             p(data-bind='text: budgetText("trip")')
@@ -103,7 +103,7 @@ block content
                                     .face.back
                                         h4 Trip's Budget
                                         hr
-                                        p(data-bind='text: budgetText("trip")')
+                                        p(data-bind='text: budgetText("trip", true)')
                                         a.rotate-btn(data-card='card-3')
                                             i.fa.fa-undo
                                             |  Back
@@ -199,7 +199,7 @@ block content
                             .switch
                                 label
                                     | Cash
-                                    input(type='checkbox', data-bind='transactionCredit')
+                                    input(type='checkbox', data-bind='checked: transactionCredit')
                                     span.lever
                                     |       Credit
 
@@ -482,7 +482,6 @@ block content
             });
             /* ROTATING CARDS */
             $('.rotate-btn').on('click', function () {
-                console.log('click');
                 var cardId = $(this).attr('data-card');
                 $('#' + cardId).toggleClass('flipped');
             });

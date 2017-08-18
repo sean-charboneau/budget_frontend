@@ -326,6 +326,7 @@ var HomeViewModel = function() {
                 console.log(data);
                 self.transactions(data.results);
                 self.loadCashReserves();
+                self.loadTripOverview();
             },
             error: function(err) {
                 console.log(err);
@@ -399,24 +400,28 @@ var HomeViewModel = function() {
     }
 
     self.initializeProgressBars = function() {
-        var todayContainer = $('#today-progress')[0];
-        var countryContainer = $('#country-progress')[0];
-        var tripContainer = $('#trip-progress')[0];
+        var todayContainer = $('#today-progress');
+        var countryContainer = $('#country-progress');
+        var tripContainer = $('#trip-progress');
+
+        todayContainer.empty();
+        countryContainer.empty();
+        tripContainer.empty();
 
         // Today Budget
         var todaySpending = self.trip().spending.today.amount;
         var todayBudget = self.trip().budget.today.amount;
-        self.initializeProgressBar(todayContainer, todaySpending, todayBudget);
+        self.initializeProgressBar(todayContainer[0], todaySpending, todayBudget);
 
         // Country Budget
         var countrySpending = self.trip().spending.country.amount;
         var countryBudget = self.trip().budget.country.amount;
-        self.initializeProgressBar(countryContainer, countrySpending, countryBudget);
+        self.initializeProgressBar(countryContainer[0], countrySpending, countryBudget);
 
         // Trip Budget
         var tripSpending = self.trip().spending.trip.amount;
         var tripBudget = self.trip().budget.trip.amount;
-        self.initializeProgressBar(tripContainer, tripSpending, tripBudget);
+        self.initializeProgressBar(tripContainer[0], tripSpending, tripBudget);
     };
 
     self.overText = function(section) {
@@ -424,7 +429,24 @@ var HomeViewModel = function() {
             return '';
         }
 
-        return (self.trip().spending[section].amount > self.trip().budget[section].amount) ? 'Over Budget' : 'On Track';
+        var trip = self.trip();
+        var over = false;
+        if(section == 'today') {
+            over = trip.spending[section].amount > trip.budget[section].amount;
+        }
+        else if(section == 'country') {
+            var daysPlannedInCountry = trip.budget.country.days;
+            var daysInCountrySoFar = trip.spending.country.daysSpent;
+
+            var perDayBudget = trip.budget[section].amount / daysPlannedInCountry;
+            var budgetToDate = perDayBudget * daysInCountrySoFar;
+
+            over = trip.spending[section].amount > budgetToDate;
+        }
+        else if(section == 'trip') {
+            over = (trip.budget.trip.surplus < 0);
+        }
+        return over ? 'Over Budget' : 'On Track';
     };
 
     self.budgetText = function(section, verbose) {
@@ -432,28 +454,120 @@ var HomeViewModel = function() {
             return '';
         }
 
+        var trip = self.trip();
+
         var currency = self.user().base_currency;
-        var spent = self.formatCurrencyShort(self.trip().spending[section].amount, currency);
-        var budget = self.formatCurrencyShort(self.trip().budget[section].amount, currency);
+        var spentNum = trip.spending[section].amount;
+        var budgetNum = trip.budget[section].amount;
+        var spent = self.formatCurrencyShort(spentNum, currency);
+        var budget = self.formatCurrencyShort(budgetNum, currency);
+        var countryName = self.getNameForCountry(trip.budget.country.country);
+
         var sectionText = {
             'today': 'today',
-            'country': 'in ' +self.getNameForCountry(self.trip().budget.country.country),
+            'country': 'in ' + countryName,
             'trip': 'on your trip'
         };
 
-        //TODO verbose text for back of cards
-        if(!verbose) {
-            return spent +
+        var text = '';
+        if(verbose) {
+            text = 'According to your budget, you should ';
+            if(section == 'today') {
+                text += 'spend no more than ' +
+                    budget +
+                    ' per day. ';
+                if(spentNum > budgetNum) {
+                    // Over budget for today
+                    text += 'You\'ve gone over budget for the day by ' +
+                        self.formatCurrencyShort(spentNum - budgetNum, currency) +
+                        '. Try to keep your expenses lower tomorrow.';
+                }
+                else {
+                    // On track for today
+                    text += 'You\'re doing great! You\'ve only spent ' +
+                        spent +
+                        ' so far today.  Keep it up!';
+                }
+            }
+            else if(section == 'country') {
+                var daysPlannedInCountry = trip.budget.country.days;
+                var daysInCountrySoFar = trip.spending.country.daysSpent;
+
+                var perDayBudget = budgetNum / daysPlannedInCountry;
+                var budgetToDate = perDayBudget * daysInCountrySoFar;
+                var actualDailySpend = spentNum / daysInCountrySoFar;
+                var projectedTotalSpend = actualDailySpend * daysPlannedInCountry;
+                var surplus = budgetNum - projectedTotalSpend;
+
+                text += 'have spent no more than ' +
+                    self.formatCurrencyShort(budgetToDate, currency) +
+                    ' ' + sectionText[section] +
+                    ' so far. ';
+                if(surplus < 0)  {
+                    // Over budget for country so far
+                    text += 'You\'ve been spending more than you planned. If you keep up your spending habits, you\'ll go over your ' +
+                        countryName +
+                        ' budget by ' +
+                        self.formatCurrencyShort(Math.abs(surplus), currency) +
+                        '.';
+                }
+                else {
+                    text += 'You\'re doing great! If you keep up your spending habits, you\'ll leave Thailand ';
+                    if(surplus == 0) {
+                        text += 'exactly on budget.';
+                    }
+                    else {
+                        text += 'with ' +
+                            self.formatCurrencyShort(surplus, currency) +
+                            ' more than you planned.';
+                    }
+                }
+            }
+            else if(section == 'trip') {
+                var budgetToDate = trip.budget.trip.toNow;
+                var surplus = trip.budget.trip.surplus;
+
+                text += 'have spent no more than ' +
+                    self.formatCurrencyShort(trip.budget.trip.toNow, currency) +
+                    ' ' + sectionText[section] +
+                    ' so far. ';
+                
+                if(surplus < 0) {
+                    text += 'You\'ve been spending more than you planned. You\'ve spent ' +
+                        spent +
+                        ' so far, ' +
+                        self.formatCurrencyShort(Math.abs(surplus), currency) +
+                        ' more than you should have.';
+                }
+                else {
+                    text += 'You\'re doing great! ';
+                    if(surplus == 0) {
+                        text += 'You\'re exactly on budget.';
+                    }
+                    else {
+                        text += 'You\'ve spent ' +
+                            self.formatCurrencyShort(surplus, currency) +
+                            ' less than you estimated on your trip to date.';
+                    }
+                }
+            }
+        }
+        else {
+            text = spent +
                 ' spent out of your '  +
                 budget +
                 ' budget ' +
                 sectionText[section] +
                 '.';
         }
+        return text;
     };
 
-    self.viewTransactionsFor = function(section) {
-        
+    self.getNameForCurrentCountry = function() {
+        if(!self.trip || !self.trip() || !self.trip().currentCountry) {
+            return '';
+        }
+        return self.getNameForCountry(self.trip().currentCountry);
     };
 
     self.getIconForCountry = function(country) {

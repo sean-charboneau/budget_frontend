@@ -16,10 +16,11 @@
     padding-right: 0px;
 }
 
-.card-wrapper {
-    margin-top: 0px;
+.budget-cards .card-up {
+    height: 25%;
 }
 
-.budget-cards .card-up {
-    height: 20%;
+.budget-cards .card-wrapper {
+    margin-top: 0px;
+    height: 400px;
 }
