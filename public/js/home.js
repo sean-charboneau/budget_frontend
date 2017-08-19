@@ -393,7 +393,8 @@ var HomeViewModel = function() {
                 circle.path.setAttribute('stroke', getColor(circle.value()));
                 circle.path.setAttribute('stroke-width', state.width);
 
-                var value = self.formatCurrencyShort(circle.value() * Math.max(amount, budget), self.user().base_currency);
+                // Use toFixed to avoid rounding errors with ProgressBar
+                var value = self.formatCurrencyShort(circle.value().toFixed(3) * Math.max(amount, budget), self.user().base_currency);
                 circle.setText(value);
             }
         }).animate(percentage);
