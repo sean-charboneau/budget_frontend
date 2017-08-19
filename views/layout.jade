@@ -9,34 +9,38 @@ html
         link(rel='stylesheet', href='/bower_components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css')
         link(rel='stylesheet', href='/bower_components/select2/dist/css/select2.min.css')
         link(rel='stylesheet', href='/bower_components/select2-bootstrap-theme/dist/select2-bootstrap.min.css')
-        //- link(rel='stylesheet', href='/bower_components/nouislider/distribute/nouislider.css')
         link(rel='stylesheet', href='/bower_components/MDBootstrap/css/mdb.css')
         link(rel='stylesheet', href='/css/mdOverrides.css')
         link(rel='stylesheet', href='/css/style.css')
         block extraHeader
 
     body
-        section.wrapper
-            section.material-design-hamburger
-                button.material-design-hamburger__icon
-                    span.material-design-hamburger__layer
-            section.menu.menu--off
-                div.menu-link(onclick='location.href = "/home"')
-                    i.material-icons home
-                    | Home
-                div.menu-link(onclick='location.href = "/transactions"')
-                    i.material-icons show_chart
-                    | Transactions
-                div.menu-link(onclick='location.href = "/cash"')
-                    i.material-icons local_atm
-                    | Cash
-                div.menu-link(onclick='location.href = "/profile"')
-                    i.material-icons account_circle
-                    | Profile
-                div.menu-link(onclick='signOut();')
-                    i.material-icons power_settings_new
-                    | Sign Out
-        
+        nav.navbar.navbar-expand-md.navbar-dark.bg-primary.stylish-color.m-bottom
+            .container
+                button.navbar-toggler.navbar-toggler-right(type='button', data-toggle='collapse', data-target='#navbarNav1', aria-controls='navbarNav1', aria-expanded='false', aria-label='Toggle navigation')
+                    span.navbar-toggler-icon
+                a.navbar-brand(href='#')
+                    strong TripTrak
+                #navbarNav1.collapse.navbar-collapse
+                    ul.navbar-nav.mr-auto.signed-in(style='display: none')
+                        li.nav-item#home-nav
+                            a.nav-link(href='/home') Home 
+                        li.nav-item#transactions-nav
+                            a.nav-link(href='/transactions') Transactions
+                        li.nav-item#cash-nav
+                            a.nav-link(href='/cash') Cash
+                        li.nav-item#profile-nav
+                            a.nav-link(href='/profile') Profile
+                    ul.navbar-nav.ml-auto.signed-out(style='display: none')
+                        li.nav-item
+                            a.nav-link(href='#')
+                                i.fa.fa-sign-in.mr-1
+                                span Sign In
+                    ul.navbar-nav.ml-auto.signed-in(style='display: none')
+                        li.nav-item
+                            a.nav-link(href='#', data-bind='click: signOut')
+                                i.fa.fa-sign-in.mr-1
+                                span Sign Out
 
         script(type='text/javascript' src='/bower_components/jquery/dist/jquery.min.js')
         script(type='text/javascript', src='/bower_components/MDBootstrap/js/popper.min.js')
@@ -46,61 +50,24 @@ html
         script(type='text/javascript', src='/bower_components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js')
         script(type='text/javascript', src='/bower_components/select2/dist/js/select2.min.js')
         script(type='text/javascript', src='/bower_components/underscore/underscore-min.js')
-        script(type='text/javascript', src='/bower_components/nouislider/distribute/nouislider.min.js')
         script(type='text/javascript', src='/bower_components/MDBootstrap/js/mdb.js')
         script(type='text/javascript', src='/bower_components/progressbar.js/dist/progressbar.js')
         script(type='text/javascript', src='/js/bindings/validation.js')
         block extraScripts
         script.
-            $(document).ready(function(){												
-                //- $.material.init()
-                //Navigation Menu Slider
-                //- $('#nav-expander').on('click', function(e){
-                //- 	e.preventDefault();
-                //- 	$('body').toggleClass('nav-expanded');
-                //- });
-                //- $('#nav-close').on('click', function(e){
-                //- 	e.preventDefault();
-                //- 	$('body').removeClass('nav-expanded');
-                //- });
-                $('.container').on('click', function(e) {
-                    var child = $('.material-design-hamburger__layer');
-                    if(child.hasClass('material-design-hamburger__icon--to-arrow')) {
-                        e.preventDefault();
-                        document.body.classList.toggle('background--blur');
-                        $('.menu').removeClass('menu--on');
-                        child.removeClass('material-design-hamburger__icon--to-arrow');
-                        child.addClass('material-design-hamburger__icon--from-arrow');
-                    }
-                });
-                document.querySelector('.material-design-hamburger__icon').addEventListener('click', function() {
-                    var child;
-                    
-                    document.body.classList.toggle('background--blur');
-                    this.parentNode.nextElementSibling.classList.toggle('menu--on');
-                    child = this.childNodes[0].classList;
-
-                    if (child.contains('material-design-hamburger__icon--to-arrow')) {
-                        child.remove('material-design-hamburger__icon--to-arrow');
-                        child.add('material-design-hamburger__icon--from-arrow');
-                    } else {
-                        child.remove('material-design-hamburger__icon--from-arrow');
-                        child.add('material-design-hamburger__icon--to-arrow');
-                    }
-                });
-
-                if(!document.cookie.match(/^(.*;)?seanBudgetToken=[^;]+(.*)?$/)) {
-                    $('.navbar').remove();
-                    $('nav').remove();
-                }
-            });
-        
             var signOut = function() {
-                self.deleteCookie('seanBudgetToken');
+                self.deleteCookie('tripTrakToken');
                 window.location = '/';
             };
 
             var deleteCookie = function(name) {
                 document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
             };
+
+            if(document.cookie.indexOf('tripTrakToken') == -1) {
+                $('.signed-out').show();
+            }
+            else {
+                $('.signed-in').show();
+            }
         block content

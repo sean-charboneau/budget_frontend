@@ -38,50 +38,50 @@ block content
                                             div.col-md-9
                                                 span Type
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "type" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "type" && sortOrder() == "asc"')
                                     th.cursor-pointer(data-bind='click: function() { sort("amount"); }')
                                         div.row
                                             div.col-md-9
                                                 span Amount
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"')
                                     th.cursor-pointer(data-bind='click: function() { sort("value"); }')
                                         div.row
                                             div.col-md-9
                                                 span Value
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "value" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "value" && sortOrder() == "asc"')
                                     th.cursor-pointer(data-bind='click: function() { sort("category"); }')
                                         div.row
                                             div.col-md-9
                                                 span Category
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "category" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "category" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "category" && sortOrder() == "asc"')
                                     th.cursor-pointer(data-bind='click: function() { sort("date"); }')
                                         div.row
                                             div.col-md-9
                                                 span Date
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "date" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "date" && sortOrder() == "asc"')
                                     th.cursor-pointer(data-bind='click: function() { sort("country"); }')
                                         div.row
                                             div.col-md-9
                                                 span Country
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "country" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "country" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "country" && sortOrder() == "asc"')
                                     th.cursor-pointer(data-bind='click: function() { sort("description"); }')
                                         div.row
                                             div.col-md-9
                                                 span Description
                                             div.col-md-3
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "desc"') keyboard_arrow_down
-                                                i.material-icons.md-12(data-bind='visible: sortField() == "description" && sortOrder() == "asc"') keyboard_arrow_up
+                                                i.fa.fa-caret-down(data-bind='visible: sortField() == "description" && sortOrder() == "desc"')
+                                                i.fa.fa-caret-up(data-bind='visible: sortField() == "description" && sortOrder() == "asc"')
                             tbody
                                 // ko foreach: transactions
                                 tr
@@ -214,6 +214,7 @@ block content
 
 
     script.
+        $('#transactions-nav').addClass('active');
         var vm = new TransactionsViewModel();
         var currencies = !{currency};
         var countries = !{countries};

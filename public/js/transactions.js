@@ -14,7 +14,7 @@ var TransactionsViewModel = function() {
     self.transactions = ko.observableArray([]);
     self.transactionError = ko.observable();
     self.savingTransaction = ko.observable(false);
-    self.transactionType = ko.observable('cash');
+    self.transactionCredit = ko.observable(false);
     self.transactionAmount = ko.observable().extend({
         gt: {
             val: 0,
@@ -115,7 +115,7 @@ var TransactionsViewModel = function() {
     self.saveTransaction = function() {
         self.savingTransaction(true);
         var body = {
-            type: self.transactionType(),
+            type: self.transactionCredit() ? 'credit' : 'cash',
             amount: self.transactionAmount(),
             currency: self.transactionCurrency(),
             date: self.transactionDate().toISOString(),

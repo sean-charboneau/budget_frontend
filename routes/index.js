@@ -4,14 +4,14 @@ var request = require('request');
 var router = express.Router();
 
 var authenticate = function(req, res, next) {
-	if(!req.cookies || !req.cookies['seanBudgetToken']) {
+	if(!req.cookies || !req.cookies['tripTrakToken']) {
 		return res.redirect('/');
 	}
 	return next();
 };
 
 var logOut = function(req, res, opts) {
-	res.clearCookie('seanBudgetToken');
+	res.clearCookie('tripTrakToken');
 	var error = opts.error || 0;
 	return res.redirect('/?error=' + error);
 }
@@ -24,7 +24,7 @@ var ERRORS = {
 /* GET login page. */
 router.get('/', function(req, res) {
 	var errorCode = req.query.error || 0;
-	if(req.cookies && req.cookies['seanBudgetToken'] && !errorCode) {
+	if(req.cookies && req.cookies['tripTrakToken'] && !errorCode) {
 		return res.redirect('/home');
 	}
 	// Display the Login page with any flash message, if any
@@ -76,7 +76,7 @@ router.get('/cash', authenticate, function(req, res) {
 });
 
 router.get('/createTrip', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/tripOverview', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + '/tripOverview', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
@@ -87,7 +87,7 @@ router.get('/createTrip', authenticate, function(req, res) {
 		if(trip.tripId) {
 			return res.redirect('/home');
 		}
-		request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+		request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 			if(err || !body) {
 				return logOut(req, res, {error: 0});
 			}
@@ -103,7 +103,7 @@ router.get('/createTrip', authenticate, function(req, res) {
 });
 
 router.get('/tripOverview', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -116,7 +116,7 @@ router.get('/tripOverview', authenticate, function(req, res) {
 });
 
 router.get('/withdrawal', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -129,7 +129,7 @@ router.get('/withdrawal', authenticate, function(req, res) {
 });
 
 router.post('/trip', authenticate, function(req, res) {
-	request.post({url: config.get('api.hostname') + '/trip', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
+	request.post({url: config.get('api.hostname') + '/trip', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -142,7 +142,7 @@ router.post('/trip', authenticate, function(req, res) {
 });
 
 router.post('/withdrawal', authenticate, function(req, res) {
-	request.post({url: config.get('api.hostname') + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
+	request.post({url: config.get('api.hostname') + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -155,7 +155,7 @@ router.post('/withdrawal', authenticate, function(req, res) {
 });
 
 router.post('/transaction', authenticate, function(req, res) {
-	request.post({url: config.get('api.hostname') + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}, form: req.body}, function(err, httpResponse, body) {
+	request.post({url: config.get('api.hostname') + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -175,7 +175,7 @@ router.get('/transactions', authenticate, function(req, res) {
 });
 
 router.get('/transaction', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -188,7 +188,7 @@ router.get('/transaction', authenticate, function(req, res) {
 });
 
 router.get('/categories', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -201,7 +201,7 @@ router.get('/categories', authenticate, function(req, res) {
 });
 
 router.get('/cashReserves', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/cashReserves', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + '/cashReserves', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -217,7 +217,7 @@ router.get('/cashReserves', authenticate, function(req, res) {
 router.get('/home', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
 	var countries = require('../data/countries.json');
-	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
@@ -230,7 +230,7 @@ router.get('/home', authenticate, function(req, res) {
 });
 
 router.get('/profile', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['seanBudgetToken']}}, function(err, httpResponse, body) {
+	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}

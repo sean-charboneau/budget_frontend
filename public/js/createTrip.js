@@ -160,7 +160,6 @@ var CreateTripViewModel = function() {
     };
     
     self.saveTrip = function() {
-        console.log(self.tripStartDate());
         self.detailsError('');
         self.segmentsError('');
 

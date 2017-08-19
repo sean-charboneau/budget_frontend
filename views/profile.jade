@@ -1,24 +1,25 @@
 extends layout
 
 block extraHeader
-	script(type="text/javascript" src="/js/profile.js")
+    script(type="text/javascript" src="/js/profile.js")
 
 block content
-	div.container
-		div.row.justify-content-md-center
-			.card(style='width: 28rem;')
-				.card-body
-					h1.text-center.login-title Welcome #{user.first_name}. Account Info:
-					.text-center
-						ul.user-details
-							li Username ---> #{user.username}
-							li Email    ---> #{user.email}
-							li First Name ---> #{user.first_name} 
-							li Last Name ---> #{user.last_name}
+    div.container
+        div.row.justify-content-md-center
+            .card(style='width: 28rem;')
+                .card-body
+                    h1.text-center.login-title Welcome #{user.first_name}. Account Info:
+                    .text-center
+                        ul.user-details
+                            li Username ---> #{user.username}
+                            li Email    ---> #{user.email}
+                            li First Name ---> #{user.first_name} 
+                            li Last Name ---> #{user.last_name}
 
-	script.
-		var vm = new ProfileViewModel();
-		
-		$(document).ready(function() {
-			ko.applyBindings(vm);
-		});
+    script.
+        $('#profile-nav').addClass('active');
+        var vm = new ProfileViewModel();
+        
+        $(document).ready(function() {
+            ko.applyBindings(vm);
+        });

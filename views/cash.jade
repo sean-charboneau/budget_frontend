@@ -9,9 +9,9 @@ block extraScripts
     script(type='text/javascript' src='/js/bindings/popover.js')
 
 block content
-    div.container
-        div.row
-            div.col-md-12
+    .container
+        .row
+            .col-md-12
                 .card
                     .card-header.default-color.lighten-1.white-text
                         .row
@@ -38,36 +38,6 @@ block content
                                     th Value
                                     th Date
                                     th Used
-                                    //- th #
-                                    //- th.cursor-pointer(data-bind='click: function() { sort("type"); }')
-                                    //-     div.row
-                                    //-         div.col-md-9
-                                    //-             span Type
-                                    //-         div.col-md-3
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "desc"') keyboard_arrow_down
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "type" && sortOrder() == "asc"') keyboard_arrow_up
-                                    //- th.cursor-pointer(data-bind='click: function() { sort("amount"); }')
-                                    //-     div.row
-                                    //-         div.col-md-9
-                                    //-             span Amount
-                                    //-         div.col-md-3
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "desc"') keyboard_arrow_down
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "amount" && sortOrder() == "asc"') keyboard_arrow_up
-                                    //- th.cursor-pointer(data-bind='click: function() { sort("value"); }')
-                                    //-     div.row
-                                    //-         div.col-md-9
-                                    //-             span Value
-                                    //-         div.col-md-3
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "desc"') keyboard_arrow_down
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "value" && sortOrder() == "asc"') keyboard_arrow_up
-                                    //- th.cursor-pointer(data-bind='click: function() { sort("date"); }')
-                                    //-     div.row
-                                    //-         div.col-md-9
-                                    //-             span Date
-                                    //-         div.col-md-3
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "desc"') keyboard_arrow_down
-                                    //-             i.material-icons.md-12(data-bind='visible: sortField() == "date" && sortOrder() == "asc"') keyboard_arrow_up
-                                    //- th Used
                                     th.icon-column
                             tbody
                                 // ko foreach: cash
@@ -86,7 +56,7 @@ block content
                                         img.img-flag(data-bind='attr: { src: "images/flags/16/" + $root.currencyObj()[currency].icon + ".png" }')
                                         span(data-bind='text: $root.formatCurrency(used, currency) + " on " + transaction_count + " transactions"')
                                     td.cursor-pointer(data-bind='click: toggleRowDetails')
-                                        i.details.material-icons(data-bind='text: showDetails() ? "keyboard_arrow_down" : "keyboard_arrow_right"')
+                                        i(data-bind='attr: { "class": showDetails() ? "fa fa-caret-down" : "fa fa-caret-right" }')
                                 tr(data-bind='visible: showDetails')
                                     td(colspan='7', data-bind='visible: !detailsFetched()')
                                         .preloader-wrapper.big.active
@@ -192,6 +162,7 @@ block content
 
 
     script.
+        $('#cash-nav').addClass('active');
         var vm = new CashViewModel();
         var currencies = !{currency};
         var countries = !{countries};

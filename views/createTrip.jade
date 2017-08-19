@@ -1,155 +1,155 @@
 extends layout
 
 block extraHeader
+    link(rel='stylesheet', href='/bower_components/nouislider/distribute/nouislider.css')
+    link(rel='stylesheet', href='/css/createTrip.css')
+
+block extraScripts
+    script(type='text/javascript', src='/bower_components/nouislider/distribute/nouislider.min.js')
     script(type='text/javascript' src='/js/createTrip.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
     script(type='text/javascript' src='/js/bindings/noUiSlider.js')
     script(type='text/javascript' src='/js/bindings/popover.js')
-    link(rel='stylesheet', href='/css/createTrip.css')
 
 block content
     .container
-        .row
+        .row.m-bottom
             .col-md-12
-                .section.details
-                    .panel.panel-default
-                        .panel-heading
-                            h3.panel-title Trip Details
-                        .panel-body
-                            span.error-message(data-bind='visible: detailsError, text: detailsError')
-                            form
-                                .col-md-6
-                                    .form-group.m-none
-                                        input(type='text', name='tripName', id='tripName', class='form-control', placeholder='Trip Name', data-bind='value: tripName')
-                                .col-md-6
-                                    .form-group.m-none
-                                        .input-group
-                                            input.form-control(type='text', name='tripStartDate', id='tripStartDate', placeholder='Start Date', data-bind='dateTimePicker: tripStartDate')
-                                            span.input-group-addon
-                                                i.material-icons date_range
-        .row
+                .card
+                    .card-header.default-color.lighten-1.white-text
+                        span Trip Details
+                    .card-body.p-bottom-none
+                        span.error-message(data-bind='visible: detailsError, text: detailsError')
+                        //- .form-group.m-none
+                        .row
+                            .col-md-6
+                                .md-form
+                                    input#tripNameInput(type='text', data-bind='value: tripName')
+                                    label(for='tripNameInput') Trip Name
+                            .col-md-6
+                                //- .input-group
+                                .md-form
+                                    label(for='tripStartDateInput') Start Date
+                                    input#tripStartDateInput(type='text', data-bind='dateTimePicker: tripStartDate')
+        .row.m-bottom
             .col-md-8.m-right-none
-                .section.segments
-                    .panel.panel-default
-                        .panel-heading
-                            h3.panel-title
-                                span Trip Segments
-                                i.material-icons.md-18.help(data-bind='popover: { options: { content: "Add segments dividing your budget between different countries or regions.  Alternatively, add one segment for your entire trip.", trigger: "hover" } }') help
-                        .panel-body
-                            span.error-message(data-bind='visible: segmentsError, text: segmentsError')
-                            .segment-details(style='display: none', data-bind='visible: tripSegments().length > 0, foreach: tripSegments')
-                                .panel.panel-info
-                                    .panel-heading.segment-head(data-bind='click: toggle')
-                                        .pull-left
-                                            img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country()) }')
-                                        .pull-left.segment-head-text(data-bind='text: $root.getNameForCountry(country())')
-                                        .pull-right.segment-head-text(data-bind='text: getBudgetText()')
-                                    .panel-body.segment-body(data-bind='visible: expanded')
-                                        .form-group.m-top-none
-                                            .country-input
-                                                select.form-control.country-dropdown#transactionCountry(data-bind='value: country')
-                                                    option
-                                        .form-group
-                                            .row
-                                                .col-md-4
+                .card
+                    .card-header.default-color.lighten-1.text-white
+                        span Trip Segments
+                        i.fa.fa-question-circle-o.help(data-bind='popover: { options: { content: "Add segments dividing your budget between different countries or regions.  Alternatively, add one segment for your entire trip.", trigger: "hover" } }')
+                    .card-body
+                        span.error-message(data-bind='visible: segmentsError, text: segmentsError')
+                        .segment-details(style='display: none', data-bind='visible: tripSegments().length > 0, foreach: tripSegments')
+                            .card.m-bottom-small
+                                .card-header.segment-head.primary-color.white-text(data-bind='click: toggle')
+                                    .pull-left
+                                        img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country()) }')
+                                    .pull-left.segment-head-text(data-bind='text: $root.getNameForCountry(country())')
+                                    .pull-right.segment-head-text(data-bind='text: getBudgetText()')
+                                .card-body.segment-body(data-bind='visible: expanded')
+                                    .form-group.m-top-none
+                                        .country-input
+                                            select.form-control.country-dropdown#transactionCountry(data-bind='value: country')
+                                                option
+                                    .form-group.m-none
+                                        .row
+                                            .col-md-4
+                                                .md-form
                                                     .input-group
-                                                        span.input-group-addon
-                                                            i.material-icons.lock-icon(data-bind='text: daysLocked() ? "lock" : "lock_open", click: toggleDaysLock')
+                                                        span.input-group-addon.lock-icon(data-bind='click: toggleDaysLock')
+                                                            i(data-bind='attr: { "class": daysLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
                                                         input.form-control(type='text', name='daysAmount', id='daysAmount', data-bind='value: days, disable: daysLocked')
-                                                        span.input-group-addon
-                                                            label(for='daysAmount') days
-                                                .col-md-8
-                                                    .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 365, value: days, id: "days" }, css: { "force-disable": daysLocked }')
-                                        .form-group.m-none
-                                            .row
-                                                .col-md-4
+                                                        span.input-group-addon days
+                                            .col-md-8
+                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 365, value: days, id: "days" }, css: { "force-disable": daysLocked }')
+                                    .form-group.m-none
+                                        .row
+                                            .col-md-4
+                                                .md-form
                                                     .input-group
-                                                        span.input-group-addon
-                                                            i.material-icons.lock-icon(data-bind='text: budgetLocked() ? "lock" : "lock_open", click: toggleBudgetLock')
+                                                        span.input-group-addon.lock-icon(data-bind='click: toggleBudgetLock')
+                                                            i(data-bind='attr: { "class": budgetLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
                                                         input.form-control(type='text', name='budgetAmount', id='budgetAmount', data-bind='value: budget, disable: budgetLocked')
-                                                        span.input-group-addon
-                                                            label(for='budgetAmount', data-bind='text: $root.user().base_currency')
-                                                .col-md-8
-                                                    .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 10000, value: budget, id: "budget" }, css: { "force-disable": budgetLocked }')
-                                        .form-group.m-none
-                                            .row
-                                                .col-md-4
+                                                        span.input-group-addon(data-bind='text: $root.user().base_currency')
+                                            .col-md-8
+                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 10000, value: budget, id: "budget" }, css: { "force-disable": budgetLocked }')
+                                    .form-group.m-none
+                                        .row
+                                            .col-md-4
+                                                .md-form
                                                     .input-group
-                                                        span.input-group-addon
-                                                            i.material-icons.lock-icon(data-bind='text: perDayLocked() ? "lock" : "lock_open", click: togglePerDayLock')
+                                                        span.input-group-addon.lock-icon(data-bind='click: togglePerDayLock')
+                                                            i(data-bind='attr: { "class": perDayLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
                                                         input.form-control(type='text', name='perDayAmount', id='perDayAmount', data-bind='value: perDay, disable: perDayLocked')
-                                                        span.input-group-addon
-                                                            label(for='perDayAmount', data-bind='text: $root.user().base_currency + "/Day"')
-                                                .col-md-8
-                                                    .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 200, value: perDay, step: 0.01, id: "perDay" }, css: { "force-disable": perDayLocked }')
-                                        .form-group.m-none
-                                            .row
-                                                .col-md-12
-                                                    button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteSegment(id) }') Delete Segment
-                            .add-segment(data-bind='click: addSegment')
-                                span Add Segment
-
-            .col-md-4
-                .row
-                    .col-md-12
-                        .section.oneoff
-                            .panel.panel-default
-                                .panel-heading
-                                    h3.panel-title
-                                        span One-Off Expenses
-                                        i.material-icons.md-18.help(data-bind='popover: { options: { content: "Enter single expenses, such as initial flights, vaccinations, or visa fees.", trigger: "hover" } }') help
-                                .panel-body
-                                    .segment-details(style='display: none', data-bind='visible: tripOneOffExpenses().length > 0, foreach: tripOneOffExpenses')
-                                        .panel.panel-info
-                                            .panel-heading.segment-head(data-bind='click: toggle')
-                                                .pull-left.segment-head-text(data-bind='text: getText()')
-                                            .panel-body.segment-body(data-bind='visible: expanded')
-                                                .form-group.m-top-none
-                                                    input.form-control(type='text', name='oneOffTitle', id='oneOffTitle', placeholder='Expense Title', data-bind='value: title')
-                                                .form-group
-                                                    .input-group
-                                                        input.form-control(type='number', name='oneOffAmount', id='oneOffAmount', placeholder='100', data-bind='value: amount')
-                                                        span.input-group-addon
-                                                            label(for='oneOffAmount', data-bind='text: $root.user().base_currency')
-                                                .form-group.m-none
-                                                    .row
-                                                        .col-md-12
-                                                            button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteOneOffExpense(id) }') Delete Expense
-                                            
-                                    .add-segment(data-bind='click: addOneOff')
-                                        span Add One-Off Expense
-                .row
-                    .col-md-12
-                        .section.overview
-                            .panel.panel-default
-                                .panel-heading
-                                    h3.panel-title Overview
-                                .panel-body
-                                    .summary-section(data-bind='foreach: tripOneOffExpenses')
-                                        .row.summary-item
-                                            .col-md-12
-                                                span.pull-left(data-bind='text: title')
-                                                span.pull-right(data-bind='text: $root.formatCurrencyShort(amount(), $root.user().base_currency)')
-                                    .summary-section(data-bind='foreach: tripSegments')
-                                        .row.summary-item
-                                            .col-md-12
-                                                span.pull-left(data-bind='text: summary()')
-                                                span.pull-right(data-bind='text: $root.formatCurrencyShort(budget(), $root.user().base_currency)')
-                                    .summary-section.total
-                                        .row.total-divider(data-bind='visible: (tripOneOffExpenses().length + tripSegments().length) > 0')
-                                            hr
+                                                        span.input-group-addon(data-bind='text: $root.user().base_currency + "/Day"')
+                                            .col-md-8
+                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 200, value: perDay, step: 0.01, id: "perDay" }, css: { "force-disable": perDayLocked }')
+                                    .form-group.m-none
                                         .row
                                             .col-md-12
-                                                span.pull-left Total
-                                                span.pull-right(data-bind='text: $root.getTotalBudgetText()')
+                                                button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteSegment(id) }') Delete Segment
+                        .add-segment(data-bind='click: addSegment')
+                            span Add Segment
+
+            .col-md-4
+                .row.m-bottom
+                    .col-md-12
+                        .card
+                            .card-header.default-color.lighten-1.text-white
+                                span One-Off Expenses
+                                i.fa.fa-question-circle-o.help(data-bind='popover: { options: { content: "Enter single expenses, such as initial flights, vaccinations, or visa fees.", trigger: "hover" } }')
+                            .card-body
+                                .segment-details(style='display: none', data-bind='visible: tripOneOffExpenses().length > 0, foreach: tripOneOffExpenses')
+                                    .card.m-bottom-small
+                                        .card-header.segment-head.primary-color.white-text(data-bind='click: toggle')
+                                            .pull-left.segment-head-text(data-bind='text: getText()')
+                                        .card-body.segment-body(data-bind='visible: expanded')
+                                            .form-group.m-top-none
+                                                .md-form
+                                                    input.form-control(type='text', name='oneOffTitle', id='oneOffTitle', placeholder='Expense Title', data-bind='value: title')
+                                            .form-group
+                                                .md-form
+                                                    .input-group
+                                                        input.form-control(type='number', name='oneOffAmount', id='oneOffAmount', placeholder='100', data-bind='value: amount')
+                                                        span.input-group-addon(data-bind='text: $root.user().base_currency')
+                                            .form-group
+                                                .row
+                                                    .col-md-12
+                                                        button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteOneOffExpense(id) }') Delete Expense
+                                        
+                                .add-segment(data-bind='click: addOneOff')
+                                    span Add One-Off Expense
+                .row
+                    .col-md-12
+                        .card
+                            .card-header.default-color.lighten-1.text-white
+                                span Overview
+                            .card-body
+                                .summary-section(data-bind='foreach: tripOneOffExpenses')
+                                    .row.summary-item
+                                        .col-md-12
+                                            span.pull-left(data-bind='text: title')
+                                            span.pull-right(data-bind='text: $root.formatCurrencyShort(amount(), $root.user().base_currency)')
+                                .summary-section(data-bind='foreach: tripSegments')
+                                    .row.summary-item
+                                        .col-md-12
+                                            span.pull-left(data-bind='text: summary()')
+                                            span.pull-right(data-bind='text: $root.formatCurrencyShort(budget(), $root.user().base_currency)')
+                                .summary-section.total
+                                    .row.total-divider(data-bind='visible: (tripOneOffExpenses().length + tripSegments().length) > 0')
+                                        hr
+                                    .row
+                                        .col-md-12
+                                            span.pull-left Total
+                                            span.pull-right(data-bind='text: $root.getTotalBudgetText()')
 
     
         .row
             .col-md-12
                 .section.save
-                    .panel.panel-default
-                        .panel-body.save-panel
-                            button.btn.btn-success.m-none.save-button(data-bind='saveTripEnabled, click: saveTrip') Save Trip
+                    .card
+                        .card-body.save-panel
+                            button.btn.success-color.m-none.save-button(data-bind='saveTripEnabled, click: saveTrip') Save Trip
     script.
         var vm = new CreateTripViewModel();
         var currencies = !{currency};
@@ -189,7 +189,6 @@ block content
         }
         
         $(document).ready(function() {
-            console.log('asdf');
             ko.applyBindings(vm);
             var formatOption = function(item) {
                 if (!item.icon) { return item.display_name; }

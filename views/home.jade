@@ -223,15 +223,15 @@ block content
                         .form-group.m-none
                             .row
                                 .col-md-6
-                                    label(for='transactionDate', data-bind='text: transactionDateLabel')
+                                    label(for='transactionDateInput', data-bind='text: transactionDateLabel')
                                     .input-group
-                                        input.form-control(id='transactionDate', data-bind='dateTimePicker: transactionDate', type='text')
+                                        input#transactionDateInput.form-control(data-bind='dateTimePicker: transactionDate', type='text')
                                         span.input-group-addon
                                             i.fa.fa-calendar
                                 .col-md-6(data-bind='visible: transactionSplit')
-                                    label(for='transactionEnd') End Date
+                                    label(for='transactionEndInput') End Date
                                     .input-group
-                                        input.form-control(id='transactionEnd', data-bind='dateTimePicker: transactionEnd', type='text')
+                                        input#transactionEndInput.form-control(data-bind='dateTimePicker: transactionEnd', type='text')
                                         span.input-group-addon
                                             i.fa.fa-calendar
                             .row.m-top-small.m-bottom
@@ -303,9 +303,9 @@ block content
                                                 //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
                                                 br
                                     .form-group
-                                        label(for='withdrawalATMDate') Date
+                                        label(for='withdrawalATMDateInput') Date
                                         .input-group
-                                            input.form-control(id='withdrawalATMDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                                            input#withdrawalATMDateInput.form-control(data-bind='dateTimePicker: withdrawalDate', type='text')
                                             span.input-group-addon
                                                 i.fa.fa-calendar
                                     .form-group
@@ -343,9 +343,9 @@ block content
                                                     option
                                                 br
                                     .form-group
-                                        label(for='withdrawalDate') Date
+                                        label(for='withdrawalEarnedDateInput') Date
                                         .input-group
-                                            input.form-control(id='withdrawalEarnedDate', data-bind='dateTimePicker: withdrawalDate', type='text')
+                                            input#withdrawalEarnedDateInput.form-control(data-bind='dateTimePicker: withdrawalDate', type='text')
                                             span.input-group-addon
                                                 i.fa.fa-calendar
                                 .modal-footer
@@ -353,6 +353,7 @@ block content
                                     button.btn.btn-primary.waves-effect(type='button', data-bind='click: saveEarnedWithdrawal, enable: canSubmitEarnedWithdrawal') Save
 
     script.
+        $('#home-nav').addClass('active');
         var vm = new HomeViewModel();
         var currencies = !{currency};
         var countries = !{countries};
