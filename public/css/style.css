@@ -96,6 +96,11 @@ ul.user-details{
     min-height: 0px;
 }
 
+.nav-item {
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
 .centered {
   position: fixed;
   top: 50%;

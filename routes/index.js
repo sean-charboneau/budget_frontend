@@ -75,6 +75,13 @@ router.get('/cash', authenticate, function(req, res) {
 	return res.render('cash', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
 });
 
+/* GET Spending Page */
+router.get('/spending', authenticate, function(req, res) {
+	var currency = require('../data/currency.json');
+	var countries = require('../data/countries.json');
+	return res.render('spending', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+});
+
 router.get('/createTrip', authenticate, function(req, res) {
 	request.get({url: config.get('api.hostname') + '/tripOverview', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {

@@ -18,7 +18,7 @@ block content
                             .col.col-xs-6
                                 span Cash
                             .col.col-xs-6.text-right
-                                button.btn.btn-sm.btn-primary.btn-create(type='button', data-toggle='modal', data-target='#cashModal') Add Cash
+                                button.btn.btn-sm.stylish-color.btn-create(type='button', data-toggle='modal', data-target='#cashModal') Add Cash
                     .card-body.p-none
                         .text-center(data-bind='visible: cashLoading')
                             .preloader-wrapper.big.active.m-top.m-bottom
@@ -157,8 +157,8 @@ block content
                             // /ko
 
                     .modal-footer
-                        button.btn.btn-default(type='button', data-dismiss='modal') Cancel
-                        button.btn.btn-primary(type='button', data-bind='click: saveWithdrawal, enable: canSubmitWithdrawal') Save
+                        button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
+                        button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveWithdrawal, enable: canSubmitWithdrawal') Save
 
 
     script.

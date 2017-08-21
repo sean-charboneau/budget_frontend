@@ -19,16 +19,19 @@ html
             .container
                 button.navbar-toggler.navbar-toggler-right(type='button', data-toggle='collapse', data-target='#navbarNav1', aria-controls='navbarNav1', aria-expanded='false', aria-label='Toggle navigation')
                     span.navbar-toggler-icon
-                a.navbar-brand(href='#')
+                a.navbar-brand(href='/home')
                     strong TripTrak
                 #navbarNav1.collapse.navbar-collapse
                     ul.navbar-nav.mr-auto.signed-in(style='display: none')
-                        li.nav-item#home-nav
-                            a.nav-link(href='/home') Home 
+                        //- TODO - figure out whether to keep home link
+                        //- li.nav-item#home-nav
+                        //-     a.nav-link(href='/home') Home 
                         li.nav-item#transactions-nav
                             a.nav-link(href='/transactions') Transactions
                         li.nav-item#cash-nav
                             a.nav-link(href='/cash') Cash
+                        li.nav-item#spending-nav
+                            a.nav-link(href='/spending') Spending
                         li.nav-item#profile-nav
                             a.nav-link(href='/profile') Profile
                     ul.navbar-nav.ml-auto.signed-out(style='display: none')

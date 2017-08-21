@@ -41,7 +41,7 @@ block content
                         span.error-message(data-bind='visible: segmentsError, text: segmentsError')
                         .segment-details(style='display: none', data-bind='visible: tripSegments().length > 0, foreach: tripSegments')
                             .card.m-bottom-small
-                                .card-header.segment-head.primary-color.white-text(data-bind='click: toggle')
+                                .card-header.segment-head.stylish-color.white-text(data-bind='click: toggle')
                                     .pull-left
                                         img.img-flag(data-bind='attr: { src: $root.getIconForCountry(country()) }')
                                     .pull-left.segment-head-text(data-bind='text: $root.getNameForCountry(country())')
@@ -101,7 +101,7 @@ block content
                             .card-body
                                 .segment-details(style='display: none', data-bind='visible: tripOneOffExpenses().length > 0, foreach: tripOneOffExpenses')
                                     .card.m-bottom-small
-                                        .card-header.segment-head.primary-color.white-text(data-bind='click: toggle')
+                                        .card-header.segment-head.stylish-color.white-text(data-bind='click: toggle')
                                             .pull-left.segment-head-text(data-bind='text: getText()')
                                         .card-body.segment-body(data-bind='visible: expanded')
                                             .form-group.m-top-none

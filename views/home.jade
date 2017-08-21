@@ -18,7 +18,7 @@ block content
                             .col.col-xs-3
                                 span Cash
                             .col.col-xs-9.text-right
-                                button.btn.btn-sm.btn-primary.btn-create.m-none.waves-effect(type='button', data-toggle='modal', data-target='#cashModal') Add Cash
+                                button.btn.btn-sm.stylish-color.btn-create.m-none.waves-effect(type='button', data-toggle='modal', data-target='#cashModal') Add Cash
                     .card-body
                         .text-center(data-bind='visible: cashReservesLoading')
                             .preloader-wrapper.big.active
@@ -136,7 +136,7 @@ block content
                             .col.col-xs-6
                                 span Transactions
                             .col.col-xs-6.text-right(style='display: none', data-bind='visible: !transactionsLoading() && trip().tripId')
-                                button.btn.btn-sm.btn-primary.btn-create.m-none.waves-effect(type='button' data-toggle='modal', data-target='#transactionModal') Add New
+                                button.btn.btn-sm.stylish-color.btn-create.m-none.waves-effect(type='button' data-toggle='modal', data-target='#transactionModal') Add New
                     .card-body.p-none
                         .text-center(data-bind='visible: transactionsLoading')
                             .preloader-wrapper.big.active.m-top.m-bottom
@@ -269,7 +269,7 @@ block content
 
                     .modal-footer
                         button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
-                        button.btn.btn-primary.waves-effect(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
+                        button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveTransaction, enable: canSubmitTransaction') Save
 
                     
         #cashModal.modal.fade(role='dialog', aria-labelledby='cashModalLabel')
@@ -322,7 +322,7 @@ block content
                                         // /ko
                                 .modal-footer
                                     button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
-                                    button.btn.btn-primary.waves-effect(type='button', data-bind='click: saveATMWithdrawal, enable: canSubmitATMWithdrawal') Save
+                                    button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveATMWithdrawal, enable: canSubmitATMWithdrawal') Save
                             #earnedPanel.tab-pane.fade(role='tabpanel')
                                 .modal-body.mb-1
                                     span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
@@ -350,7 +350,7 @@ block content
                                                 i.fa.fa-calendar
                                 .modal-footer
                                     button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
-                                    button.btn.btn-primary.waves-effect(type='button', data-bind='click: saveEarnedWithdrawal, enable: canSubmitEarnedWithdrawal') Save
+                                    button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveEarnedWithdrawal, enable: canSubmitEarnedWithdrawal') Save
 
     script.
         $('#home-nav').addClass('active');
