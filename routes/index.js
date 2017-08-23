@@ -194,6 +194,45 @@ router.get('/transaction', authenticate, function(req, res) {
 	});
 });
 
+router.get('/spendingData', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
+		return res.json(body);
+	});
+});
+
+router.get('/trips', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
+		return res.json(body);
+	});
+});
+
+router.get('/categoriesForTrip', authenticate, function(req, res) {
+	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+		
+		return res.json(body);
+	});
+});
+
 router.get('/categories', authenticate, function(req, res) {
 	request.get({url: config.get('api.hostname') + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {

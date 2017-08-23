@@ -504,3 +504,11 @@ td {
 .budget-progress:hover {
   font-size: 20px;
 }
+
+.dropdown-content li {
+    line-height: 0.7rem;
+}
+
+.dropdown-content li span {
+    font-size: 0.8rem;
+}

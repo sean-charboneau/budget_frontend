@@ -4,6 +4,7 @@ block extraHeader
     //- link(rel='stylesheet', href='/css/cash.css')
 
 block extraScripts
+    script(type='text/javascript' src='/js/mdDropdown.js')
     script(type='text/javascript' src='/js/spending.js')
     script(type='text/javascript' src='/js/bindings/datepicker.js')
     script(type='text/javascript' src='/js/bindings/popover.js')
@@ -35,7 +36,25 @@ block content
                             .over-time-section(style='display: none', data-bind='visible: !dataLoading()')
                                 .row.m-top
                                     .col-md-3
-                                        span asdf
+                                        .md-form
+                                            select#over-time-trip-select(data-bind='value: selectedTrip')
+                                            label Trip
+                                        .md-form
+                                            select.mdb-select(data-bind='value: selectedRange')
+                                                option(value='label', disabled) Select Time Frame
+                                                option(value='trip', selected) Entire Trip
+                                                option(value='thisMonth') This Month
+                                                option(value='thisWeek') This Week
+                                                option(value='last30') Past 30 Days
+                                                option(value='last14') Past 14 Days
+                                                option(value='last7') Past 7 Days
+                                            label Time Period
+                                        .md-form
+                                            select.mdb-select(multiple)
+                                                option(value='label', disabled) Select Category
+                                                option(value='current', selected) All Categories
+                                                option(value='other') Food
+                                            label Category
                                     .col-md-9
                                         .chart-container(style='position: relative;')
                                             canvas#over-time-chart
@@ -103,6 +122,9 @@ block content
         
         $(document).ready(function() {
             ko.applyBindings(vm);
+
+            $('.mdb-select').material_select();
+
             var formatOption = function(item) {
                 if (!item.icon) { return item.display_name; }
                 var $item = $(
