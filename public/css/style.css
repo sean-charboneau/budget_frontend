@@ -512,3 +512,16 @@ td {
 .dropdown-content li span {
     font-size: 0.8rem;
 }
+
+.multiple-select-dropdown li [type="checkbox"] + label {
+    height: 20px;
+}
+
+.chart-container {
+    position: relative;
+}
+
+.doughnut {
+    width: 60%;
+    margin-left: 20%;
+}

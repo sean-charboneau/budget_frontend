@@ -79,7 +79,16 @@ router.get('/cash', authenticate, function(req, res) {
 router.get('/spending', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
 	var countries = require('../data/countries.json');
-	return res.render('spending', {currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+		if(err || !body) {
+			return logOut(req, res, {error: 0});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+
+		return res.render('spending', {user: body, currency: JSON.stringify(currency), countries: JSON.stringify(countries)});
+	});
 });
 
 router.get('/createTrip', authenticate, function(req, res) {

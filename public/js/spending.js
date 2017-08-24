@@ -1,27 +1,49 @@
 var SpendingViewModel = function() {
     var self = this;
 
-    self.dataLoading = ko.observable(true);
+    self.chartObj = null;
+
     self.trips = ko.observableArray([]);
+    self.graphColors = ['#009688', '#2196f3', '#3f51b5', '#673ab7', '#f44336', '#4caf50', '#ff9800', '#ffeb3b'];
+
+    self.optionsLoading = ko.observable(true);
+
     self.categories = ko.observableArray([]);
+    self.selectedCategories = ko.observableArray([]);
+    self.displayCategorySelect = ko.observable(true);
+
     self.selectedTrip = ko.observable();
     self.selectedTrip.subscribe(function() {
         self.loadCategoriesForTrip();
     });
+
     self.selectedRange = ko.observable();
+    self.selectedRange.subscribe(function() {
+        self.loadSpendingData();
+    });
 
     self.loadSpendingData = function() {
-        var categories = [1, 2, 3, 4, 5, 6, 7, 8]; // TODO dynamic
+        if(self.selectedTab() == '#over-time') {
+            self.loadSpendingDataOverTime();
+        }
+        else if(self.selectedTab() == '#by-country') {
+            self.loadSpendingDataByCountry();
+        }
+        else if(self.selectedTab() == '#by-category') {
+            self.loadSpendingDataByCategory();
+        }
+    };
+
+    self.loadSpendingDataOverTime = function() {
+        var categories = self.selectedCategories();
         var tripId = self.selectedTrip();
         var range = self.selectedRange();
-        var qs = 'tripId=' + tripId + '&range=' + range + '&categories=' + JSON.stringify(categories);
-        console.log(qs);
+        var qs = 'graphType=overTime&tripId=' + tripId + '&range=' + range + '&categories=' + JSON.stringify(categories);
         $.ajax({
             type: 'GET',
             url: '/spendingData?' + qs,
             success: function(data) {
                 data = JSON.parse(data);
-                console.log(data);
                 var labels = [];
                 var dataPoints = [];
                 for(var i = 0; i < data.length; i++) {
@@ -48,44 +70,148 @@ var SpendingViewModel = function() {
                         scales: {
                             yAxes: [{
                                 ticks: {
-                                    beginAtZero: true
+                                    beginAtZero: true,
+                                    callback: function(value, index, values) {
+                                        return self.formatCurrencyShort(value, self.user().base_currency)
+                                    }
                                 }
                             }]
                         }
                     }
                 };
 
-                var ctx = $('#over-time-chart');
-                new Chart(ctx, config);
+                if(self.chartObj) {
+                    self.chartObj.destroy();
+                }
+                var ctx = $('#chart');
+                ctx.parent().removeClass('doughnut');
+                self.chartObj = new Chart(ctx, config);
             }
         });
+    };
 
-        
+    self.loadSpendingDataByCountry = function() {
+        var tripId = self.selectedTrip();
+        var range = self.selectedRange();
+        var qs = 'graphType=byCountry&tripId=' + tripId + '&range=' + range;
+        $.ajax({
+            type: 'GET',
+            url: '/spendingData?' + qs,
+            success: function(data) {
+                data = JSON.parse(data);
 
+                var labels = [];
+                var dataPoints = [];
+                var colors = [];
+                
+                for(var i = 0; i < data.length; i++) {
+                    labels.push(self.getNameForCountry(data[i].country));
+                    dataPoints.push(data[i].spent_base);
+                    colors.push(self.graphColors[i % self.graphColors.length]);
+                }
 
-        // setTimeout(function() {
-        //     self.dataLoading(false);
-        //     
-        // },  2000);
+                var config = {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Amount Spent',
+                            backgroundColor: colors,
+                            data: dataPoints
+                        }]
+                    }
+                };
+
+                if(self.chartObj) {
+                    self.chartObj.destroy();
+                }
+                var ctx = $('#chart');
+                ctx.parent().addClass('doughnut');
+                self.chartObj = new Chart(ctx, config);
+            }
+        });
+    };
+
+    self.loadSpendingDataByCategory = function() {
+        var tripId = self.selectedTrip();
+        var range = self.selectedRange();
+        var qs = 'graphType=byCategory&tripId=' + tripId + '&range=' + range;
+        $.ajax({
+            type: 'GET',
+            url: '/spendingData?' + qs,
+            success: function(data) {
+                data = JSON.parse(data);
+
+                var labels = [];
+                var dataPoints = [];
+                var colors = [];
+                
+                for(var i = 0; i < data.length; i++) {
+                    labels.push(self.toTitleCase(data[i].category));
+                    dataPoints.push(data[i].spent_base);
+                    colors.push(self.graphColors[i % self.graphColors.length]);
+                }
+
+                var config = {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Amount Spent',
+                            backgroundColor: colors,
+                            data: dataPoints
+                        }]
+                    }
+                };
+
+                if(self.chartObj) {
+                    self.chartObj.destroy();
+                }
+                var ctx = $('#chart');
+                ctx.parent().addClass('doughnut');
+                self.chartObj = new Chart(ctx, config);
+            }
+        });
     };
 
     self.updateCategorySelect = function() {
-        // TODO Actually update this
-        console.log(self.categories());
-        self.loadSpendingData();
+        self.selectedCategories([]);
+        var select = $('#category-select');
+        select.material_select('destroy');
+        select.empty();
+        select.append($('<option>').attr('value', 'label').text('Select Categories').prop('disabled', true));
+        
+        for(var i = 0; i < self.categories().length; i++) {
+            var category = self.categories()[i];
+            var option = $('<option>').attr('value', category.id).text(self.toTitleCase(category.category));
+            if(category.category != 'one-off expense') {
+                option = option.prop('selected', true);
+                self.selectedCategories.push(category.id);
+            }
+            select.append(option);
+        }
+        select.on('change', function() {
+            self.selectedCategories(select.val());
+            self.loadSpendingDataOverTime();
+        });
+        select.material_select();
+
+        self.optionsLoading(false);
     };
 
     self.updateTripSelect = function() {
-        var select = $('#over-time-trip-select');
+        var select = $('#trip-select');
+
         select.material_select('destroy');
         select.empty();
         select.append($('<option>').attr('value', 'label').text('Select Trip').prop('disabled', true));
         
-        for(var i = 0; i < self.trips().length; i++) {
-            var trip = self.trips()[i];
+        for(var j = 0; j < self.trips().length; j++) {
+            var trip = self.trips()[j];
             var option = $('<option>').attr('value', trip.id).text(trip.trip_name);
-            if(self.trips()[i].is_active) {
+            if(trip.is_active) {
                 option = option.prop('selected', true);
+                self.selectedTrip(trip.id);
             }
             select.append(option);
         }
@@ -94,15 +220,21 @@ var SpendingViewModel = function() {
     };
 
     self.loadCategoriesForTrip = function() {
-        self.dataLoading(true);
         $.ajax({
             type: 'GET',
             url: '/categoriesForTrip?tripId=' + self.selectedTrip(),
             success: function(data) {
                 self.categories(JSON.parse(data));
                 self.updateCategorySelect();
-                self.dataLoading(false);
+                self.loadSpendingData();
             }
+        });
+    };
+
+    self.setupTabs = function() {
+        self.selectedTab.subscribe(function() {
+            self.displayCategorySelect(self.selectedTab() == '#over-time');
+            self.loadSpendingData();
         });
     };
 
@@ -113,14 +245,23 @@ var SpendingViewModel = function() {
             success: function(data) {
                 self.trips(JSON.parse(data));
                 self.updateTripSelect();
-                self.dataLoading(false);
+                self.setupTabs();
+                self.loadCategoriesForTrip();
             }
         });
     };
-    
-    self.formatCurrency = function(amount, currency) {
+
+    self.formatCurrencyShort = function(amount, currency) {
+        return self.currencyObj()[currency].symbol_native + self.formatCurrencyAmount(amount, currency);
+    };
+
+    self.formatCurrencyAmount = function(amount, currency) {
         var currencyOptions = self.currencyObj()[currency];
-        return amount.toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits}) +
+        return parseFloat(amount || 0).toLocaleString(undefined, {minimumFractionDigits: currencyOptions.decimal_digits, maximumFractionDigits: currencyOptions.decimal_digits});
+    };
+
+    self.formatCurrency = function(amount, currency) {
+         return self.formatCurrencyAmount(amount, currency) +
             ' ' +
             currency;
     };
@@ -149,7 +290,7 @@ var SpendingViewModel = function() {
         } else {
             console.log('No support for localStorage in browser.');
         }
-    }
+    };
 
     self.getItem = function(item) {
         if (typeof(Storage) !== "undefined") {
@@ -158,6 +299,7 @@ var SpendingViewModel = function() {
             console.log('No support for localStorage in browser.');
             return null;
         }
-    }
+    };
+
     self.loadTrips();
 };

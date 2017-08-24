@@ -23,95 +23,58 @@ block content
                             a.nav-link(data-toggle='tab', href='#by-category', role='tab') By Category
 
                     .tab-content.card
-                        #over-time.tab-pane.fade.in.show.active(role='tabpanel')
-                            .text-center(data-bind='visible: dataLoading')
-                                .preloader-wrapper.big.active.m-top.m-bottom
-                                    .spinner-layer.spinner-blue-only
-                                        .circle-clipper.left
-                                            .circle
-                                        .gap-patch
-                                            .circle
-                                        .circle-clipper.right
-                                            .circle
-                            .over-time-section(style='display: none', data-bind='visible: !dataLoading()')
-                                .row.m-top
-                                    .col-md-3
-                                        .md-form
-                                            select#over-time-trip-select(data-bind='value: selectedTrip')
-                                            label Trip
-                                        .md-form
-                                            select.mdb-select(data-bind='value: selectedRange')
-                                                option(value='label', disabled) Select Time Frame
-                                                option(value='trip', selected) Entire Trip
-                                                option(value='thisMonth') This Month
-                                                option(value='thisWeek') This Week
-                                                option(value='last30') Past 30 Days
-                                                option(value='last14') Past 14 Days
-                                                option(value='last7') Past 7 Days
-                                            label Time Period
-                                        .md-form
-                                            select.mdb-select(multiple)
-                                                option(value='label', disabled) Select Category
-                                                option(value='current', selected) All Categories
-                                                option(value='other') Food
-                                            label Category
-                                    .col-md-9
-                                        .chart-container(style='position: relative;')
-                                            canvas#over-time-chart
-
-                        // Panel 2
-                        #by-country.tab-pane.fade(role='tabpanel')
-                            br
-                            p
-                                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil odit magnam minima, soluta doloribus
-                                | reiciendis molestiae placeat unde eos molestias. Quisquam aperiam, pariatur. Tempora, placeat ratione
-                                | porro voluptate odit minima.
-                            p
-                                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil odit magnam minima, soluta doloribus
-                                | reiciendis molestiae placeat unde eos molestias. Quisquam aperiam, pariatur. Tempora, placeat ratione
-                                | porro voluptate odit minima.
-                        // /.Panel 2
-                        // Panel 3
-                        #by-category.tab-pane.fade(role='tabpanel')
-                            br
-                            p
-                                | Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil odit magnam minima, soluta doloribus
-                                | reiciendis molestiae placeat unde eos molestias. Quisquam aperiam, pariatur. Tempora, placeat ratione
-                                | porro voluptate odit minima.
-                        // /.Panel 3
-
-                    //- .card-body.p-none
-                    //-     
-                    //-     .row(style='display: none', data-bind='visible: !initialLoading()')
-                    //-         span asdf
+                        #over-time.tab-pane.fade.in.show.active(style='display: none', role='tabpanel')
+                        #by-country.tab-pane.fade.in.show.active(style='display: none', role='tabpanel')
+                        #by-category.tab-pane.fade.in.show.active(style='display: none', role='tabpanel')
+                        .text-center(data-bind='visible: optionsLoading')
+                            .preloader-wrapper.big.active
+                                .spinner-layer.spinner-blue-only
+                                    .circle-clipper.left
+                                        .circle
+                                    .gap-patch
+                                        .circle
+                                    .circle-clipper.right
+                                        .circle
+                        .row.m-top(style='display: none', data-bind='visible: !optionsLoading()')
+                            .col-md-3
+                                .options-panel
+                                    .md-form
+                                        select#trip-select(data-bind='value: selectedTrip')
+                                        label Trip
+                                    .md-form
+                                        select.mdb-select(data-bind='value: selectedRange')
+                                            option(value='label', disabled) Select Time Frame
+                                            option(value='trip', selected) Entire Trip
+                                            option(value='thisMonth') This Month
+                                            option(value='thisWeek') This Week
+                                            option(value='last30') Past 30 Days
+                                            option(value='last14') Past 14 Days
+                                            option(value='last7') Past 7 Days
+                                        label Time Period
+                                    .md-form(data-bind='visible: displayCategorySelect')
+                                        select#category-select(multiple)
+                                        label Category
+                            .col-md-9
+                                .chart-container
+                                    canvas#chart
 
     script.
         $('#spending-nav').addClass('active');
         var vm = new SpendingViewModel();
+        var user = !{user};
         var currencies = !{currency};
         var countries = !{countries};
+
         vm.currencyArr = ko.observableArray(currencies);
         vm.currencyObj = ko.observable({});
         vm.countryArr = ko.observableArray([]);
         vm.countryObj = ko.observable(countries);
+        vm.user = ko.observable(user);
+        vm.selectedTab = ko.observable('#over-time');
 
-        // Preload flag images
-        var images = new Array();
-        var noImage = ['BQ', 'BV', 'GF', 'GP', 'HM', 'IO', 'PM', 'RE', 'SJ', 'SX', 'UM', 'XK'];
-        function preload(src) {
-            images.push(new Image());
-            images[images.length - 1].src = src;
-        }
         for(var key in vm.countryObj().countries) {
             if(vm.countryObj().countries.hasOwnProperty(key)) {
                 var country = vm.countryObj().countries[key];
-                if(noImage.indexOf(key) == -1) {
-                    vm.countryObj().countries[key].icon = key;
-                    preload('images/flags/16/' + key + '.png');
-                }
-                else {
-                    vm.countryObj().countries[key].icon = '_unknown';
-                }
                 country.id = key;
                 vm.countryArr.push(country);
             }
@@ -119,86 +82,13 @@ block content
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr("href") // activated tab
+            vm.selectedTab(target);
+        });
         
         $(document).ready(function() {
             ko.applyBindings(vm);
 
             $('.mdb-select').material_select();
-
-            var formatOption = function(item) {
-                if (!item.icon) { return item.display_name; }
-                var $item = $(
-                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.display_name + '</span>'
-                );
-                return $item;
-            };
-            var formatSelection = function(item) {
-                if (!item.icon) { return item.display_name; }
-                var $item = $(
-                    '<span><img src="images/flags/16/' + item.icon + '.png" class="img-flag" /> ' + item.id + '</span>'
-                );
-                return $item;
-            };
-            $('.currency-dropdown').select2({
-                data: vm.currencyArr(),
-                matcher: function(params, data) {
-                    var term = $.trim(params.term);
-                    if (term === '') {
-                        return data;
-                    }
-                    if(data.id === '') {
-                        return null;
-                    }
-                    if(data.display_name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
-                        return data;
-                    }
-                    return null;
-                },
-                placeholder: {
-                    id: '',
-                    display_name: 'Home Currency',
-                    icon: '_unknown'
-                },
-                templateResult: formatOption,
-                templateSelection: formatSelection,
-                theme: 'bootstrap'
-            });
-
-            var formatCountryOption = function(item) {
-                var code = item.id || '_unknown';
-                if(noImage.indexOf(code) > -1) {
-                    code = '_unknown';
-                }
-                var $item = $(
-                    '<span><img src="images/flags/16/' + code + '.png" class="img-flag" /> ' + item.name + '</span>'
-                );
-                return $item;
-            };
-            $('.country-dropdown').select2({
-                data: vm.countryArr(),
-                matcher: function(params, data) {
-                    var term = $.trim(params.term);
-                    if (term === '') {
-                        return data;
-                    }
-                    if(data.id === '') {
-                        return null;
-                    }
-                    if(data.name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
-                        return data;
-                    }
-                    if(data.native.toUpperCase().indexOf(term.toUpperCase()) > -1) {
-                        return data;
-                    }
-                    return null;
-                },
-                placeholder: {
-                    id: '',
-                    name: 'Select Country',
-                    icon: '_unknown'
-                },
-                templateResult: formatCountryOption,
-                templateSelection: formatCountryOption,
-                theme: 'bootstrap'
-            });
         });
