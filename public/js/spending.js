@@ -19,7 +19,9 @@ var SpendingViewModel = function() {
 
     self.selectedRange = ko.observable();
     self.selectedRange.subscribe(function() {
-        self.loadSpendingData();
+        if(!self.optionsLoading()) {
+            self.loadSpendingData();
+        }
     });
 
     self.loadSpendingData = function() {
@@ -211,7 +213,6 @@ var SpendingViewModel = function() {
             var option = $('<option>').attr('value', trip.id).text(trip.trip_name);
             if(trip.is_active) {
                 option = option.prop('selected', true);
-                self.selectedTrip(trip.id);
             }
             select.append(option);
         }
@@ -246,7 +247,6 @@ var SpendingViewModel = function() {
                 self.trips(JSON.parse(data));
                 self.updateTripSelect();
                 self.setupTabs();
-                self.loadCategoriesForTrip();
             }
         });
     };
