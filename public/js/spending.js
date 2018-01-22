@@ -45,11 +45,12 @@ var SpendingViewModel = function() {
             type: 'GET',
             url: '/spendingData?' + qs,
             success: function(data) {
+                var ctx = $('#chart');
                 data = JSON.parse(data);
                 var labels = [];
                 var dataPoints = [];
                 for(var i = 0; i < data.length; i++) {
-                    labels.push(moment(data[i].date).format('MMM D'));
+                    labels.push(moment(data[i].date).format('YYYY-MM-DD'));
                     dataPoints.push(data[i].spent_base);
                 }
 
@@ -78,6 +79,17 @@ var SpendingViewModel = function() {
                                     }
                                 }
                             }]
+                        },
+                        hover: {
+                            onHover: function(event, elements) {
+                                ctx.css("cursor", elements[0] ? "pointer" : "default");
+                            }
+                        },
+                        onClick: function(event, elements) {
+                            // TODO: Don't love having this tied to the label.
+                            //       Figure out a way to pass arbitrary data
+                            var date = elements[0]._model.label;
+                            window.location = "/transactions?filters=" + encodeURIComponent(JSON.stringify({dateStart: date, dateEnd: date}))
                         }
                     }
                 };
@@ -85,7 +97,6 @@ var SpendingViewModel = function() {
                 if(self.chartObj) {
                     self.chartObj.destroy();
                 }
-                var ctx = $('#chart');
                 ctx.parent().removeClass('doughnut');
                 self.chartObj = new Chart(ctx, config);
             }
