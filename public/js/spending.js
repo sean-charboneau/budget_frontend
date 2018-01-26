@@ -118,7 +118,11 @@ var SpendingViewModel = function() {
                 var colors = [];
                 
                 for(var i = 0; i < data.length; i++) {
-                    labels.push(self.getNameForCountry(data[i].country));
+                    var code = '';
+                    if(data[i].country) {
+                        code = ' (' + data[i].country + ')'
+                    }
+                    labels.push(self.getNameForCountry(data[i].country) + code);
                     dataPoints.push(data[i].spent_base);
                     colors.push(self.graphColors[i % self.graphColors.length]);
                 }
@@ -128,10 +132,23 @@ var SpendingViewModel = function() {
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Amount Spent',
+                            // label: 'Amount Spent',
                             backgroundColor: colors,
                             data: dataPoints
                         }]
+                    },
+                    options: {
+                        hover: {
+                            onHover: function(event, elements) {
+                                ctx.css("cursor", elements[0] ? "pointer" : "default");
+                            }
+                        },
+                        onClick: function(event, elements) {
+                            // TODO: Don't love having this tied to the label.
+                            //       Figure out a way to pass arbitrary data
+                            var country = elements[0]._model.label.match(/\(([^)]+)\)/)[1];
+                            window.location = "/transactions?filters=" + encodeURIComponent(JSON.stringify({country: country}))
+                        }
                     }
                 };
 

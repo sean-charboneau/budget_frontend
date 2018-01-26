@@ -207,6 +207,10 @@ var TransactionsViewModel = function() {
             filterObj.dateEnd = self.filters.dateEnd();
             filtersActive = true;
         }
+        if(self.filters.country()) {
+            filterObj.country = self.filters.country();
+            filtersActive = true;
+        }
         if(filtersActive) {
             qs = self.qsConcat(qs, 'filters=' + encodeURIComponent(JSON.stringify(filterObj)));
         }
@@ -238,9 +242,11 @@ var TransactionsViewModel = function() {
         limitList: ko.observableArray([10, 25, 50]),
         limit: ko.observable(self.defaultLimit),
         page: ko.observable(1),
-        withdrawalId: ko.observable(),
+
+        country: ko.observable(),
+        dateEnd: ko.observable(),
         dateStart: ko.observable(),
-        dateEnd: ko.observable()
+        withdrawalId: ko.observable()
     };
     self.filters.limit.subscribe(function(val) {
         if(self.filtersLoading()) {
@@ -322,15 +328,18 @@ var TransactionsViewModel = function() {
             } catch(e) {}
         }
         if(filters.dateStart) {
-            console.log('start');
             try {
                 self.filters.dateStart(moment(filters.dateStart).format('YYYY-MM-DD'));
             } catch(e) {}
         }
         if(filters.dateEnd) {
-            console.log('end');
             try {
                 self.filters.dateEnd(moment(filters.dateEnd).format('YYYY-MM-DD'));
+            } catch(e) {}
+        }
+        if(filters.country) {
+            try {
+                self.filters.country(filters.country);
             } catch(e) {}
         }
 
