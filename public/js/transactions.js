@@ -106,9 +106,9 @@ var TransactionsViewModel = function() {
         if(!self.unassociatedTransaction() && !self.transactionCountry()) {
             return false;
         }
-        if(!self.selectedCategory()) {
-            return false;
-        }
+        // if(!self.selectedCategory()) {
+        //     return false;
+        // }
         return true;
     });
 
@@ -211,6 +211,10 @@ var TransactionsViewModel = function() {
             filterObj.country = self.filters.country();
             filtersActive = true;
         }
+        if(self.filters.categoryName()) {
+            filterObj.categoryName = self.filters.categoryName();
+            filtersActive = true;
+        }
         if(filtersActive) {
             qs = self.qsConcat(qs, 'filters=' + encodeURIComponent(JSON.stringify(filterObj)));
         }
@@ -243,6 +247,7 @@ var TransactionsViewModel = function() {
         limit: ko.observable(self.defaultLimit),
         page: ko.observable(1),
 
+        categoryName: ko.observable(),
         country: ko.observable(),
         dateEnd: ko.observable(),
         dateStart: ko.observable(),
@@ -340,6 +345,11 @@ var TransactionsViewModel = function() {
         if(filters.country) {
             try {
                 self.filters.country(filters.country);
+            } catch(e) {}
+        }
+        if(filters.categoryName) {
+            try {
+                self.filters.categoryName(filters.categoryName);
             } catch(e) {}
         }
 

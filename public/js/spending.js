@@ -26,6 +26,7 @@ var SpendingViewModel = function() {
 
     self.loadSpendingData = function() {
         if(self.selectedTab() == '#over-time') {
+            console.log('1');
             self.loadSpendingDataOverTime();
         }
         else if(self.selectedTab() == '#by-country') {
@@ -146,7 +147,15 @@ var SpendingViewModel = function() {
                         onClick: function(event, elements) {
                             // TODO: Don't love having this tied to the label.
                             //       Figure out a way to pass arbitrary data
-                            var country = elements[0]._model.label.match(/\(([^)]+)\)/)[1];
+                            var country = '';
+                            var countryMatch = elements[0]._model.label.match(/\(([^)]+)\)/);
+                            if(countryMatch &&  countryMatch.length > 1) {
+                                country = countryMatch[1];
+                            }
+                            if(!country) {
+                                // Unassigned transactions
+                                country = 'XX';
+                            }
                             window.location = "/transactions?filters=" + encodeURIComponent(JSON.stringify({country: country}))
                         }
                     }
@@ -187,10 +196,23 @@ var SpendingViewModel = function() {
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Amount Spent',
                             backgroundColor: colors,
                             data: dataPoints
                         }]
+                    },
+                    options: {
+                        hover: {
+                            onHover: function(event, elements) {
+                                ctx.css("cursor", elements[0] ? "pointer" : "default");
+                            }
+                        },
+                        onClick: function(event, elements) {
+                            // TODO: Don't love having this tied to the label.
+                            //       Figure out a way to pass arbitrary data
+                            //       Especially true here; custom categories would break this
+                            var category = elements[0]._model.label;
+                            window.location = "/transactions?filters=" + encodeURIComponent(JSON.stringify({categoryName: category.toLowerCase()}))
+                        }
                     }
                 };
 
@@ -222,6 +244,7 @@ var SpendingViewModel = function() {
         }
         select.on('change', function() {
             self.selectedCategories(select.val());
+            console.log('2');
             self.loadSpendingDataOverTime();
         });
         select.material_select();
