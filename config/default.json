@@ -3,6 +3,9 @@
         "hostname": "http://localhost:8080",
         "key": "mykey"
     },
+    "heroku": {
+        "key": "7e879fd9-cfdf-4f29-8b5c-ad15f8f2b982"
+    },
     "port": "8088",
     "storage": {
         "token": "tripTrakToken",

@@ -295,6 +295,8 @@ var SpendingViewModel = function() {
             type: 'GET',
             url: '/trips',
             success: function(data) {
+                // console.log('DONE');
+                // console.log(data);
                 self.trips(JSON.parse(data));
                 self.updateTripSelect();
                 self.setupTabs();

@@ -14,12 +14,17 @@ var logOut = function(req, res, opts) {
 	res.clearCookie('tripTrakToken');
 	var error = opts.error || 0;
 	return res.redirect('/?error=' + error);
-}
+};
 
 var ERRORS = {
 	0: "",
 	1: "Your session has expired, please log in again"
-}
+};
+
+var apiUrl = '';
+var getApiUrl = function() {
+	return process.env.api || config.get('api.hostname');
+};
 
 /* GET login page. */
 router.get('/', function(req, res) {
@@ -34,7 +39,7 @@ router.get('/', function(req, res) {
 
 /* Handle Login POST */
 router.post('/login', function(req, res) {
-	request.post({url: config.get('api.hostname') + '/login', form: req.body}, function(err, httpResponse, body) {
+	request.post({url: getApiUrl() + '/login', form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err}); //TODO error flash
 		}
@@ -55,7 +60,7 @@ router.get('/register', function(req, res) {
 
 /* Handle Registration POST */
 router.post('/register', function(req, res) {
-	request.post({url: config.get('api.hostname') + '/register', form: req.body}, function(err, httpResponse, body) {
+	request.post({url: getApiUrl() + '/register', form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err}); //TODO error flash
 		}
@@ -79,7 +84,7 @@ router.get('/cash', authenticate, function(req, res) {
 router.get('/spending', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
 	var countries = require('../data/countries.json');
-	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
@@ -92,7 +97,7 @@ router.get('/spending', authenticate, function(req, res) {
 });
 
 router.get('/createTrip', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/tripOverview', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + '/tripOverview', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
@@ -103,7 +108,7 @@ router.get('/createTrip', authenticate, function(req, res) {
 		if(trip.tripId) {
 			return res.redirect('/home');
 		}
-		request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+		request.get({url: getApiUrl() + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 			if(err || !body) {
 				return logOut(req, res, {error: 0});
 			}
@@ -119,7 +124,7 @@ router.get('/createTrip', authenticate, function(req, res) {
 });
 
 router.get('/tripOverview', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -132,7 +137,7 @@ router.get('/tripOverview', authenticate, function(req, res) {
 });
 
 router.get('/withdrawal', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -145,7 +150,7 @@ router.get('/withdrawal', authenticate, function(req, res) {
 });
 
 router.post('/trip', authenticate, function(req, res) {
-	request.post({url: config.get('api.hostname') + '/trip', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
+	request.post({url: getApiUrl() + '/trip', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -158,7 +163,7 @@ router.post('/trip', authenticate, function(req, res) {
 });
 
 router.post('/withdrawal', authenticate, function(req, res) {
-	request.post({url: config.get('api.hostname') + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
+	request.post({url: getApiUrl() + '/withdrawal', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -171,7 +176,7 @@ router.post('/withdrawal', authenticate, function(req, res) {
 });
 
 router.post('/transaction', authenticate, function(req, res) {
-	request.post({url: config.get('api.hostname') + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
+	request.post({url: getApiUrl() + '/transaction', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -191,7 +196,7 @@ router.get('/transactions', authenticate, function(req, res) {
 });
 
 router.get('/transaction', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -204,7 +209,7 @@ router.get('/transaction', authenticate, function(req, res) {
 });
 
 router.get('/spendingData', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -217,7 +222,7 @@ router.get('/spendingData', authenticate, function(req, res) {
 });
 
 router.get('/trips', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -230,7 +235,7 @@ router.get('/trips', authenticate, function(req, res) {
 });
 
 router.get('/categoriesForTrip', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + req.originalUrl, headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -243,7 +248,7 @@ router.get('/categoriesForTrip', authenticate, function(req, res) {
 });
 
 router.get('/categories', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + '/categories', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -256,7 +261,7 @@ router.get('/categories', authenticate, function(req, res) {
 });
 
 router.get('/cashReserves', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/cashReserves', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + '/cashReserves', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err) {
 			return res.json({error: err});
 		}
@@ -272,7 +277,7 @@ router.get('/cashReserves', authenticate, function(req, res) {
 router.get('/home', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
 	var countries = require('../data/countries.json');
-	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
@@ -285,7 +290,7 @@ router.get('/home', authenticate, function(req, res) {
 });
 
 router.get('/profile', authenticate, function(req, res) {
-	request.get({url: config.get('api.hostname') + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
+	request.get({url: getApiUrl() + '/me', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}}, function(err, httpResponse, body) {
 		if(err || !body) {
 			return logOut(req, res, {error: 0});
 		}
