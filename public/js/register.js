@@ -37,7 +37,7 @@ var RegisterViewModel = function() {
                             }
                             else {
                                 document.cookie = data.cookie.split(';')[0];
-                                document.location = '/home';
+                                document.location = '/createTrip?first=1';
                             }
                         }
                     });

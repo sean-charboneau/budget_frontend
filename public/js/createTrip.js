@@ -268,6 +268,18 @@ var CreateTripViewModel = function() {
         return self.countryObj().countries[country].name;
     };
 
+    self.getQueryVariable = function(variable) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i=0;i<vars.length;i++) {
+            var pair = vars[i].split("=");
+            if(pair[0] == variable) {
+                return pair[1];
+            }
+        }
+        return(false);
+    };
+
     self.toTitleCase = function(str) {
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
     };
@@ -278,7 +290,7 @@ var CreateTripViewModel = function() {
         } else {
             console.log('No support for localStorage in browser.');
         }
-    }
+    };
 
     self.getItem = function(item) {
         if (typeof(Storage) !== "undefined") {
@@ -287,5 +299,9 @@ var CreateTripViewModel = function() {
             console.log('No support for localStorage in browser.');
             return null;
         }
+    };
+
+    if(self.getQueryVariable('first')) {
+        swal('Welcome!', 'Let\'s start by setting up your trip');
     }
 };
