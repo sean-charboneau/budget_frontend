@@ -23,7 +23,6 @@ var ERRORS = {
 
 var apiUrl = '';
 var getApiUrl = function() {
-	console.log('API URL: ' + (process.env.api || config.get('api.hostname')));
 	return process.env.api || config.get('api.hostname');
 };
 

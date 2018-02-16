@@ -35,11 +35,16 @@
 .lock-icon {
     cursor: pointer;
     cursor: hand;
-    font-size: 24px;
+    /* font-size: 24px; */
 }
 
 .lock-icon:hover {
     color: gray;
+}
+
+.input-group-text {
+    padding-top: 0.8rem;
+    padding-bottom: 0.8rem;
 }
 
 .noUi-handle {

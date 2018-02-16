@@ -6519,9 +6519,6 @@ label {
     width: calc(100% - 3rem);
   }
 }
-.md-form .input-group {
-  border: 1px solid #eee;
-}
 .md-form .input-group .form-control {
   margin: 0;
   padding-left: 1.2rem;

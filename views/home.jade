@@ -226,14 +226,16 @@ block content
                                     label(for='transactionDateInput', data-bind='text: transactionDateLabel')
                                     .input-group
                                         input#transactionDateInput.form-control(data-bind='dateTimePicker: transactionDate', type='text')
-                                        span.input-group-addon
-                                            i.fa.fa-calendar
+                                        .input-group-append
+                                            span.input-group-text
+                                                i.fa.fa-calendar
                                 .col-md-6(data-bind='visible: transactionSplit')
                                     label(for='transactionEndInput') End Date
                                     .input-group
                                         input#transactionEndInput.form-control(data-bind='dateTimePicker: transactionEnd', type='text')
-                                        span.input-group-addon
-                                            i.fa.fa-calendar
+                                        .input-group-append
+                                            span.input-group-text
+                                                i.fa.fa-calendar
                             .row.m-top-small.m-bottom
                                 .col-md-12
                                     a(href='#' style='font-size: 70%', data-bind='click: toggleTransactionSplit, text: transactionSplitText')
@@ -306,8 +308,9 @@ block content
                                         label(for='withdrawalATMDateInput') Date
                                         .input-group
                                             input#withdrawalATMDateInput.form-control(data-bind='dateTimePicker: withdrawalDate', type='text')
-                                            span.input-group-addon
-                                                i.fa.fa-calendar
+                                            .input-group-append
+                                                span.input-group-text
+                                                    i.fa.fa-calendar
                                     .form-group
                                         input#transactionFeeCheckbox(type='checkbox', value='', data-bind='checked: isTransactionFee')
                                         label(for='transactionFeeCheckbox') This withdrawal incurred a transaction fee
@@ -346,8 +349,9 @@ block content
                                         label(for='withdrawalEarnedDateInput') Date
                                         .input-group
                                             input#withdrawalEarnedDateInput.form-control(data-bind='dateTimePicker: withdrawalDate', type='text')
-                                            span.input-group-addon
-                                                i.fa.fa-calendar
+                                            .input-group-append
+                                                span.input-group-text
+                                                    i.fa.fa-calendar
                                 .modal-footer
                                     button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
                                     button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveEarnedWithdrawal, enable: canSubmitEarnedWithdrawal') Save

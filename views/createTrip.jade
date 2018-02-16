@@ -56,10 +56,12 @@ block content
                                             .col-md-4
                                                 .md-form
                                                     .input-group
-                                                        span.input-group-addon.lock-icon(data-bind='click: toggleDaysLock')
-                                                            i(data-bind='attr: { "class": daysLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
+                                                        .input-group-prepend
+                                                            span.input-group-text.lock-icon(data-bind='click: toggleDaysLock')
+                                                                i(data-bind='attr: { "class": daysLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
                                                         input.form-control(type='text', name='daysAmount', id='daysAmount', data-bind='value: days, disable: daysLocked')
-                                                        span.input-group-addon days
+                                                        .input-group-append
+                                                            span.input-group-text days
                                             .col-md-8
                                                 .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 365, value: days, id: "days" }, css: { "force-disable": daysLocked }')
                                     .form-group.m-none
@@ -67,21 +69,25 @@ block content
                                             .col-md-4
                                                 .md-form
                                                     .input-group
-                                                        span.input-group-addon.lock-icon(data-bind='click: toggleBudgetLock')
-                                                            i(data-bind='attr: { "class": budgetLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
+                                                        .input-group-prepend
+                                                            span.input-group-text.lock-icon(data-bind='click: toggleBudgetLock')
+                                                                i(data-bind='attr: { "class": budgetLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
                                                         input.form-control(type='text', name='budgetAmount', id='budgetAmount', data-bind='value: budget, disable: budgetLocked')
-                                                        span.input-group-addon(data-bind='text: $root.user().base_currency')
+                                                        .input-group-append
+                                                            span.input-group-text(data-bind='text: $root.user().base_currency')
                                             .col-md-8
-                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 10000, value: budget, id: "budget" }, css: { "force-disable": budgetLocked }')
+                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 2000, value: budget, id: "budget" }, css: { "force-disable": budgetLocked }')
                                     .form-group.m-none
                                         .row
                                             .col-md-4
                                                 .md-form
                                                     .input-group
-                                                        span.input-group-addon.lock-icon(data-bind='click: togglePerDayLock')
-                                                            i(data-bind='attr: { "class": perDayLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
+                                                        .input-group-prepend
+                                                            span.input-group-text.lock-icon(data-bind='click: togglePerDayLock')
+                                                                i(data-bind='attr: { "class": perDayLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
                                                         input.form-control(type='text', name='perDayAmount', id='perDayAmount', data-bind='value: perDay, disable: perDayLocked')
-                                                        span.input-group-addon(data-bind='text: $root.user().base_currency + "/Day"')
+                                                        .input-group-append
+                                                            span.input-group-text(data-bind='text: $root.user().base_currency + "/Day"')
                                             .col-md-8
                                                 .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 200, value: perDay, step: 0.01, id: "perDay" }, css: { "force-disable": perDayLocked }')
                                     .form-group.m-none
@@ -111,7 +117,8 @@ block content
                                                 .md-form
                                                     .input-group
                                                         input.form-control(type='number', name='oneOffAmount', id='oneOffAmount', placeholder='100', data-bind='value: amount')
-                                                        span.input-group-addon(data-bind='text: $root.user().base_currency')
+                                                        .input-group-append
+                                                            span.input-group-text(data-bind='text: $root.user().base_currency')
                                             .form-group
                                                 .row
                                                     .col-md-12

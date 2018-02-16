@@ -101,7 +101,8 @@ block content
                                         a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
                             .col-md-2.per-page
                                 .input-group
-                                    span.input-group-addon Per Page: 
+                                    .input-group-prepend
+                                        span.input-group-text Per Page: 
                                     select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
@@ -141,8 +142,9 @@ block content
                             label(for='withdrawalDate') Date
                             .input-group
                                 input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
-                                span.input-group-addon
-                                    i.fa.fa-calendar
+                                .input-group-append
+                                    span.input-group-text
+                                        i.fa.fa-calendar
                             .form-check(data-bind='visible: withdrawalType() == "atm"')
                                 label.form-check-label.m-top
                                     input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')

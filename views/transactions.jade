@@ -118,7 +118,8 @@ block content
                                         a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
                             .col-md-2.per-page
                                 .input-group
-                                    span.input-group-addon Per Page: 
+                                    .input-group-prepend
+                                        span.input-group-text Per Page: 
                                     select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
@@ -167,14 +168,16 @@ block content
                                     label(for='transactionDate', data-bind='text: transactionDateLabel')
                                     .input-group
                                         input.form-control(id='transactionDate', data-bind='dateTimePicker: transactionDate', type='text')
-                                        span.input-group-addon
-                                            i.fa.fa-calendar
+                                        .input-group-append
+                                            span.input-group-text
+                                                i.fa.fa-calendar
                                 .col-md-6(data-bind='visible: transactionSplit')
                                     label(for='transactionEnd') End Date
                                     .input-group
                                         input.form-control(id='transactionEnd', data-bind='dateTimePicker: transactionEnd', type='text')
-                                        span.input-group-addon
-                                            i.fa.fa-calendar
+                                        .input-group-append
+                                            span.input-group-text
+                                                i.fa.fa-calendar
                             .row.m-top-small.m-bottom
                                 .col-md-12
                                     a(href='#' style='font-size: 70%', data-bind='click: toggleTransactionSplit, text: transactionSplitText')
