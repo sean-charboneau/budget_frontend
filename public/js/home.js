@@ -513,12 +513,12 @@ var HomeViewModel = function() {
                         '.';
                 }
                 else {
-                    text += 'You\'re doing great! If you keep up your spending habits, you\'ll leave Thailand ';
+                    text += 'You\'re doing great! If you keep up your spending habits, you\'ll leave ' + countryName;
                     if(surplus == 0) {
-                        text += 'exactly on budget.';
+                        text += ' exactly on budget.';
                     }
                     else {
-                        text += 'with ' +
+                        text += ' with ' +
                             self.formatCurrencyShort(surplus, currency) +
                             ' more than you planned.';
                     }
