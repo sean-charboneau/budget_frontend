@@ -79,6 +79,8 @@ block content
                 vm.countryArr.push(country);
             }
         }
+        vm.countryArr.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+        
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }

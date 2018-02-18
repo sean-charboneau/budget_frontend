@@ -23,9 +23,6 @@ html
                     strong TripTrak
                 #navbarNav1.collapse.navbar-collapse
                     ul.navbar-nav.mr-auto.signed-in(style='display: none')
-                        //- TODO - figure out whether to keep home link
-                        //- li.nav-item#home-nav
-                        //-     a.nav-link(href='/home') Home 
                         li.nav-item#transactions-nav
                             a.nav-link(href='/transactions') Transactions
                         li.nav-item#cash-nav
@@ -36,7 +33,7 @@ html
                             a.nav-link(href='/profile') Profile
                     ul.navbar-nav.ml-auto.signed-out(style='display: none')
                         li.nav-item
-                            a.nav-link(href='#')
+                            a.nav-link(href='/')
                                 i.fa.fa-sign-in.mr-1
                                 span Sign In
                     ul.navbar-nav.ml-auto.signed-in(style='display: none')

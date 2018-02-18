@@ -23,6 +23,8 @@ block content
 							i.fa.fa-lock.prefix.grey-text
 							input#password.form-control(type='password', required)
 							label(for='password') Your password
+						.text-center(data-bind='visible: loginError')
+							span.error-message(data-bind='text: loginError')
 						.text-center
 							button.btn.btn-default.waves-effect.waves-light(type='submit') Login
 				// Footer

@@ -33,6 +33,8 @@ block content
 						.md-form
 							select.form-control.currency-dropdown(required)
 								option
+						.text-center(data-bind='visible: registerError')
+							span.error-message(data-bind='text: registerError')
 						.text-center
 							button.btn.btn-default.waves-effect.waves-light(type='submit') Register
 
@@ -75,4 +77,9 @@ block content
 				theme: 'bootstrap'
 			});
 			$('.select2-selection').css('height', 'auto');
+
+			// For now only support USD base
+			$('.currency-dropdown').val('USD');
+			$('.currency-dropdown').trigger('change');
+			$('.currency-dropdown').prop('disabled', true);
 		});

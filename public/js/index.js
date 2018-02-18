@@ -1,9 +1,11 @@
 var IndexViewModel = function() {
     var self = this;
+    self.loginError = ko.observable();
 
     self.logIn = function (e) {
         var username = $('#username').val();
         var password = $('#password').val();
+        self.loginError('');
         $.ajax({
             type: 'POST',
             url: '/login',
@@ -13,7 +15,7 @@ var IndexViewModel = function() {
             },
             success: function(data) {
                 if(!data || data.error) {
-                    $('#error-message').text(data.error);
+                    self.loginError(data.error);
                 }
                 else {
                     document.cookie = data.cookie.split(';')[0];

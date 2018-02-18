@@ -1,6 +1,8 @@
 var RegisterViewModel = function() {
     var self = this;
 
+    self.registerError = ko.observable();
+
     self.username = ko.observable();
     self.password = ko.observable();
     self.email = ko.observable();
@@ -8,6 +10,7 @@ var RegisterViewModel = function() {
     self.lastName = ko.observable();
 
     self.register = function () {
+        self.registerError('');
         $.ajax({
             type: 'POST',
             url: '/register',
@@ -21,7 +24,7 @@ var RegisterViewModel = function() {
             },
             success: function(data) {
                 if(!data || data.error) {
-                    $('#error-message').text(data.error);
+                    self.registerError(data.error);
                 }
                 else {
                     $.ajax({
@@ -33,7 +36,7 @@ var RegisterViewModel = function() {
                         },
                         success: function(data) {
                             if(!data || data.error) {
-                                $('#error-message').text(data.error);
+                                self.registerError(data.error);
                             }
                             else {
                                 document.cookie = data.cookie.split(';')[0];

@@ -85,25 +85,38 @@ block content
                                 // /ko
                     .panel-footer(style='display: none', data-bind='visible: !cashLoading()')
                         .row
-                            .col-md-5.page-display
-                                span(data-bind='text: pageDisplayText')
-                            .col-md-5.text-center
-                                ul.pagination.hidden-md
-                                    li
-                                        a(href='#', data-bind='click: function(e) { navigate("first") }, clickBubble: false') <<
-                                    li
-                                        a(href='#', data-bind='click: function(e) { navigate("prev") }, clickBubble: false') <
-                                    li.disabled
-                                        a(href='#', data-bind='text: filters.page') 1
-                                    li
-                                        a(href='#', data-bind='click: function(e) { navigate("next") }, clickBubble: false') >
-                                    li
-                                        a(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false') >>
-                            .col-md-2.per-page
-                                .input-group
-                                    .input-group-prepend
-                                        span.input-group-text Per Page: 
-                                    select.form-control(data-bind='options: filters.limitList, value: filters.limit')
+                            //- .col-md-5.page-display
+                            //-     span(data-bind='text: pageDisplayText')
+                            .col-md-7.offset-md-5.text-center
+                                nav(aria-label='Page navigation')
+                                    ul.pagination
+                                        li.page-item
+                                            a.page-link(href='#', data-bind='click: function(e) { navigate("first") }, clickBubble: false', aria-label='First')
+                                                span(aria-hidden='true')
+                                                    i.fa.fa-angle-double-left
+                                                span.sr-only First
+                                        li.page-item
+                                            a.page-link(href='#', data-bind='click: function(e) { navigate("prev") }, clickBubble: false', aria-label='Previous')
+                                                span(aria-hidden='true')
+                                                    i.fa.fa-angle-left
+                                                span.sr-only Previous
+                                        li.page-item.disabled
+                                            a.page-link(href='#', data-bind='text: filters.page') 1
+                                        li.page-item
+                                            a.page-link(href='#', data-bind='click: function(e) { navigate("next") }, clickBubble: false', aria-label='Next')
+                                                span(aria-hidden='true')
+                                                    i.fa.fa-angle-right
+                                                span.sr-only Next
+                                        li.page-item
+                                            a.page-link(href='#', data-bind='click: function(e) { navigate("last") }, clickBubble: false', aria-label='Last')
+                                                span(aria-hidden='true')
+                                                    i.fa.fa-angle-double-right
+                                                span.sr-only Last
+                            //- .col-md-2.per-page
+                            //-     .input-group
+                            //-         .input-group-prepend
+                            //-             span.input-group-text Per Page: 
+                            //-         select.form-control(data-bind='options: filters.limitList, value: filters.limit')
 
         //- Modals
         #cashModal.modal.fade(role='dialog', aria-labelledby='cashModalLabel')
@@ -194,6 +207,8 @@ block content
                 vm.countryArr.push(country);
             }
         }
+        vm.countryArr.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+        
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }

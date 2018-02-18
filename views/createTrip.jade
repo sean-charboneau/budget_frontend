@@ -63,7 +63,7 @@ block content
                                                         .input-group-append
                                                             span.input-group-text days
                                             .col-md-8
-                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 365, value: days, id: "days" }, css: { "force-disable": daysLocked }')
+                                                .slider.slider-info(data-bind='noUiSlider: { min: 1, max: 60, value: days, id: "days" }, css: { "force-disable": daysLocked }')
                                     .form-group.m-none
                                         .row
                                             .col-md-4
@@ -93,6 +93,7 @@ block content
                                     .form-group.m-none
                                         .row
                                             .col-md-12
+                                                button.btn.stylish-color.pull-right(data-bind='click: toggle') Ok
                                                 button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteSegment(id) }') Delete Segment
                         .add-segment(data-bind='click: addSegment')
                             span Add Segment
@@ -112,7 +113,8 @@ block content
                                         .card-body.segment-body(data-bind='visible: expanded')
                                             .form-group.m-top-none
                                                 .md-form
-                                                    input.form-control(type='text', name='oneOffTitle', id='oneOffTitle', placeholder='Expense Title', data-bind='value: title')
+                                                    .input-group
+                                                        input.form-control(type='text', name='oneOffTitle', id='oneOffTitle', placeholder='Expense Title', data-bind='value: title')
                                             .form-group
                                                 .md-form
                                                     .input-group
@@ -122,7 +124,8 @@ block content
                                             .form-group
                                                 .row
                                                     .col-md-12
-                                                        button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteOneOffExpense(id) }') Delete Expense
+                                                        button.btn.stylish-color.pull-right(data-bind='click: toggle') Ok
+                                                        button.btn.btn-danger.pull-right(data-bind='click: function() { $root.deleteOneOffExpense(id) }') Delete
                                         
                                 .add-segment(data-bind='click: addOneOff')
                                     span Add One-Off Expense
@@ -135,7 +138,7 @@ block content
                                 .summary-section(data-bind='foreach: tripOneOffExpenses')
                                     .row.summary-item
                                         .col-md-12
-                                            span.pull-left(data-bind='text: title')
+                                            span.pull-left(data-bind='text: title() || "Expense"')
                                             span.pull-right(data-bind='text: $root.formatCurrencyShort(amount(), $root.user().base_currency)')
                                 .summary-section(data-bind='foreach: tripSegments')
                                     .row.summary-item
@@ -156,7 +159,7 @@ block content
                 .section.save
                     .card
                         .card-body.save-panel
-                            button.btn.success-color.m-none.save-button(data-bind='saveTripEnabled, click: saveTrip') Save Trip
+                            button.btn.stylish-color.m-none.save-button(data-bind='saveTripEnabled, click: saveTrip') Save Trip
     script.
         var vm = new CreateTripViewModel();
         var currencies = !{currency};
@@ -177,6 +180,7 @@ block content
             images.push(new Image());
             images[images.length - 1].src = src;
         }
+
         for(var key in vm.countryObj().countries) {
             if(vm.countryObj().countries.hasOwnProperty(key)) {
                 var country = vm.countryObj().countries[key];
@@ -191,6 +195,8 @@ block content
                 vm.countryArr.push(country);
             }
         }
+        vm.countryArr.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }
@@ -211,29 +217,5 @@ block content
                 );
                 return $item;
             };
-            $('.currency-dropdown').select2({
-                data: vm.currencyArr(),
-                matcher: function(params, data) {
-                    var term = $.trim(params.term);
-                    if (term === '') {
-                        return data;
-                    }
-                    if(data.id === '') {
-                        return null;
-                    }
-                    if(data.display_name.toUpperCase().indexOf(term.toUpperCase()) > -1) {
-                        return data;
-                    }
-                    return null;
-                },
-                placeholder: {
-                    id: '',
-                    display_name: 'Home Currency',
-                    icon: '_unknown'
-                },
-                templateResult: formatOption,
-                templateSelection: formatSelection,
-                theme: 'bootstrap'
-            });
             vm.initCountryDropdown();
         });

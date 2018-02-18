@@ -30,10 +30,10 @@ block content
                                     .circle-clipper.right
                                         .circle
                         .amount.text-center(style='display: none', data-bind='visible: !cashReservesLoading()')
-                            div(data-bind='visible: !cashReserves')
-                                h4 No Cash
+                            div(data-bind='visible: !cashReserves || !cashReserves().length')
+                                span No cash yet, record your ATM withdrawals here!
                                     //- a(href='/createTrip') Set one up now!
-                            div(data-bind='visible: cashReserves')
+                            div(data-bind='visible: cashReserves && cashReserves().length')
                                 // ko foreach: cashReserves
                                 span(data-bind='text: $root.formatCurrency(amount, currency)') 
                                 br
@@ -128,7 +128,7 @@ block content
                                     a(href='/createTrip') Set one up now!
                             
 
-        .row.m-top
+        .row.m-top.m-bottom
             .col-md-12
                 .card
                     .card-header.default-color.lighten-1.white-text
@@ -137,7 +137,7 @@ block content
                                 span Transactions
                             .col.col-xs-6.text-right(style='display: none', data-bind='visible: !transactionsLoading() && trip().tripId')
                                 button.btn.btn-sm.stylish-color.btn-create.m-none.waves-effect(type='button' data-toggle='modal', data-target='#transactionModal') Add New
-                    .card-body.p-none
+                    .card-body(data-bind='visible: transactionsLoading() || !trip().tripId || (!transactionsLoading() && transactions && !transactions().length)')
                         .text-center(data-bind='visible: transactionsLoading')
                             .preloader-wrapper.big.active.m-top.m-bottom
                                 .spinner-layer.spinner-blue-only
@@ -148,11 +148,15 @@ block content
                                     .circle-clipper.right
                                         .circle
                         .transactions.text-center(style='display: none', data-bind='visible: !transactionsLoading()')
-                            div.text-center(data-bind='visible: !trip().tripId')
+                            .text-center(data-bind='visible: !trip().tripId')
                                 h4 Please 
                                     a(href='/createTrip') set up a trip 
                                     | to add transactions
-                            table.table.table-striped.table-bordered.table-list.table-sm(data-bind='visible: trip().tripId')
+                            .text-center(data-bind='visible: transactions && !transactions().length')
+                                span No transactions yet, record your purchases here!
+                    .card-body.p-none(data-bind='visible: !transactionsLoading() && trip().tripId && transactions && transactions().length')
+                        .transactions.text-center(style='display: none', data-bind='visible: !transactionsLoading()')
+                            table.table.table-striped.table-bordered.table-list.table-sm(data-bind='visible: trip().tripId && transactions && transactions().length')
                                 thead
                                     tr
                                         th #
@@ -389,6 +393,8 @@ block content
                 vm.countryArr.push(country);
             }
         }
+        vm.countryArr.sort(function(a,b) {return (a.name > b.name) ? 1 : ((b.name > a.name) ? -1 : 0);} );
+
         for(var i = 0; i < vm.currencyArr().length; i++) {
             vm.currencyObj()[vm.currencyArr()[i].id] = vm.currencyArr()[i];
         }
