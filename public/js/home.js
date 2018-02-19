@@ -140,7 +140,7 @@ var HomeViewModel = function() {
         self.withdrawalType('earned');
         self.withdrawalAmount(self.withdrawalEarnedAmount());
         self.saveWithdrawal();
-    }
+    };
 
     self.saveWithdrawal = function() {
         self.savingWithdrawal(true);

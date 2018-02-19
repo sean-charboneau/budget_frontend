@@ -1,7 +1,7 @@
 var CashViewModel = function() {
     var self = this;
 
-    self.cashLoading = ko.observable(true);
+    self.cashReservesLoading = ko.observable(true);
     self.filtersLoading = ko.observable(true);
     
     self.formatCurrency = function(amount, currency) {
@@ -25,7 +25,19 @@ var CashViewModel = function() {
         },
         deferValidation: true
     });
-    self.withdrawalAmount = ko.observable().extend({
+    self.withdrawalAmount = ko.observable();
+    self.withdrawalATMAmount = ko.observable().extend({
+        gt: {
+            val: 0,
+            message: 'Value must be positive'
+        },
+        required: {
+            val: true,
+            message: "Please enter the amount you withdrew from the ATM"
+        },
+        deferValidation: true
+    });
+    self.withdrawalEarnedAmount = ko.observable().extend({
         gt: {
             val: 0,
             message: 'Value must be positive'
@@ -40,7 +52,11 @@ var CashViewModel = function() {
     self.withdrawalError = ko.observable();
     self.withdrawalCurrency = ko.observable();
     self.withdrawalType = ko.observable('atm');
-    $('#withdrawalCurrency').on('change', function() {
+    $('#withdrawalATMCurrency').on('change', function() {
+        // Hacky way to make select2 observable
+        self.withdrawalCurrency(this.value);
+    });
+    $('#withdrawalEarnedCurrency').on('change', function() {
         // Hacky way to make select2 observable
         self.withdrawalCurrency(this.value);
     });
@@ -51,11 +67,29 @@ var CashViewModel = function() {
         }
         return message;
     });
-    self.canSubmitWithdrawal = ko.computed(function() {
+    self.canSubmitATMWithdrawal = ko.computed(function() {
         if(self.savingWithdrawal()) {
             return false;
         }
-        if(self.withdrawalAmount.errors().length) {
+        if(self.withdrawalATMAmount.errors().length) {
+            return false;
+        }
+        if(!self.withdrawalCurrency()) {
+            return false;
+        }
+        if(!self.withdrawalDate()) {
+            return false;
+        }
+        if(self.isTransactionFee() && self.transactionFee.errors().length) {
+            return false;
+        }
+        return true;
+    });
+    self.canSubmitEarnedWithdrawal = ko.computed(function() {
+        if(self.savingWithdrawal()) {
+            return false;
+        }
+        if(self.withdrawalEarnedAmount.errors().length) {
             return false;
         }
         if(!self.withdrawalCurrency()) {
@@ -70,9 +104,21 @@ var CashViewModel = function() {
         return true;
     });
 
+    self.saveATMWithdrawal = function() {
+        self.withdrawalType('atm');
+        self.withdrawalAmount(self.withdrawalATMAmount());
+        self.saveWithdrawal();
+    };
+
+    self.saveEarnedWithdrawal = function() {
+        self.withdrawalType('earned');
+        self.withdrawalAmount(self.withdrawalEarnedAmount());
+        self.saveWithdrawal();
+    };
+
     self.saveWithdrawal = function() {
         self.savingWithdrawal(true);
-        // self.cashReservesLoading(true);
+        self.cashReservesLoading(true);
         $.ajax({
             type: 'POST',
             url: '/withdrawal',
@@ -87,7 +133,7 @@ var CashViewModel = function() {
             success: function(data) {
                 data = JSON.parse(data);
                 self.savingWithdrawal(false);
-                // self.cashReservesLoading(false);
+                self.cashReservesLoading(false);
                 if(data.error) {
                     self.withdrawalError("Error: " + data.error);
                     return;
@@ -95,9 +141,12 @@ var CashViewModel = function() {
                 $('#cashModal').modal('hide');
                 self.isTransactionFee(false);
                 self.withdrawalAmount(null);
+                self.withdrawalATMAmount(null);
+                self.withdrawalEarnedAmount(null);
                 self.transactionFee(null);
                 self.withdrawalError(null);
-                self.withdrawalAmount.canValidate(false);
+                self.withdrawalATMAmount.canValidate(false);
+                self.withdrawalEarnedAmount.canValidate(false);
                 self.transactionFee.canValidate(false);
                 self.withdrawalDate(moment());
                 self.setItem('lastWithdrawalCurrency', self.withdrawalCurrency());
@@ -107,6 +156,7 @@ var CashViewModel = function() {
             }
         });
     };
+
     self.totalResults = ko.observable(0);
     self.doSearch = function() {
         if(self.filtersLoading()) {
@@ -172,7 +222,7 @@ var CashViewModel = function() {
                 } catch(e) {
                     self.cash([]);
                 }
-                self.cashLoading(false);
+                self.cashReservesLoading(false);
             }
         });
     };

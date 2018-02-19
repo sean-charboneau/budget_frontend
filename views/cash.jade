@@ -20,7 +20,7 @@ block content
                             .col.col-xs-6.text-right
                                 button.btn.btn-sm.stylish-color.btn-create(type='button', data-toggle='modal', data-target='#cashModal') Add Cash
                     .card-body.p-none
-                        .text-center(data-bind='visible: cashLoading')
+                        .text-center(data-bind='visible: cashReservesLoading')
                             .preloader-wrapper.big.active.m-top.m-bottom
                                 .spinner-layer.spinner-blue-only
                                     .circle-clipper.left
@@ -29,7 +29,7 @@ block content
                                         .circle
                                     .circle-clipper.right
                                         .circle
-                        table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !cashLoading()')
+                        table.table.table-striped.table-bordered.table-list(style='display: none', data-bind='visible: !cashReservesLoading()')
                             thead
                                 tr
                                     th #
@@ -83,7 +83,7 @@ block content
                                             // /ko
                                         a(data-bind='attr: { href: "/transactions?filters=" + encodeURIComponent(JSON.stringify({withdrawalId: id})) }') More Details
                                 // /ko
-                    .panel-footer(style='display: none', data-bind='visible: !cashLoading()')
+                    .panel-footer(style='display: none', data-bind='visible: !cashReservesLoading()')
                         .row
                             //- .col-md-5.page-display
                             //-     span(data-bind='text: pageDisplayText')
@@ -120,60 +120,86 @@ block content
 
         //- Modals
         #cashModal.modal.fade(role='dialog', aria-labelledby='cashModalLabel')
-            .modal-dialog(role='document')
+            .modal-dialog.cascading-modal(role='document')
                 .modal-content
-                    .modal-header
-                        button.close(type='button', data-dismiss='modal', aria-label='Close')
-                            span(aria-hidden='true') ×
-                        h4#cashModalLabel.modal-title Add Cash
-                    .modal-body
-                        span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
-                        .form-group
-                            label.radio-inline
-                                input(type='radio', name='withdrawalType', value='atm', data-bind='checked: withdrawalType')
-                                | ATM Withdrawal
-                            label.radio-inline
-                                input(type='radio', name='withdrawalType', value='earned', data-bind='checked: withdrawalType')
-                                | Earned Cash
-                        .form-group.m-none
-                            .row
-                                .amount-input.col-md-8(data-bind='css: { "has-error": withdrawalAmount.canValidate() && withdrawalAmount.errors().length }')
-                                    label(for='withdrawalAmountInput') Amount
-                                    input.form-control(type='number', min='0', id='withdrawalAmountInput', data-bind='value: withdrawalAmount, valueUpdate: "afterkeydown"')
-                                    //ko if: withdrawalAmount.canValidate() && withdrawalAmount.errors().length
-                                    //ko foreach: withdrawalAmount.errors
-                                    span.form-error(data-bind='text: message')
-                                    // /ko
-                                    // /ko
-                                .currency-input.col-md-4
-                                    label(for='withdrawalCurrency') Currency
-                                    select.form-control.currency-dropdown#withdrawalCurrency(required)
-                                        option
-                                    //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
-                                    br
-                        .form-group.m-none
-                            label(for='withdrawalDate') Date
-                            .input-group
-                                input.form-control(id='withdrawalDate', data-bind='dateTimePicker: withdrawalDate', type='text')
-                                .input-group-append
-                                    span.input-group-text
-                                        i.fa.fa-calendar
-                            .form-check(data-bind='visible: withdrawalType() == "atm"')
-                                label.form-check-label.m-top
-                                    input.form-check-input(type='checkbox', value='', data-bind='checked: isTransactionFee')
-                                    | This withdrawal incurred a transaction fee
-                        .form-group.m-none(data-bind='visible: withdrawalType() == "atm" && isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
-                            label.m-top(for='transactionFee', data-bind='text: transactionFeeLabel')
-                            input.form-control(type='number', min='0', id='transactionFee', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
-                            //ko if: transactionFee.canValidate() && transactionFee.errors().length
-                            //ko foreach: transactionFee.errors
-                            span.form-error(data-bind='text: message')
-                            // /ko
-                            // /ko
-
-                    .modal-footer
-                        button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
-                        button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveWithdrawal, enable: canSubmitWithdrawal') Save
+                    .modal-c-tabs
+                        ul.nav.nav-tabs.tabs-2.default-color.darken-3(role='tablist')
+                            li.nav-item
+                                a.nav-link.active(data-toggle='tab', href='#atmPanel', role='tab') ATM Withdrawal
+                            li.nav-item
+                                a.nav-link(data-toggle='tab', href='#earnedPanel', role='tab') Earned Cash
+                        .tab-content
+                            #atmPanel.tab-pane.fade.show.active(role='tabpanel')
+                                .modal-body.mb-1
+                                    span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
+                                    .form-group.m-none
+                                        .row
+                                            .amount-input.col-md-8(data-bind='css: { "has-error": withdrawalATMAmount.canValidate() && withdrawalATMAmount.errors().length }')
+                                                .md-form
+                                                    input#withdrawalATMAmountInput.form-control(type='number', min='0', data-bind='value: withdrawalATMAmount, valueUpdate: "afterkeydown"')
+                                                    label(for='withdrawalATMAmountInput') Amount Withdrawn
+                                                //ko if: withdrawalATMAmount.canValidate() && withdrawalATMAmount.errors().length
+                                                //ko foreach: withdrawalATMAmount.errors
+                                                span.form-error(data-bind='text: message')
+                                                // /ko
+                                                // /ko
+                                            .currency-input.col-md-4
+                                                label(for='withdrawalATMCurrency') Currency
+                                                select.form-control.currency-dropdown#withdrawalATMCurrency(required)
+                                                    option
+                                                //- small.form-text.text-muted.m-bottom The currency you withdrew from the ATM
+                                                br
+                                    .form-group
+                                        label(for='withdrawalATMDateInput') Date
+                                        .input-group
+                                            input#withdrawalATMDateInput.form-control(data-bind='dateTimePicker: withdrawalDate', type='text')
+                                            .input-group-append
+                                                span.input-group-text
+                                                    i.fa.fa-calendar
+                                    .form-group
+                                        input#transactionFeeCheckbox(type='checkbox', value='', data-bind='checked: isTransactionFee')
+                                        label(for='transactionFeeCheckbox') This withdrawal incurred a transaction fee
+                                    .form-group.m-none(data-bind='visible: isTransactionFee(), css: { "has-error": transactionFee.canValidate() && transactionFee.errors().length }')
+                                        .md-form
+                                            input#transactionFee.form-control(type='number', min='0', data-bind='value: transactionFee, valueUpdate: "afterkeydown"')
+                                            label#transactionFeeLabel(for='transactionFee', data-bind='text: transactionFeeLabel')
+                                        //ko if: transactionFee.canValidate() && transactionFee.errors().length
+                                        //ko foreach: transactionFee.errors
+                                        span.form-error(data-bind='text: message')
+                                        // /ko
+                                        // /ko
+                                .modal-footer
+                                    button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
+                                    button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveATMWithdrawal, enable: canSubmitATMWithdrawal') Save
+                            #earnedPanel.tab-pane.fade(role='tabpanel')
+                                .modal-body.mb-1
+                                    span.error-message(data-bind='visible: withdrawalError, text: withdrawalError')
+                                    .form-group.m-none
+                                        .row
+                                            .amount-input.col-md-8(data-bind='css: { "has-error": withdrawalEarnedAmount.canValidate() && withdrawalEarnedAmount.errors().length }')
+                                                .md-form
+                                                    input#withdrawalEarnedAmountInput.form-control(type='number', min='0', data-bind='value: withdrawalEarnedAmount, valueUpdate: "afterkeydown"')
+                                                    label(for='withdrawalEarnedAmountInput') Amount Earned
+                                                //ko if: withdrawalEarnedAmount.canValidate() && withdrawalEarnedAmount.errors().length
+                                                //ko foreach: withdrawalEarnedAmount.errors
+                                                span.form-error(data-bind='text: message')
+                                                // /ko
+                                                // /ko
+                                            .currency-input.col-md-4
+                                                label(for='withdrawalEarnedCurrency') Currency
+                                                select.form-control.currency-dropdown#withdrawalEarnedCurrency(required)
+                                                    option
+                                                br
+                                    .form-group
+                                        label(for='withdrawalEarnedDateInput') Date
+                                        .input-group
+                                            input#withdrawalEarnedDateInput.form-control(data-bind='dateTimePicker: withdrawalDate', type='text')
+                                            .input-group-append
+                                                span.input-group-text
+                                                    i.fa.fa-calendar
+                                .modal-footer
+                                    button.btn.btn-default.waves-effect(type='button', data-dismiss='modal') Cancel
+                                    button.btn.stylish-color.waves-effect(type='button', data-bind='click: saveEarnedWithdrawal, enable: canSubmitEarnedWithdrawal') Save
 
 
     script.
@@ -293,12 +319,26 @@ block content
             });
             //- $('.select2-selection').css('height', 'auto');
 
-            $('#cashModal').on('shown.bs.modal', function() {
-                $('#withdrawalAmountInput').focus();
+            $('#cashModal').on('shown.bs.modal', function () {
+                $('#withdrawalATMAmountInput').focus();
+            });
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("href") // activated tab
+                console.log(target);
+                if(target == '#atmPanel') {
+                    $('#withdrawalATMAmountInput').focus();
+                    if(vm.transactionFee() != null) {
+                        $('#transactionFeeLabel').addClass('active');
+                    }
+                }
+                if(target == '#earnedPanel') {
+                    $('#withdrawalEarnedAmountInput').focus();
+                }
             });
 
             var lastWithdrawalCurrency = vm.getItem('lastWithdrawalCurrency');
             if(lastWithdrawalCurrency) {
-                $('#withdrawalCurrency').val(lastWithdrawalCurrency).trigger('change');
+                $('#withdrawalATMCurrency').val(lastWithdrawalCurrency).trigger('change');
+                $('#withdrawalEarnedCurrency').val(lastWithdrawalCurrency).trigger('change');
             }
         });

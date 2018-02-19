@@ -1,25 +1,55 @@
 extends layout
 
 block extraHeader
-    script(type="text/javascript" src="/js/profile.js")
+	script(type="text/javascript" src="/js/profile.js")
 
 block content
-    div.container
-        div.row.justify-content-md-center
-            .card(style='width: 28rem;')
-                .card-body
-                    h1.text-center.login-title Welcome #{user.first_name}. Account Info:
-                    .text-center
-                        ul.user-details
-                            li Username: #{user.username}
-                            li Email: #{user.email}
-                            li First Name: #{user.first_name} 
-                            li Last Name: #{user.last_name}
+	.container
+		.row
+			.col-md-12
+				.card
+					.card-header.default-color.lighten-1.white-text
+						span Edit Profile
+					.card-body
+						form(data-bind='submit: updateUser')
+							.md-form
+								span Hello, 
+								span(data-bind='text: username')
+								|!
+							.row
+								.col-md-6
+									.md-form
+										input#firstName.form-control(type='text', data-bind='value: firstName', required)
+										label(for='firstName') First Name
+								.col-md-6
+									.md-form
+										input#lastName.form-control(type='text', data-bind='value: lastName', required)
+										label(for='lastName') Last Name
+							.md-form
+								input#email.form-control(type='text', data-bind='value: email', required)
+								label(for='email') Email Address
+							.text-center(data-bind='visible: updateError')
+								span.error-message(data-bind='text: updateError')
+							.text-right
+								button.btn.btn-default.waves-effect.waves-light(type='submit') Update Profile
 
-    script.
-        $('#profile-nav').addClass('active');
-        var vm = new ProfileViewModel();
-        
-        $(document).ready(function() {
-            ko.applyBindings(vm);
-        });
+
+	script.
+		$('#profile-nav').addClass('active');
+		var vm = new ProfileViewModel();
+		var user = !{user};
+		vm.user = ko.observable(user);
+
+		// For mdBootstrap labels
+		vm.triggerFocus = function() {
+			$('#email').focus();
+			$('#lastName').focus();
+			$('#firstName').focus();
+		};
+		
+		$(document).ready(function() {
+			ko.applyBindings(vm);
+
+			vm.loadUser();
+			vm.triggerFocus();
+		});

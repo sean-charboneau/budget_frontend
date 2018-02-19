@@ -188,6 +188,19 @@ router.post('/transaction', authenticate, function(req, res) {
 	});
 });
 
+router.post('/profile', authenticate, function(req, res) {
+	request.post({url: getApiUrl() + '/profile', headers: {'Authorization': 'Bearer ' + req.cookies['tripTrakToken']}, form: req.body}, function(err, httpResponse, body) {
+		if(err) {
+			return res.json({error: err});
+		}
+		if(JSON.parse(body).message == 'jwt expired') {
+			return logOut(req, res, {error: 1});
+		}
+
+		return res.json(body);
+	});
+});
+
 /* GET Transactions Page */
 router.get('/transactions', authenticate, function(req, res) {
 	var currency = require('../data/currency.json');
@@ -298,7 +311,7 @@ router.get('/profile', authenticate, function(req, res) {
 			return logOut(req, res, {error: 1});
 		}
 		
-		return res.render('profile', { user: JSON.parse(body) });
+		return res.render('profile', { user: body });
 	});
 });
 
