@@ -25,13 +25,11 @@ var SpendingViewModel = function() {
     });
 
     self.loadSpendingData = function(first) {
-        if(!self.selectedTrip()) {
+        if(!self.selectedTrip() || !self.selectedRange()) {
             return;
         }
-        
+
         if(self.selectedTab() == '#over-time' || first) {
-            console.log('1');
-            // console.log(first);
             self.loadSpendingDataOverTime();
         }
         else if(self.selectedTab() == '#by-country') {
@@ -249,7 +247,6 @@ var SpendingViewModel = function() {
         }
         select.on('change', function() {
             self.selectedCategories(select.val());
-            console.log('2');
             self.loadSpendingDataOverTime();
         });
         select.material_select();
@@ -269,6 +266,7 @@ var SpendingViewModel = function() {
             var option = $('<option>').attr('value', trip.id).text(trip.trip_name);
             if(trip.is_active) {
                 option = option.prop('selected', true);
+                self.selectedTrip(trip.id);
             }
             select.append(option);
         }
