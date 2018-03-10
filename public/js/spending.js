@@ -17,6 +17,8 @@ var SpendingViewModel = function() {
         self.loadCategoriesForTrip();
     });
 
+    self.defaultTrip = ko.observable();
+
     self.selectedRange = ko.observable();
     self.selectedRange.subscribe(function() {
         if(!self.optionsLoading()) {
@@ -25,7 +27,7 @@ var SpendingViewModel = function() {
     });
 
     self.loadSpendingData = function(first) {
-        if(!self.selectedTrip() || !self.selectedRange()) {
+        if((!self.selectedTrip() && !self.defaultTrip()) || !self.selectedRange()) {
             return;
         }
 
@@ -42,7 +44,7 @@ var SpendingViewModel = function() {
 
     self.loadSpendingDataOverTime = function() {
         var categories = self.selectedCategories();
-        var tripId = self.selectedTrip();
+        var tripId = self.selectedTrip() || self.defaultTrip();
         var range = self.selectedRange();
         var qs = 'graphType=overTime&tripId=' + tripId + '&range=' + range + '&categories=' + JSON.stringify(categories);
         $.ajax({
@@ -108,7 +110,7 @@ var SpendingViewModel = function() {
     };
 
     self.loadSpendingDataByCountry = function() {
-        var tripId = self.selectedTrip();
+        var tripId = self.selectedTrip() || self.defaultTrip();
         var range = self.selectedRange();
         var qs = 'graphType=byCountry&tripId=' + tripId + '&range=' + range;
         $.ajax({
@@ -175,7 +177,7 @@ var SpendingViewModel = function() {
     };
 
     self.loadSpendingDataByCategory = function() {
-        var tripId = self.selectedTrip();
+        var tripId = self.selectedTrip() || self.defaultTrip();
         var range = self.selectedRange();
         var qs = 'graphType=byCategory&tripId=' + tripId + '&range=' + range;
         $.ajax({
@@ -266,7 +268,7 @@ var SpendingViewModel = function() {
             var option = $('<option>').attr('value', trip.id).text(trip.trip_name);
             if(trip.is_active) {
                 option = option.prop('selected', true);
-                self.selectedTrip(trip.id);
+                self.defaultTrip(trip.id);
             }
             select.append(option);
         }
