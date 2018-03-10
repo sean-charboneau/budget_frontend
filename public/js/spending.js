@@ -24,9 +24,14 @@ var SpendingViewModel = function() {
         }
     });
 
-    self.loadSpendingData = function() {
-        if(self.selectedTab() == '#over-time') {
+    self.loadSpendingData = function(first) {
+        if(!self.selectedTrip()) {
+            return;
+        }
+        
+        if(self.selectedTab() == '#over-time' || first) {
             console.log('1');
+            // console.log(first);
             self.loadSpendingDataOverTime();
         }
         else if(self.selectedTab() == '#by-country') {
@@ -300,6 +305,7 @@ var SpendingViewModel = function() {
                 self.trips(JSON.parse(data));
                 self.updateTripSelect();
                 self.setupTabs();
+                self.loadSpendingData(true);
             }
         });
     };

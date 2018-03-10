@@ -150,7 +150,7 @@ var HomeViewModel = function() {
             url: '/withdrawal',
             data: {
                 amount: self.withdrawalAmount(),
-                date: moment(self.withdrawalDate()).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'),
+                date: moment(self.withdrawalDate()).format('YYYY-MM-DD'),
                 isFee: self.isTransactionFee(),
                 feeAmount: self.isTransactionFee() ? self.transactionFee() : 0,
                 currency: self.withdrawalCurrency(),
@@ -290,12 +290,12 @@ var HomeViewModel = function() {
             type: self.transactionCredit() ? 'credit' : 'cash',
             amount: self.transactionAmount(),
             currency: self.transactionCurrency(),
-            date: moment(self.transactionDate()).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'),
+            date: moment(self.transactionDate()).format('YYYY-MM-DD'),
             categoryId: self.selectedCategory().id,
             description: self.transactionDescription()
         };
         if(self.transactionSplit()) {
-            body.endDate = moment(self.transactionEnd()).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ');
+            body.endDate = moment(self.transactionEnd()).format('YYYY-MM-DD');
         }
         if(!self.unassociatedTransaction()) {
             body.country = self.transactionCountry();
