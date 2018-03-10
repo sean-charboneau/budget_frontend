@@ -44,6 +44,10 @@ var SpendingViewModel = function() {
 
     self.loadSpendingDataOverTime = function() {
         var categories = self.selectedCategories();
+        if(!categories.length) {
+            return;
+        }
+        
         var tripId = self.selectedTrip() || self.defaultTrip();
         var range = self.selectedRange();
         var qs = 'graphType=overTime&tripId=' + tripId + '&range=' + range + '&categories=' + JSON.stringify(categories);
