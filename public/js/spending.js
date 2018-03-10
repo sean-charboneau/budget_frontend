@@ -277,12 +277,12 @@ var SpendingViewModel = function() {
     };
 
     self.loadCategoriesForTrip = function() {
-        if(!self.selectedTrip()) {
+        if(!self.selectedTrip() && !self.defaultTrip()) {
             return;
         }
         $.ajax({
             type: 'GET',
-            url: '/categoriesForTrip?tripId=' + self.selectedTrip(),
+            url: '/categoriesForTrip?tripId=' + (self.selectedTrip() || self.defaultTrip()),
             success: function(data) {
                 self.categories(JSON.parse(data));
                 self.updateCategorySelect();
@@ -307,6 +307,7 @@ var SpendingViewModel = function() {
                 // console.log(data);
                 self.trips(JSON.parse(data));
                 self.updateTripSelect();
+                self.loadCategoriesForTrip();
                 self.setupTabs();
                 self.loadSpendingData(true);
             }
