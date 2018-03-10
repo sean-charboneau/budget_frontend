@@ -118,12 +118,12 @@ var TransactionsViewModel = function() {
             type: self.transactionCredit() ? 'credit' : 'cash',
             amount: self.transactionAmount(),
             currency: self.transactionCurrency(),
-            date: self.transactionDate().format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'),
+            date: moment(self.transactionDate()).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'),
             categoryId: self.selectedCategory().id,
             description: self.transactionDescription()
         };
         if(self.transactionSplit()) {
-            body.endDate = self.transactionEnd().format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ');
+            body.endDate = moment(self.transactionEnd()).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ');
         }
         if(!self.unassociatedTransaction()) {
             body.country = self.transactionCountry();

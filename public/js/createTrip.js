@@ -188,7 +188,7 @@ var CreateTripViewModel = function() {
             data: {
                 currency: self.user().base_currency,
                 name: self.tripName(),
-                startDate: self.tripStartDate().format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'),
+                startDate: moment(self.tripStartDate()).format('YYYY-MM-DD[T]HH:mm:ss.SSSZZ'),
                 segments: ko.toJSON(self.tripSegments),
                 oneOffExpenses: ko.toJSON(self.tripOneOffExpenses)
             },
