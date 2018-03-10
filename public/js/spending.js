@@ -275,6 +275,9 @@ var SpendingViewModel = function() {
     };
 
     self.loadCategoriesForTrip = function() {
+        if(!self.selectedTrip()) {
+            return;
+        }
         $.ajax({
             type: 'GET',
             url: '/categoriesForTrip?tripId=' + self.selectedTrip(),
