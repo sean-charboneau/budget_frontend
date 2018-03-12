@@ -59,7 +59,7 @@ block content
                                                         .input-group-prepend
                                                             span.input-group-text.lock-icon(data-bind='click: toggleDaysLock')
                                                                 i(data-bind='attr: { "class": daysLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
-                                                        input.form-control(type='text', name='daysAmount', id='daysAmount', data-bind='value: days, disable: daysLocked')
+                                                        input.form-control(type='number', name='daysAmount', id='daysAmount', data-bind='value: days, disable: daysLocked')
                                                         .input-group-append
                                                             span.input-group-text days
                                             .col-md-8
@@ -72,7 +72,7 @@ block content
                                                         .input-group-prepend
                                                             span.input-group-text.lock-icon(data-bind='click: toggleBudgetLock')
                                                                 i(data-bind='attr: { "class": budgetLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
-                                                        input.form-control(type='text', name='budgetAmount', id='budgetAmount', data-bind='value: budget, disable: budgetLocked')
+                                                        input.form-control(type='number', name='budgetAmount', id='budgetAmount', data-bind='value: budget, disable: budgetLocked')
                                                         .input-group-append
                                                             span.input-group-text(data-bind='text: $root.user().base_currency')
                                             .col-md-8
@@ -85,7 +85,7 @@ block content
                                                         .input-group-prepend
                                                             span.input-group-text.lock-icon(data-bind='click: togglePerDayLock')
                                                                 i(data-bind='attr: { "class": perDayLocked() ? "fa fa-lock" : "fa fa-unlock-alt" }')
-                                                        input.form-control(type='text', name='perDayAmount', id='perDayAmount', data-bind='value: perDay, disable: perDayLocked')
+                                                        input.form-control(type='number', name='perDayAmount', id='perDayAmount', data-bind='value: perDay, disable: perDayLocked')
                                                         .input-group-append
                                                             span.input-group-text(data-bind='text: $root.user().base_currency + "/Day"')
                                             .col-md-8

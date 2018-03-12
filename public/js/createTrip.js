@@ -63,6 +63,9 @@ var CreateTripViewModel = function() {
                 return;
             }
             newSegment.adjusting(true);
+            if(newSegment.days() <= 0) {
+                newSegment.days(1);
+            }
             if(newSegment.budgetLocked()) {
                 var newPerDay = self.formatCurrencyAmount(newSegment.budget() / newSegment.days(), self.user().base_currency);
                 newSegment.perDay(newPerDay);
@@ -77,6 +80,9 @@ var CreateTripViewModel = function() {
                 return;
             }
             newSegment.adjusting(true);
+            if(newSegment.budget() <= 0) {
+                newSegment.budget(1);
+            }
             if(newSegment.perDayLocked()) {
                 newSegment.days(Math.ceil(newSegment.budget() / newSegment.perDay()));
             }
@@ -91,6 +97,9 @@ var CreateTripViewModel = function() {
                 return;
             }
             newSegment.adjusting(true);
+            if(newSegment.perDay() <= 0) {
+                newSegment.perDay(1);
+            }
             if(newSegment.daysLocked()) {
                 newSegment.budget(Math.floor(newSegment.perDay() * newSegment.days()));
             }

@@ -1,7 +1,5 @@
 ko.bindingHandlers.noUiSlider = {
     init: function(element, options) {
-        console.log('init');
-        console.log(element);
         var self = this;
         self.sliderUpdate = {};
         noUiSlider.create(element, {
