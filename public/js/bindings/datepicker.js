@@ -3,7 +3,18 @@ ko.bindingHandlers.dateTimePicker = {
         //initialize datepicker with some optional options
         var options = allBindingsAccessor().dateTimePickerOptions || {
             showTodayButton: true,
-            format: "MMM DD, YYYY"
+            format: "MMM DD, YYYY",
+            icons: {
+                time: 'fa fa-clock-o',
+                date: 'fa fa-calendar',
+                up: 'fa fa-chevron-up',
+                down: 'fa fa-chevron-down',
+                previous: 'fa fa-chevron-left',
+                next: 'fa fa-chevron-right',
+                today: 'fa fa-calendar-check-o',
+                clear: 'fa fa-trash-o',
+                close: 'fa fa-close'
+            }
         };
         $(element).datetimepicker(options);
 
